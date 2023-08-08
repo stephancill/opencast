@@ -2,8 +2,23 @@
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
+  experimental: {
+    images: {
+      remotePatterns: [
+        {
+          protocol: 'https',
+          hostname: '**'
+        }
+      ]
+    }
+  },
   images: {
-    domains: ['lh3.googleusercontent.com', 'firebasestorage.googleapis.com']
+    domains: [
+      'lh3.googleusercontent.com',
+      'firebasestorage.googleapis.com',
+      'i.imgur.com',
+      'i.seadn.io'
+    ]
   }
 };
 

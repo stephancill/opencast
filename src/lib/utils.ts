@@ -45,3 +45,18 @@ export function getStatsMove(movePixels: number): MotionProps {
 export function isPlural(count: number): string {
   return count > 1 ? 's' : '';
 }
+
+const replacer = (_: any, value: any) =>
+  typeof value === 'bigint' ? value.toString() : value;
+
+export function JSONStringify<T>(data: T): string {
+  return JSON.stringify(data, replacer);
+}
+
+export function JSONParse<T>(data: string): T {
+  return JSON.parse(data);
+}
+
+export function serialize<T>(data: T): T {
+  return JSONParse(JSONStringify(data));
+}

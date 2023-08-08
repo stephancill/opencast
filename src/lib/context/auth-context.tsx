@@ -1,30 +1,14 @@
-import { useState, useEffect, useContext, createContext, useMemo } from 'react';
+import { auth } from '@lib/firebase/app';
+import { getRandomId } from '@lib/random';
+import type { Bookmark } from '@lib/types/bookmark';
+import type { User } from '@lib/types/user';
 import {
-  signInWithPopup,
   GoogleAuthProvider,
-  onAuthStateChanged,
+  signInWithPopup,
   signOut as signOutFirebase
 } from 'firebase/auth';
-import {
-  doc,
-  getDoc,
-  setDoc,
-  onSnapshot,
-  serverTimestamp
-} from 'firebase/firestore';
-import { auth } from '@lib/firebase/app';
-import {
-  usersCollection,
-  userStatsCollection,
-  userBookmarksCollection
-} from '@lib/firebase/collections';
-import { getRandomId, getRandomInt } from '@lib/random';
 import type { ReactNode } from 'react';
-import type { User as AuthUser } from 'firebase/auth';
-import type { WithFieldValue } from 'firebase/firestore';
-import type { User } from '@lib/types/user';
-import type { Bookmark } from '@lib/types/bookmark';
-import type { Stats } from '@lib/types/stats';
+import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 
 type AuthContext = {
   user: User | null;
@@ -46,116 +30,128 @@ type AuthContextProviderProps = {
 export function AuthContextProvider({
   children
 }: AuthContextProviderProps): JSX.Element {
+  const [userId, setUserId] = useState<string | null>('1689');
+
   const [user, setUser] = useState<User | null>(null);
   const [userBookmarks, setUserBookmarks] = useState<Bookmark[] | null>(null);
   const [error, setError] = useState<Error | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const manageUser = async (authUser: AuthUser): Promise<void> => {
-      const { uid, displayName, photoURL } = authUser;
+    const manageUser = async (fid: string): Promise<void> => {
+      // const { uid, displayName, photoURL } = authUser;
 
-      const userSnapshot = await getDoc(doc(usersCollection, uid));
+      // const userSnapshot = await getDoc(doc(usersCollection, uid));
 
-      if (!userSnapshot.exists()) {
-        let available = false;
-        let randomUsername = '';
+      // if (!userSnapshot.exists()) {
+      //   let available = false;
+      //   let randomUsername = '';
 
-        while (!available) {
-          const normalizeName = displayName?.replace(/\s/g, '').toLowerCase();
-          const randomInt = getRandomInt(1, 10_000);
+      //   while (!available) {
+      //     const normalizeName = displayName?.replace(/\s/g, '').toLowerCase();
+      //     const randomInt = getRandomInt(1, 10_000);
 
-          randomUsername = `${normalizeName as string}${randomInt}`;
+      //     randomUsername = `${normalizeName as string}${randomInt}`;
 
-          const randomUserSnapshot = await getDoc(
-            doc(usersCollection, randomUsername)
-          );
+      //     const randomUserSnapshot = await getDoc(
+      //       doc(usersCollection, randomUsername)
+      //     );
 
-          if (!randomUserSnapshot.exists()) available = true;
-        }
+      //     if (!randomUserSnapshot.exists()) available = true;
+      //   }
 
-        const userData: WithFieldValue<User> = {
-          id: uid,
-          bio: null,
-          name: displayName as string,
-          theme: null,
-          accent: null,
-          website: null,
-          location: null,
-          photoURL: photoURL as string,
-          username: randomUsername,
-          verified: false,
-          following: [],
-          followers: [],
-          createdAt: serverTimestamp(),
-          updatedAt: null,
-          totalTweets: 0,
-          totalPhotos: 0,
-          pinnedTweet: null,
-          coverPhotoURL: null
-        };
+      //   const userData: WithFieldValue<User> = {
+      //     id: uid,
+      //     bio: null,
+      //     name: displayName as string,
+      //     theme: null,
+      //     accent: null,
+      //     website: null,
+      //     location: null,
+      //     photoURL: photoURL as string,
+      //     username: randomUsername,
+      //     verified: false,
+      //     following: [],
+      //     followers: [],
+      //     createdAt: serverTimestamp(),
+      //     updatedAt: null,
+      //     totalTweets: 0,
+      //     totalPhotos: 0,
+      //     pinnedTweet: null,
+      //     coverPhotoURL: null
+      //   };
 
-        const userStatsData: WithFieldValue<Stats> = {
-          likes: [],
-          tweets: [],
-          updatedAt: null
-        };
+      //   const userStatsData: WithFieldValue<Stats> = {
+      //     likes: [],
+      //     tweets: [],
+      //     updatedAt: null
+      //   };
 
-        try {
-          await Promise.all([
-            setDoc(doc(usersCollection, uid), userData),
-            setDoc(doc(userStatsCollection(uid), 'stats'), userStatsData)
-          ]);
+      //   try {
+      //     await Promise.all([
+      //       setDoc(doc(usersCollection, uid), userData),
+      //       setDoc(doc(userStatsCollection(uid), 'stats'), userStatsData)
+      //     ]);
 
-          const newUser = (await getDoc(doc(usersCollection, uid))).data();
-          setUser(newUser as User);
-        } catch (error) {
-          setError(error as Error);
-        }
-      } else {
-        const userData = userSnapshot.data();
-        setUser(userData);
+      //     const newUser = (await getDoc(doc(usersCollection, uid))).data();
+      //     setUser(newUser as User);
+      //   } catch (error) {
+      //     setError(error as Error);
+      //   }
+      // } else {
+      //   const userData = userSnapshot.data();
+      //   setUser(userData);
+      // }
+
+      const userResponse = await fetch(`/api/user/${fid}`);
+
+      if (userResponse.ok) {
+        const { result: user } = await userResponse.json();
+        console.log('User changed', user);
+        setUser(user);
       }
 
       setLoading(false);
     };
 
-    const handleUserAuth = (authUser: AuthUser | null): void => {
+    const handleUserAuth = (): void => {
       setLoading(true);
 
-      if (authUser) void manageUser(authUser);
+      if (userId) void manageUser(userId);
       else {
         setUser(null);
         setLoading(false);
       }
     };
 
-    onAuthStateChanged(auth, handleUserAuth);
+    handleUserAuth();
+
+    // onAuthStateChanged(auth, handleUserAuth);
   }, []);
 
-  useEffect(() => {
-    if (!user) return;
+  // useEffect(() => {
+  //   if (!user) return;
 
-    const { id } = user;
+  //   const { id } = user;
 
-    const unsubscribeUser = onSnapshot(doc(usersCollection, id), (doc) => {
-      setUser(doc.data() as User);
-    });
+  //   const unsubscribeUser = onSnapshot(doc(usersCollection, id), (doc) => {
+  //     setUser(doc.data() as User);
+  //   });
 
-    const unsubscribeBookmarks = onSnapshot(
-      userBookmarksCollection(id),
-      (snapshot) => {
-        const bookmarks = snapshot.docs.map((doc) => doc.data());
-        setUserBookmarks(bookmarks);
-      }
-    );
+  //   const unsubscribeBookmarks = onSnapshot(
+  //     userBookmarksCollection(id),
+  //     (snapshot) => {
+  //       const bookmarks = snapshot.docs.map((doc) => doc.data());
+  //       setUserBookmarks(bookmarks);
+  //     }
+  //   );
 
-    return () => {
-      unsubscribeUser();
-      unsubscribeBookmarks();
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.id]);
+  //   return () => {
+  //     unsubscribeUser();
+  //     unsubscribeBookmarks();
+  //   };
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [user?.id]);
 
   const signInWithGoogle = async (): Promise<void> => {
     try {

@@ -15,6 +15,9 @@ type AppPropsWithLayout = AppProps & {
   Component: NextPageWithLayout;
 };
 
+import { QueryClient, QueryClientProvider } from 'react-query';
+const queryClient = new QueryClient();
+
 export default function App({
   Component,
   pageProps
@@ -24,11 +27,13 @@ export default function App({
   return (
     <>
       <AppHead />
-      <AuthContextProvider>
-        <ThemeContextProvider>
-          {getLayout(<Component {...pageProps} />)}
-        </ThemeContextProvider>
-      </AuthContextProvider>
+      <QueryClientProvider client={queryClient}>
+        <AuthContextProvider>
+          <ThemeContextProvider>
+            {getLayout(<Component {...pageProps} />)}
+          </ThemeContextProvider>
+        </AuthContextProvider>
+      </QueryClientProvider>
     </>
   );
 }

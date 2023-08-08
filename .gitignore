@@ -38,3 +38,5 @@ next-env.d.ts
 # python
 /.mypy_cache
 *.py
+
+.env

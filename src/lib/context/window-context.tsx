@@ -15,21 +15,30 @@ export const WindowContext = createContext<WindowContext | null>(null);
 type WindowContextProviderProps = {
   children: ReactNode;
 };
-
 export function WindowContextProvider({
   children
 }: WindowContextProviderProps): JSX.Element {
   const [windowSize, setWindowSize] = useState<WindowSize>({
-    width: window.innerWidth,
-    height: window.innerHeight
+    width: typeof window !== 'undefined' ? window.innerWidth : 9999,
+    height: typeof window !== 'undefined' ? window.innerHeight : 9999
   });
 
+  const [isMobile, setIsMobile] = useState<boolean>(false);
+
   useEffect(() => {
-    const handleResize = (): void =>
+    const handleResize = (): void => {
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+
       setWindowSize({
-        width: window.innerWidth,
-        height: window.innerHeight
+        width,
+        height
       });
+
+      setIsMobile(width < 500);
+    };
+
+    handleResize(); // Initially set the size and isMobile
 
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
@@ -37,7 +46,7 @@ export function WindowContextProvider({
 
   const value: WindowContext = {
     ...windowSize,
-    isMobile: windowSize.width < 500
+    isMobile
   };
 
   return (

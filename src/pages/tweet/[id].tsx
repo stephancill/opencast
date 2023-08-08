@@ -1,22 +1,18 @@
-import { useRef } from 'react';
-import { useRouter } from 'next/router';
-import { AnimatePresence } from 'framer-motion';
-import { doc, query, where, orderBy } from 'firebase/firestore';
-import { tweetsCollection } from '@lib/firebase/collections';
-import { useCollection } from '@lib/hooks/useCollection';
-import { useDocument } from '@lib/hooks/useDocument';
-import { isPlural } from '@lib/utils';
-import { HomeLayout, ProtectedLayout } from '@components/layout/common-layout';
-import { MainLayout } from '@components/layout/main-layout';
+import { SEO } from '@components/common/seo';
 import { MainContainer } from '@components/home/main-container';
 import { MainHeader } from '@components/home/main-header';
-import { Tweet } from '@components/tweet/tweet';
-import { ViewTweet } from '@components/view/view-tweet';
-import { SEO } from '@components/common/seo';
-import { Loading } from '@components/ui/loading';
+import { HomeLayout, ProtectedLayout } from '@components/layout/common-layout';
+import { MainLayout } from '@components/layout/main-layout';
 import { Error } from '@components/ui/error';
+import { Loading } from '@components/ui/loading';
 import { ViewParentTweet } from '@components/view/view-parent-tweet';
+import { ViewTweet } from '@components/view/view-tweet';
+import { isPlural } from '@lib/utils';
+import { useRouter } from 'next/router';
 import type { ReactElement, ReactNode } from 'react';
+import { useRef } from 'react';
+import { useQuery } from 'react-query';
+import { TweetResponse } from '../../lib/types/tweet';
 
 export default function TweetId(): JSX.Element {
   const {
@@ -24,21 +20,41 @@ export default function TweetId(): JSX.Element {
     back
   } = useRouter();
 
-  const { data: tweetData, loading: tweetLoading } = useDocument(
-    doc(tweetsCollection, id as string),
-    { includeUser: true, allowNull: true }
-  );
+  const fetchCast = async ({ pageParam = null }) => {
+    const response = await fetch(`/api/tweet/${id}`);
+
+    if (!response.ok) {
+      console.log(await response.json());
+      return;
+    }
+
+    const responseJson = (await response.json()) as TweetResponse;
+
+    if (!responseJson.result) {
+      console.error(responseJson.message);
+    }
+
+    const tweet = responseJson.result;
+
+    return tweet;
+  };
+
+  const {
+    data: tweetData,
+    isLoading: tweetLoading,
+    isError: tweetError
+  } = useQuery('tweet', fetchCast);
 
   const viewTweetRef = useRef<HTMLElement>(null);
 
-  const { data: repliesData, loading: repliesLoading } = useCollection(
-    query(
-      tweetsCollection,
-      where('parent.id', '==', id),
-      orderBy('createdAt', 'desc')
-    ),
-    { includeUser: true, allowNull: true }
-  );
+  // const { data: repliesData, loading: repliesLoading } = useCollection(
+  //   query(
+  //     tweetsCollection,
+  //     where('parent.id', '==', id),
+  //     orderBy('createdAt', 'desc')
+  //   ),
+  //   { includeUser: true, allowNull: true }
+  // );
 
   const { text, images } = tweetData ?? {};
 
@@ -46,7 +62,7 @@ export default function TweetId(): JSX.Element {
   const parentId = tweetData?.parent?.id;
 
   const pageTitle = tweetData
-    ? `${tweetData.user.name} on Twitter: "${text ?? ''}${
+    ? `${tweetData.user?.name} on Twitter: "${text ?? ''}${
         images ? ` (${imagesLength} image${isPlural(imagesLength)})` : ''
       }" / Twitter`
     : null;
@@ -76,7 +92,7 @@ export default function TweetId(): JSX.Element {
               />
             )}
             <ViewTweet viewTweetRef={viewTweetRef} {...tweetData} />
-            {tweetData &&
+            {/* {tweetData &&
               (repliesLoading ? (
                 <Loading className='mt-5' />
               ) : (
@@ -85,7 +101,7 @@ export default function TweetId(): JSX.Element {
                     <Tweet {...tweet} key={tweet.id} />
                   ))}
                 </AnimatePresence>
-              ))}
+              ))} */}
           </>
         )}
       </section>

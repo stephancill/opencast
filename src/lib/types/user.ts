@@ -1,5 +1,6 @@
+import { Timestamp } from 'firebase/firestore';
+import { BaseResponse } from './responses';
 import type { Theme, Accent } from './theme';
-import type { Timestamp, FirestoreDataConverter } from 'firebase/firestore';
 
 export type User = {
   id: string;
@@ -29,12 +30,39 @@ export type EditableData = Extract<
 
 export type EditableUserData = Pick<User, EditableData>;
 
-export const userConverter: FirestoreDataConverter<User> = {
-  toFirestore(user) {
-    return { ...user };
-  },
-  fromFirestore(snapshot, options) {
-    const data = snapshot.data(options);
-    return { ...data } as User;
+export type USerResponse = BaseResponse<User>;
+
+// export const userConverter: FirestoreDataConverter<User> = {
+//   toFirestore(user) {
+//     return { ...user };
+//   },
+//   fromFirestore(snapshot, options) {
+//     const data = snapshot.data(options);
+//     return { ...data } as User;
+//   }
+// };
+
+export const userConverter = {
+  toUser(user: any): User {
+    return {
+      id: user.fid.toString(),
+      bio: user['3'] ?? null,
+      name: user['2'],
+      theme: null,
+      accent: null,
+      website: null,
+      location: null,
+      username: user['6'],
+      photoURL: user['1'], //user['1'],
+      coverPhotoURL: null,
+      verified: false,
+      following: [],
+      followers: [],
+      createdAt: Timestamp.now(),
+      updatedAt: null,
+      totalTweets: 0,
+      totalPhotos: 0,
+      pinnedTweet: null
+    } as User;
   }
 };
