@@ -7,7 +7,7 @@ export type Tweet = {
   id: string;
   text: string | null;
   images: ImagesPreview | null;
-  parent: { id: string; username: string } | null;
+  parent: { id: string; username?: string; userId?: string } | null;
   userLikes: string[];
   createdBy: string;
   createdAt: Date;
@@ -25,13 +25,21 @@ export const tweetConverter = {
     // Check if cast.hash is a buffer
     const isBuffer = Buffer.isBuffer(cast.hash);
 
+    let parent: { id: string; userId?: string } | null = null;
+    if (cast.parent_hash) {
+      parent = {
+        id: cast.parent_hash.toString('hex'),
+        userId: cast.parent_fid?.toString()
+      };
+    }
+
     return {
       id: isBuffer
-        ? cast.hash
+        ? cast.hash.toString('hex')
         : Buffer.from((cast.hash as any).data).toString('hex'),
       text: cast.text,
       images: null,
-      parent: null,
+      parent,
       userLikes: [],
       createdBy: cast.fid.toString(),
       createdAt: cast.created_at,

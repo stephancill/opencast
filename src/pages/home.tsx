@@ -33,15 +33,29 @@ export default function Home(): JSX.Element {
           <Error message='Something went wrong' />
         ) : (
           <>
-            {data.pages.map(({ tweets, users }) =>
-              tweets.map((tweet) => (
-                <Tweet
-                  {...tweet}
-                  user={users[tweet.createdBy]}
-                  key={tweet.id}
-                />
-              ))
-            )}
+            {data.pages.map((page) => {
+              if (!page) return;
+              const { tweets, users } = page;
+              return tweets.map((tweet) => {
+                if (!users[tweet.createdBy]) {
+                  return <></>;
+                }
+
+                const parent = tweet.parent;
+                if (parent && !tweet.parent?.username && tweet.parent?.userId) {
+                  tweet.parent.username = users[tweet.parent.userId]?.username;
+                  console.log(parent);
+                }
+
+                return (
+                  <Tweet
+                    {...tweet}
+                    user={users[tweet.createdBy]}
+                    key={tweet.id}
+                  />
+                );
+              });
+            })}
             <LoadMore />
           </>
         )}

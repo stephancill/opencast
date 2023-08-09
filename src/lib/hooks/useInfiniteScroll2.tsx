@@ -1,13 +1,10 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 
-import { useInfiniteQuery } from 'react-query';
 import { motion } from 'framer-motion';
-import { useState, useEffect, useCallback } from 'react';
-import { casts } from '@prisma/client';
-import { Tweet } from '../types/tweet';
-import { Timestamp } from 'firebase/firestore';
-import { User } from '../types/user';
+import { useCallback, useEffect, useState } from 'react';
+import { useInfiniteQuery } from 'react-query';
 import { Loading } from '../../components/ui/loading';
+import { FeedResponse } from '../types/feed';
 
 export function useInfiniteScroll(
   fid: string,
@@ -32,62 +29,20 @@ export function useInfiniteScroll(
       throw new Error('Could not fetch the casts');
     }
 
-    const responseJson = (await response.json()) as {
-      casts: casts[];
-      nextPageCursor: string;
-      users: any;
-    };
+    const { result } = (await response.json()) as FeedResponse;
+
+    if (!result) {
+      throw new Error('Could not fetch the casts');
+      return;
+    }
 
     // Transform to tweet object
-    const tweets = responseJson.casts.map((cast) => {
-      return {
-        id: Buffer.from((cast.hash as any).data).toString('hex'),
-        text: cast.text,
-        images: null,
-        parent: null,
-        userLikes: [],
-        createdBy: cast.fid.toString(),
-        createdAt: new Date(cast.created_at),
-        updatedAt: null,
-        userReplies: 0,
-        userRetweets: []
-      } as Tweet;
-    });
-
-    // Transform users
-    const users = Object.keys(responseJson.users).map((fid) => {
-      const user = responseJson.users[fid];
-      return {
-        id: fid,
-        bio: user['3'] ?? null,
-        name: user['2'],
-        theme: null,
-        accent: null,
-        website: null,
-        location: null,
-        username: user['6'],
-        photoURL: user['1'], //user['1'],
-        coverPhotoURL: null,
-        verified: false,
-        following: [],
-        followers: [],
-        createdAt: Timestamp.now(),
-        updatedAt: null,
-        totalTweets: 0,
-        totalPhotos: 0,
-        pinnedTweet: null
-      } as User;
-    });
-
-    const _users = users.reduce((acc, user) => {
-      acc[user.id] = user;
-      return acc;
-    }, {} as { [key: string]: User });
+    const { tweets, users, nextPageCursor } = result;
 
     return {
       tweets,
-      nextPageCursor: responseJson.nextPageCursor,
-      users: _users
+      users,
+      nextPageCursor
     };
   };
 
@@ -99,7 +54,7 @@ export function useInfiniteScroll(
     isFetchingNextPage
   } = useInfiniteQuery(['casts', fid], fetchCasts, {
     getNextPageParam: (lastPage) => {
-      return lastPage.nextPageCursor ?? false;
+      return lastPage?.nextPageCursor ?? false;
     }
   });
 

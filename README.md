@@ -26,6 +26,7 @@ https://user-images.githubusercontent.com/55032197/201472767-9db0177a-79b5-4913-
   - [ ] Number of likes, comments, and reposts
   - [ ] Paginated replies
 - [ ] User profiles
+- [ ] Auth
 - [ ] Engagement actions
 - [ ] Post creation
 - [ ] Post deletion

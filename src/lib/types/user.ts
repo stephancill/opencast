@@ -1,6 +1,7 @@
+import { UserDataType } from '@farcaster/hub-web';
 import { Timestamp } from 'firebase/firestore';
 import { BaseResponse } from './responses';
-import type { Theme, Accent } from './theme';
+import type { Accent, Theme } from './theme';
 
 export type User = {
   id: string;
@@ -32,28 +33,18 @@ export type EditableUserData = Pick<User, EditableData>;
 
 export type USerResponse = BaseResponse<User>;
 
-// export const userConverter: FirestoreDataConverter<User> = {
-//   toFirestore(user) {
-//     return { ...user };
-//   },
-//   fromFirestore(snapshot, options) {
-//     const data = snapshot.data(options);
-//     return { ...data } as User;
-//   }
-// };
-
 export const userConverter = {
   toUser(user: any): User {
     return {
       id: user.fid.toString(),
-      bio: user['3'] ?? null,
-      name: user['2'],
+      bio: user[UserDataType.BIO] ?? null,
+      name: user[UserDataType.DISPLAY],
       theme: null,
       accent: null,
       website: null,
       location: null,
-      username: user['6'],
-      photoURL: user['1'], //user['1'],
+      username: user[UserDataType.USERNAME],
+      photoURL: user[UserDataType.PFP], //user['1'],
       coverPhotoURL: null,
       verified: false,
       following: [],
