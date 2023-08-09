@@ -46,6 +46,17 @@ export function isPlural(count: number): string {
   return count > 1 ? 's' : '';
 }
 
+export function replaceOccurrencesMultiple(
+  text: string,
+  occurrences: string[],
+  replacement: string
+): string {
+  return occurrences.reduce(
+    (acc, occurrence) => acc.replace(occurrence, replacement),
+    text
+  );
+}
+
 const replacer = (_: any, value: any) =>
   typeof value === 'bigint' ? value.toString() : value;
 

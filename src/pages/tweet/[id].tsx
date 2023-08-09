@@ -23,7 +23,7 @@ export default function TweetId(): JSX.Element {
     back
   } = useRouter();
 
-  const fetchCast = async ({ pageParam = null }) => {
+  const fetchCast = async () => {
     const response = await fetch(`/api/tweet/${id}`);
 
     if (!response.ok) {
@@ -105,6 +105,17 @@ export default function TweetId(): JSX.Element {
                     return tweets.map((tweet) => {
                       if (!users[tweet.createdBy]) {
                         return <></>;
+                      }
+
+                      // Look up username in users object
+                      const parent = tweet.parent;
+                      if (
+                        parent &&
+                        !tweet.parent?.username &&
+                        tweet.parent?.userId
+                      ) {
+                        tweet.parent.username =
+                          users[tweet.parent.userId]?.username;
                       }
 
                       return (

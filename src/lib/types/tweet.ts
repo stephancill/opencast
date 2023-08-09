@@ -1,4 +1,6 @@
 import { casts } from '@prisma/client';
+import { replaceOccurrencesMultiple } from '../utils';
+import { isValidImageExtension } from '../validation';
 import type { ImagesPreview } from './file';
 import { BaseResponse } from './responses';
 import type { User } from './user';
@@ -40,12 +42,30 @@ export const tweetConverter = {
       };
     }
 
+    const images =
+      cast.embeds.length > 0
+        ? cast.embeds
+            .filter((embed) => isValidImageExtension(embed))
+            .map((url) => ({
+              src: url,
+              alt: '',
+              id: url
+            }))
+        : null;
+
+    // Remove images links that will be embedded from text
+    const formattedText = replaceOccurrencesMultiple(
+      cast.text,
+      images?.map((img) => img.src) ?? [],
+      ''
+    );
+
     return {
       id: isBuffer
         ? cast.hash.toString('hex')
         : Buffer.from((cast.hash as any).data).toString('hex'),
-      text: cast.text,
-      images: null,
+      text: formattedText,
+      images,
       parent,
       userLikes: [],
       createdBy: cast.fid.toString(),

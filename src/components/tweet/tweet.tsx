@@ -1,23 +1,23 @@
-import Link from 'next/link';
-import { AnimatePresence, motion } from 'framer-motion';
-import cn from 'clsx';
-import { useAuth } from '@lib/context/auth-context';
-import { useModal } from '@lib/hooks/useModal';
-import { delayScroll } from '@lib/utils';
+import { ImagePreview } from '@components/input/image-preview';
 import { Modal } from '@components/modal/modal';
 import { TweetReplyModal } from '@components/modal/tweet-reply-modal';
-import { ImagePreview } from '@components/input/image-preview';
 import { UserAvatar } from '@components/user/user-avatar';
-import { UserTooltip } from '@components/user/user-tooltip';
 import { UserName } from '@components/user/user-name';
+import { UserTooltip } from '@components/user/user-tooltip';
 import { UserUsername } from '@components/user/user-username';
-import { TweetActions } from './tweet-actions';
-import { TweetStatus } from './tweet-status';
-import { TweetStats } from './tweet-stats';
-import { TweetDate } from './tweet-date';
-import type { Variants } from 'framer-motion';
+import { useAuth } from '@lib/context/auth-context';
+import { useModal } from '@lib/hooks/useModal';
 import type { Tweet } from '@lib/types/tweet';
 import type { User } from '@lib/types/user';
+import { delayScroll } from '@lib/utils';
+import cn from 'clsx';
+import type { Variants } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
+import Link from 'next/link';
+import { TweetActions } from './tweet-actions';
+import { TweetDate } from './tweet-date';
+import { TweetStats } from './tweet-stats';
+import { TweetStatus } from './tweet-status';
 
 export type TweetProps = Tweet & {
   user: User;
@@ -96,7 +96,7 @@ export function Tweet(tweet: TweetProps): JSX.Element {
             `accent-tab hover-card relative flex flex-col 
              gap-y-4 px-4 py-3 outline-none duration-200`,
             parentTweet
-              ? 'mt-0.5 pt-2.5 pb-0'
+              ? 'mt-0.5 pb-0 pt-2.5'
               : 'border-b border-light-border dark:border-dark-border'
           )}
           onClick={delayScroll(200)}

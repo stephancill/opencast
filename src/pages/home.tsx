@@ -41,6 +41,7 @@ export default function Home(): JSX.Element {
                   return <></>;
                 }
 
+                // Look up username in users object
                 const parent = tweet.parent;
                 if (parent && !tweet.parent?.username && tweet.parent?.userId) {
                   tweet.parent.username = users[tweet.parent.userId]?.username;
