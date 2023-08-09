@@ -8,18 +8,23 @@ import { FeedResponse } from '../types/feed';
 
 export function useInfiniteScroll(
   fid: string,
-  options?: { initialSize?: number; stepSize?: number; marginBottom?: number }
+  options?: {
+    initialSize?: number;
+    stepSize?: number;
+    marginBottom?: number;
+  }
 ) {
-  const { initialSize, stepSize, marginBottom } = options ?? {
+  const { initialSize, stepSize, marginBottom } = {
     initialSize: 10,
     stepSize: 10,
-    marginBottom: 100
+    marginBottom: 100,
+    ...(options ?? {})
   };
 
   const [reachedLimit, setReachedLimit] = useState(false);
   const [loadMoreInView, setLoadMoreInView] = useState(false);
 
-  const fetchCasts = async ({ pageParam = null }) => {
+  const fetchData = async ({ pageParam = null }) => {
     const response = await fetch(
       `/api/feed?fid=${fid}&limit=${stepSize}${
         pageParam ? `&cursor=${pageParam}` : ''
@@ -52,7 +57,7 @@ export function useInfiniteScroll(
     hasNextPage,
     isLoading: loading,
     isFetchingNextPage
-  } = useInfiniteQuery(['casts', fid], fetchCasts, {
+  } = useInfiniteQuery(['casts', fid], fetchData, {
     getNextPageParam: (lastPage) => {
       return lastPage?.nextPageCursor ?? false;
     }

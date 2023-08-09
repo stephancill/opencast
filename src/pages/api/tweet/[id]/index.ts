@@ -1,9 +1,8 @@
 import { ReactionType } from '@farcaster/hub-web';
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { prisma } from '../../../lib/prisma';
-import { tweetConverter, TweetResponse } from '../../../lib/types/tweet';
-import { userConverter } from '../../../lib/types/user';
-import { serialize } from '../../../lib/utils';
+import { prisma } from '../../../../lib/prisma';
+import { tweetConverter, TweetResponse } from '../../../../lib/types/tweet';
+import { userConverter } from '../../../../lib/types/user';
 
 type TweetEndpointQuery = {
   id: string;
@@ -76,14 +75,14 @@ export default async function tweetIdEndpoint(
     return userConverter.toUser({ ...user, fid });
   });
 
-  const tweet = tweetConverter.toTweet(cast);
+  const tweet = {
+    ...tweetConverter.toTweet(cast),
+    userLikes: reactions[ReactionType.LIKE] || [],
+    userRetweets: reactions[ReactionType.RECAST] || [],
+    user: users[0]
+  };
 
   res.json({
-    result: serialize({
-      ...tweet,
-      userLikes: reactions[ReactionType.LIKE] || [],
-      userRetweets: reactions[ReactionType.RECAST] || [],
-      user: users[0]
-    })
+    result: tweet
   });
 }

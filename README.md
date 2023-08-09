@@ -25,7 +25,7 @@ https://user-images.githubusercontent.com/55032197/201472767-9db0177a-79b5-4913-
   - [ ] Recasts
 - [x] Cast detail
   - [x] Number of likes, comments, and reposts
-  - [ ] Paginated replies
+  - [x] Paginated replies
 - [ ] User profiles
 - [ ] Auth
 - [ ] Engagement actions

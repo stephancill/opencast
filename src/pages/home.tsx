@@ -8,7 +8,7 @@ import { Tweet } from '@components/tweet/tweet';
 import { Error } from '@components/ui/error';
 import { Loading } from '@components/ui/loading';
 import { useWindow } from '@lib/context/window-context';
-import { useInfiniteScroll } from '@lib/hooks/useInfiniteScroll2';
+import { useInfiniteScroll } from '@lib/hooks/useInfiniteScrollByFid';
 import type { ReactElement, ReactNode } from 'react';
 
 export default function Home(): JSX.Element {
@@ -44,7 +44,6 @@ export default function Home(): JSX.Element {
                 const parent = tweet.parent;
                 if (parent && !tweet.parent?.username && tweet.parent?.userId) {
                   tweet.parent.username = users[tweet.parent.userId]?.username;
-                  console.log(parent);
                 }
 
                 return (

@@ -19,6 +19,13 @@ export type Tweet = {
 export type TweetWithUser = Tweet & { user: User };
 
 export type TweetResponse = BaseResponse<TweetWithUser>;
+export interface TweetRepliesResponse
+  extends BaseResponse<{
+    tweets: Tweet[];
+    nextPageCursor: string | null;
+    // fid -> User
+    users: { [key: string]: User };
+  }> {}
 
 export const tweetConverter = {
   toTweet(cast: casts): Tweet {

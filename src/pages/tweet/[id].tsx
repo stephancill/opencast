@@ -8,10 +8,13 @@ import { Loading } from '@components/ui/loading';
 import { ViewParentTweet } from '@components/view/view-parent-tweet';
 import { ViewTweet } from '@components/view/view-tweet';
 import { isPlural } from '@lib/utils';
+import { AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/router';
 import type { ReactElement, ReactNode } from 'react';
 import { useRef } from 'react';
 import { useQuery } from 'react-query';
+import { Tweet } from '../../components/tweet/tweet';
+import { useInfiniteScroll } from '../../lib/hooks/useInfiniteScrollReplies';
 import { TweetResponse } from '../../lib/types/tweet';
 
 export default function TweetId(): JSX.Element {
@@ -43,18 +46,15 @@ export default function TweetId(): JSX.Element {
     data: tweetData,
     isLoading: tweetLoading,
     isError: tweetError
-  } = useQuery('tweet', fetchCast, { keepPreviousData: false });
+  } = useQuery(['tweet', id], fetchCast, { keepPreviousData: false });
+
+  const {
+    data: repliesData,
+    loading: repliesLoading,
+    LoadMore
+  } = useInfiniteScroll(`${id}`, { marginBottom: 20 });
 
   const viewTweetRef = useRef<HTMLElement>(null);
-
-  // const { data: repliesData, loading: repliesLoading } = useCollection(
-  //   query(
-  //     tweetsCollection,
-  //     where('parent.id', '==', id),
-  //     orderBy('createdAt', 'desc')
-  //   ),
-  //   { includeUser: true, allowNull: true }
-  // );
 
   const { text, images } = tweetData ?? {};
 
@@ -92,16 +92,33 @@ export default function TweetId(): JSX.Element {
               />
             )}
             <ViewTweet viewTweetRef={viewTweetRef} {...tweetData} />
-            {/* {tweetData &&
+            {tweetData &&
               (repliesLoading ? (
                 <Loading className='mt-5' />
+              ) : !repliesData ? (
+                <div>No replies</div>
               ) : (
                 <AnimatePresence mode='popLayout'>
-                  {repliesData?.map((tweet) => (
-                    <Tweet {...tweet} key={tweet.id} />
-                  ))}
+                  {repliesData.pages.map((page) => {
+                    if (!page) return;
+                    const { tweets, users } = page;
+                    return tweets.map((tweet) => {
+                      if (!users[tweet.createdBy]) {
+                        return <></>;
+                      }
+
+                      return (
+                        <Tweet
+                          {...tweet}
+                          user={users[tweet.createdBy]}
+                          key={tweet.id}
+                        />
+                      );
+                    });
+                  })}
+                  <LoadMore />
                 </AnimatePresence>
-              ))} */}
+              ))}
           </>
         )}
       </section>
