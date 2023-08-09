@@ -3,7 +3,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { prisma } from '../../lib/prisma';
 import { FeedResponse } from '../../lib/types/feed';
 import { Tweet, tweetConverter } from '../../lib/types/tweet';
-import { User, userConverter } from '../../lib/types/user';
+import { resolveUserFromFid } from '../../lib/user/resolveUser';
 
 export default async function handle(
   req: NextApiRequest,
@@ -149,39 +149,18 @@ export default async function handle(
         return acc;
       }, []);
 
-      const userData = await prisma.user_data.findMany({
-        where: {
-          fid: {
-            in: fids
-          }
-        }
-      });
-
-      // Create a map of fid to user data
-      const userDataMap = userData.reduce((acc: any, cur) => {
-        const key = cur.fid.toString();
-        if (acc[key]) {
-          acc[key] = {
-            ...acc[key],
-            [cur.type]: cur.value
-          };
-        } else {
-          acc[key] = {
-            [cur.type]: cur.value
-          };
+      // TODO: Combine into one query
+      // TODO: Cache results
+      // TODO: Only pass minimal user data and fetch on-demand
+      const users = await Promise.all(
+        fids.map((fid) => resolveUserFromFid(fid))
+      );
+      const usersMap = users.reduce((acc: any, cur) => {
+        if (cur) {
+          acc[cur.id] = cur;
         }
         return acc;
       }, {});
-
-      // Transform users
-      const users: { [key: string]: User } = Object.keys(userDataMap).reduce(
-        (acc: any, fid) => {
-          const user = userDataMap[fid];
-          acc[fid] = userConverter.toUser({ ...user, fid });
-          return acc;
-        },
-        {}
-      );
 
       const nextPageCursor =
         casts.length > 0
@@ -189,7 +168,7 @@ export default async function handle(
           : null;
 
       res.json({
-        result: { tweets, users, nextPageCursor }
+        result: { tweets, users: usersMap, nextPageCursor }
       });
       break;
     default:

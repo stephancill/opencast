@@ -22,7 +22,7 @@ This project depends on the Farcaster PosgreSQL database. Follow the instruction
 - [x] Cast detail
   - [x] Number of likes, comments, and reposts
   - [x] Paginated replies
-- [ ] User profiles
+- [x] User profiles
 - [ ] Auth
 - [ ] Engagement actions
 - [ ] Post creation

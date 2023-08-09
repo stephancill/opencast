@@ -69,7 +69,7 @@ export const tweetConverter = {
       parent,
       userLikes: [],
       createdBy: cast.fid.toString(),
-      createdAt: cast.created_at,
+      createdAt: cast.timestamp,
       updatedAt: null,
       userReplies: 0,
       userRetweets: []
