@@ -2,7 +2,7 @@
 
 ### Farcaster Replicator
 
-This project depends on the Farcaster PosgreSQL database. Follow the instructions at https://github.com/farcasterxyz/hub-monorepo/tree/main/packages/hub-nodejs/examples/replicate-data-postgres to set up an instance.
+This project depends on the Farcaster PosgreSQL database. Follow the instructions at [replicate-data-postgres](https://github.com/farcasterxyz/hub-monorepo/tree/main/packages/hub-nodejs/examples/replicate-data-postgres) to set up an instance.
 
 ### Local
 
@@ -11,10 +11,6 @@ This project depends on the Farcaster PosgreSQL database. Follow the instruction
 1. Copy the `.env.sample` file to `.env` and fill in the database connection details.
 
 1. `yarn dev`
-
-## Preview 🎬
-
-https://user-images.githubusercontent.com/55032197/201472767-9db0177a-79b5-4913-8666-1744102b0ad7.mp4
 
 ## Todo
 
@@ -31,6 +27,7 @@ https://user-images.githubusercontent.com/55032197/201472767-9db0177a-79b5-4913-
 - [ ] Engagement actions
 - [ ] Post creation
 - [ ] Post deletion
+- [ ] Search
 - [ ] Channels (may require modification of the Postgres replication)
 
 ...
