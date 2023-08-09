@@ -21,9 +21,10 @@ https://user-images.githubusercontent.com/55032197/201472767-9db0177a-79b5-4913-
 - [ ] Feed
   - [x] Reverse chronological feed
   - [x] Pagination
-  - [ ] Number of likes, comments, and reposts
-- [ ] Cast detail
-  - [ ] Number of likes, comments, and reposts
+  - [x] Number of likes, comments, and reposts
+  - [ ] Recasts
+- [x] Cast detail
+  - [x] Number of likes, comments, and reposts
   - [ ] Paginated replies
 - [ ] User profiles
 - [ ] Auth

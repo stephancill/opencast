@@ -71,6 +71,29 @@ export default async function handle(
         }
       });
 
+      const replyCount = await prisma.casts.groupBy({
+        by: ['parent_hash'],
+        where: {
+          parent_hash: {
+            in: casts.map((cast) => cast.hash)
+          }
+        },
+        _count: {
+          parent_hash: true
+        }
+      });
+
+      // Create a map of parent_hash to reply count
+      const replyCountMap = replyCount.reduce((acc: any, cur) => {
+        const key = cur.parent_hash!.toString('hex');
+        if (acc[key]) {
+          acc[key] = cur._count.parent_hash;
+        } else {
+          acc[key] = cur._count.parent_hash;
+        }
+        return acc;
+      }, {});
+
       // Group reactions by reaction_type for each target_hash
       const reactionsMap = engagements.reduce(
         (acc: { [key: string]: { [key: number]: string[] } }, cur) => {
@@ -107,7 +130,8 @@ export default async function handle(
             : [],
           userRetweets: reactionsMap[id]
             ? reactionsMap[id][ReactionType.RECAST] || []
-            : []
+            : [],
+          userReplies: replyCountMap[id] || 0
         };
       });
 

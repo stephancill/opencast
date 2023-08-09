@@ -43,7 +43,7 @@ export default function TweetId(): JSX.Element {
     data: tweetData,
     isLoading: tweetLoading,
     isError: tweetError
-  } = useQuery('tweet', fetchCast);
+  } = useQuery('tweet', fetchCast, { keepPreviousData: false });
 
   const viewTweetRef = useRef<HTMLElement>(null);
 
