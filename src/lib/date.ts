@@ -1,5 +1,3 @@
-import type { Timestamp } from 'firebase/firestore';
-
 const RELATIVE_TIME_FORMATTER = new Intl.RelativeTimeFormat('en-gb', {
   style: 'short',
   numeric: 'auto'
@@ -70,6 +68,8 @@ function getPostTime(date: Date): string {
 }
 
 function getJoinedTime(date: Date): string {
+  console.log('hello', date);
+
   return new Intl.DateTimeFormat('en-gb', {
     month: 'long',
     year: 'numeric'

@@ -1,19 +1,20 @@
-import { ReactionType } from '@farcaster/hub-web';
+import { ReactionType, UserDataType } from '@farcaster/hub-web';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { prisma } from '../../lib/prisma';
-import { FeedResponse } from '../../lib/types/feed';
-import { Tweet, tweetConverter } from '../../lib/types/tweet';
-import { User, userConverter } from '../../lib/types/user';
+import { prisma } from '../../../../lib/prisma';
+import {
+  Tweet,
+  tweetConverter,
+  TweetRepliesResponse
+} from '../../../../lib/types/tweet';
+import { User, userConverter } from '../../../../lib/types/user';
 
 export default async function handle(
   req: NextApiRequest,
-  res: NextApiResponse<FeedResponse>
+  res: NextApiResponse<TweetRepliesResponse>
 ) {
   const { method } = req;
   switch (method) {
     case 'GET':
-      const userFid = Number(req.query.fid); // assuming 'fid' is passed as query param
-      // const skip = req.query.skip ? Number(req.query.skip) : undefined;
       const cursor = req.query.cursor
         ? new Date(req.query.cursor as string)
         : undefined;
@@ -22,30 +23,35 @@ export default async function handle(
           ? Number(req.query.limit)
           : 10;
 
-      // Get all the target_fids (people that the user follows)
-      const links = await prisma.links.findMany({
-        where: {
-          AND: [{ fid: userFid }, { target_fid: { not: null } }]
-        },
-        select: {
-          target_fid: true
+      // Try to convert id to number
+      let id = req.query.id;
+      if (isNaN(Number(id))) {
+        const username = (id as string).toLowerCase();
+        const userData = await prisma.user_data.findFirst({
+          where: {
+            type: UserDataType.USERNAME,
+            value: username
+          }
+        });
+        if (userData) {
+          id = userData.fid.toString();
+        } else {
+          res.status(404).json({ message: 'User not found' });
+          return;
         }
-      });
-      const targetFids = links.map((link) => link.target_fid) as bigint[];
+      }
 
-      // Get the casts made by the people the user follows
+      // Get the casts with the given parent_hash
       const casts = await prisma.casts.findMany({
         where: {
           AND: [
             {
-              fid: {
-                in: targetFids
-              }
-            },
-            {
               timestamp: {
                 lt: cursor || undefined
               }
+            },
+            {
+              fid: BigInt(id as string)
             },
             {
               parent_hash: null

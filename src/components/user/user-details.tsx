@@ -37,8 +37,8 @@ export function UserDetails({
 }: UserDetailsProps): JSX.Element {
   const detailIcons: Readonly<DetailIcon[]> = [
     [location, 'MapPinIcon'],
-    [website, 'LinkIcon'],
-    [`Joined ${formatDate(createdAt, 'joined')}`, 'CalendarDaysIcon']
+    [website, 'LinkIcon']
+    // [`Joined ${formatDate(new Date(createdAt), 'joined')}`, 'CalendarDaysIcon']
   ];
 
   return (

@@ -16,8 +16,8 @@ export type User = {
   verified: boolean;
   following: string[];
   followers: string[];
-  createdAt: Timestamp;
-  updatedAt: Timestamp | null;
+  createdAt: Date;
+  updatedAt: Date | null;
   totalTweets: number;
   totalPhotos: number;
   pinnedTweet: string | null;
@@ -31,7 +31,7 @@ export type EditableData = Extract<
 
 export type EditableUserData = Pick<User, EditableData>;
 
-export type USerResponse = BaseResponse<User>;
+export type UserResponse = BaseResponse<User>;
 
 export const userConverter = {
   toUser(user: any): User {
@@ -49,7 +49,7 @@ export const userConverter = {
       verified: false,
       following: [],
       followers: [],
-      createdAt: Timestamp.now(),
+      createdAt: new Date(),
       updatedAt: null,
       totalTweets: 0,
       totalPhotos: 0,

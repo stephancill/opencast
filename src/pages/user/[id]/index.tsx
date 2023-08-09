@@ -1,56 +1,58 @@
-import { doc, query, where } from 'firebase/firestore';
-import { AnimatePresence } from 'framer-motion';
-import { useUser } from '@lib/context/user-context';
-import { useCollection } from '@lib/hooks/useCollection';
-import { useDocument } from '@lib/hooks/useDocument';
-import { tweetsCollection } from '@lib/firebase/collections';
-import { mergeData } from '@lib/merge';
-import { UserLayout, ProtectedLayout } from '@components/layout/common-layout';
+import { ProtectedLayout, UserLayout } from '@components/layout/common-layout';
 import { MainLayout } from '@components/layout/main-layout';
 import { UserDataLayout } from '@components/layout/user-data-layout';
 import { UserHomeLayout } from '@components/layout/user-home-layout';
 import { StatsEmpty } from '@components/tweet/stats-empty';
-import { Loading } from '@components/ui/loading';
 import { Tweet } from '@components/tweet/tweet';
+import { Loading } from '@components/ui/loading';
+import { useUser } from '@lib/context/user-context';
+import { AnimatePresence } from 'framer-motion';
 import type { ReactElement, ReactNode } from 'react';
+import { useInfiniteScroll } from '../../../lib/hooks/useInfiniteScrollByAuthor';
 
 export default function UserTweets(): JSX.Element {
   const { user } = useUser();
 
   const { id, username, pinnedTweet } = user ?? {};
 
-  const { data: pinnedData } = useDocument(
-    doc(tweetsCollection, pinnedTweet ?? 'null'),
-    {
-      disabled: !pinnedTweet,
-      allowNull: true,
-      includeUser: true
-    }
-  );
+  // const { data: pinnedData } = useDocument(
+  //   doc(tweetsCollection, pinnedTweet ?? 'null'),
+  //   {
+  //     disabled: !pinnedTweet,
+  //     allowNull: true,
+  //     includeUser: true
+  //   }
+  // );
 
-  const { data: ownerTweets, loading: ownerLoading } = useCollection(
-    query(
-      tweetsCollection,
-      where('createdBy', '==', id),
-      where('parent', '==', null)
-    ),
-    { includeUser: true, allowNull: true }
-  );
+  // const { data: ownerTweets, loading: ownerLoading } = useCollection(
+  //   query(
+  //     tweetsCollection,
+  //     where('createdBy', '==', id),
+  //     where('parent', '==', null)
+  //   ),
+  //   { includeUser: true, allowNull: true }
+  // );
+  const {
+    data: ownerTweets,
+    loading: ownerLoading,
+    LoadMore
+  } = useInfiniteScroll(`${id}`, { marginBottom: 20 });
 
-  const { data: peopleTweets, loading: peopleLoading } = useCollection(
-    query(
-      tweetsCollection,
-      where('createdBy', '!=', id),
-      where('userRetweets', 'array-contains', id)
-    ),
-    { includeUser: true, allowNull: true }
-  );
+  // const { data: peopleTweets, loading: peopleLoading } = useCollection(
+  //   query(
+  //     tweetsCollection,
+  //     where('createdBy', '!=', id),
+  //     where('userRetweets', 'array-contains', id)
+  //   ),
+  //   { includeUser: true, allowNull: true }
+  // );
 
-  const mergedTweets = mergeData(true, ownerTweets, peopleTweets);
+  // const mergedTweets = mergeData(true, ownerTweets, peopleTweets);
+  const mergedTweets = ownerTweets;
 
   return (
     <section>
-      {ownerLoading || peopleLoading ? (
+      {ownerLoading ? (
         <Loading className='mt-5' />
       ) : !mergedTweets ? (
         <StatsEmpty
@@ -59,12 +61,36 @@ export default function UserTweets(): JSX.Element {
         />
       ) : (
         <AnimatePresence mode='popLayout'>
-          {pinnedData && (
+          {/* {pinnedData && (
             <Tweet pinned {...pinnedData} key={`pinned-${pinnedData.id}`} />
           )}
           {mergedTweets.map((tweet) => (
             <Tweet {...tweet} profile={user} key={tweet.id} />
-          ))}
+          ))} */}
+          {mergedTweets.pages.map((page) => {
+            if (!page) return;
+            const { tweets, users } = page;
+            return tweets.map((tweet) => {
+              if (!users[tweet.createdBy]) {
+                return <></>;
+              }
+
+              // Look up username in users object
+              const parent = tweet.parent;
+              if (parent && !tweet.parent?.username && tweet.parent?.userId) {
+                tweet.parent.username = users[tweet.parent.userId]?.username;
+              }
+
+              return (
+                <Tweet
+                  {...tweet}
+                  user={users[tweet.createdBy]}
+                  key={tweet.id}
+                />
+              );
+            });
+          })}
+          <LoadMore />
         </AnimatePresence>
       )}
     </section>

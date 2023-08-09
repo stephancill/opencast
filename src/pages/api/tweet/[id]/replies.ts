@@ -28,11 +28,6 @@ export default async function handle(
       const casts = await prisma.casts.findMany({
         where: {
           AND: [
-            // {
-            //   fid: {
-            //     in: targetFids
-            //   }
-            // },
             {
               timestamp: {
                 lt: cursor || undefined
@@ -40,6 +35,9 @@ export default async function handle(
             },
             {
               parent_hash: Buffer.from(id as string, 'hex')
+            },
+            {
+              deleted_at: null
             }
           ]
         },
@@ -67,7 +65,8 @@ export default async function handle(
         where: {
           parent_hash: {
             in: casts.map((cast) => cast.hash)
-          }
+          },
+          deleted_at: null
         },
         _count: {
           parent_hash: true

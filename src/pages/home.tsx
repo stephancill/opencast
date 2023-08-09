@@ -8,7 +8,7 @@ import { Tweet } from '@components/tweet/tweet';
 import { Error } from '@components/ui/error';
 import { Loading } from '@components/ui/loading';
 import { useWindow } from '@lib/context/window-context';
-import { useInfiniteScroll } from '@lib/hooks/useInfiniteScrollByFid';
+import { useInfiniteScroll } from '@lib/hooks/useInfiniteScrollByFeed';
 import type { ReactElement, ReactNode } from 'react';
 
 export default function Home(): JSX.Element {
