@@ -1,12 +1,5 @@
 const footerLinks = [
-  ['Terms of Service', 'https://twitter.com/tos'],
-  ['Privacy Policy', 'https://twitter.com/privacy'],
-  ['Cookie Policy', 'https://support.twitter.com/articles/20170514'],
-  ['Accessibility', 'https://help.twitter.com/resources/accessibility'],
-  [
-    'Ads Info',
-    'https://business.twitter.com/en/help/troubleshooting/how-twitter-ads-work.html'
-  ]
+  ['GitHub', 'https://github.com/stephancill/twitter-farcaster-client']
 ] as const;
 
 export function AsideFooter(): JSX.Element {
@@ -28,7 +21,8 @@ export function AsideFooter(): JSX.Element {
           </a>
         ))}
       </nav>
-      <p>© 2022 Twitter, Inc.</p>
+      <div></div>
+      <p>Forked by @stephancill. Use at own risk.</p>
     </footer>
   );
 }

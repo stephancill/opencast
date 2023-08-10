@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import cn from 'clsx';
-import { useArrayDocument } from '@lib/hooks/useArrayDocument';
 import { useModal } from '@lib/hooks/useModal';
 import { usersCollection } from '@lib/firebase/collections';
 import { Modal } from '@components/modal/modal';
@@ -38,11 +37,11 @@ export function ViewTweetStats({
 
   const { open, openModal, closeModal } = useModal();
 
-  const { data, loading } = useArrayDocument(
-    statsType ? (statsType === 'likes' ? userLikes : userRetweets) : [],
-    usersCollection,
-    { disabled: !statsType }
-  );
+  // const { data, loading } = useArrayDocument(
+  //   statsType ? (statsType === 'likes' ? userLikes : userRetweets) : [],
+  //   usersCollection,
+  //   { disabled: !statsType }
+  // );
 
   const handleOpen = (type: StatsType) => (): void => {
     setStatsType(type);
@@ -72,8 +71,10 @@ export function ViewTweetStats({
           <UserCards
             follow
             type={statsType as StatsType}
-            data={data}
-            loading={loading}
+            data={null}
+            loading={false}
+            // data={data}
+            // loading={loading}
           />
         </TweetStatsModal>
       </Modal>
@@ -88,7 +89,7 @@ export function ViewTweetStats({
               !!stats && (
                 <button
                   className={cn(
-                    `hover-animation mt-0.5 mb-[3px] flex h-4 items-center gap-1 border-b 
+                    `hover-animation mb-[3px] mt-0.5 flex h-4 items-center gap-1 border-b 
                      border-b-transparent outline-none hover:border-b-light-primary 
                      focus-visible:border-b-light-primary dark:hover:border-b-dark-primary
                      dark:focus-visible:border-b-dark-primary`,

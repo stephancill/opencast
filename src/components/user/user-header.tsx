@@ -1,12 +1,9 @@
-import { useRouter } from 'next/router';
-import { doc } from 'firebase/firestore';
-import { AnimatePresence, motion } from 'framer-motion';
-import { useDocument } from '@lib/hooks/useDocument';
 import { useUser } from '@lib/context/user-context';
 import { isPlural } from '@lib/utils';
-import { userStatsCollection } from '@lib/firebase/collections';
-import { UserName } from './user-name';
 import type { Variants } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
+import { useRouter } from 'next/router';
+import { UserName } from './user-name';
 
 export const variants: Variants = {
   initial: { opacity: 0 },
@@ -24,20 +21,9 @@ export function UserHeader(): JSX.Element {
 
   const userId = user ? user.id : null;
 
-  const { data: statsData, loading: statsLoading } = useDocument(
-    doc(userStatsCollection(userId ?? 'null'), 'stats'),
-    {
-      allowNull: true,
-      disabled: !userId
-    }
-  );
-
-  const { tweets, likes } = statsData ?? {};
-
-  const [totalTweets, totalPhotos, totalLikes] = [
-    (user?.totalTweets ?? 0) + (tweets?.length ?? 0),
-    user?.totalPhotos,
-    likes?.length
+  const [totalTweets, totalPhotos] = [
+    user?.totalTweets ?? 0,
+    user?.totalPhotos
   ];
 
   const currentPage = pathname.split('/').pop() ?? '';
@@ -47,14 +33,14 @@ export function UserHeader(): JSX.Element {
 
   return (
     <AnimatePresence mode='popLayout'>
-      {loading || statsLoading ? (
+      {loading ? (
         <motion.div
           className='-mb-1 inner:animate-pulse inner:rounded-lg 
                      inner:bg-light-secondary dark:inner:bg-dark-secondary'
           {...variants}
           key='loading'
         >
-          <div className='mb-1 -mt-1 h-5 w-24' />
+          <div className='-mt-1 mb-1 h-5 w-24' />
           <div className='h-4 w-12' />
         </motion.div>
       ) : !user ? (
@@ -83,9 +69,7 @@ export function UserHeader(): JSX.Element {
                     totalPhotos
                   )}`
                 : 'No Photo & GIF'
-              : totalLikes
-              ? `${totalLikes} Like${isPlural(totalLikes)}`
-              : 'No Like'}
+              : ''}
           </p>
         </motion.div>
       )}
