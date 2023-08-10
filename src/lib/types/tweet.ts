@@ -1,3 +1,4 @@
+import { Embed } from '@farcaster/hub-web';
 import { casts } from '@prisma/client';
 import { replaceOccurrencesMultiple } from '../utils';
 import { isValidImageExtension } from '../validation';
@@ -42,21 +43,23 @@ export const tweetConverter = {
       };
     }
 
+    const embeds = cast.embeds as Embed[];
+
     const images =
-      cast.embeds.length > 0
-        ? cast.embeds
-            .filter((embed) => isValidImageExtension(embed))
-            .map((url) => ({
-              src: url,
+      embeds.length > 0
+        ? embeds
+            .filter((embed) => embed.url && isValidImageExtension(embed.url))
+            .map((embed) => ({
+              src: embed.url,
               alt: '',
-              id: url
+              id: embed.url
             }))
-        : null;
+        : [];
 
     // Remove images links that will be embedded from text
     const formattedText = replaceOccurrencesMultiple(
       cast.text,
-      images?.map((img) => img.src) ?? [],
+      images.map((img) => img.src ?? '') ?? [],
       ''
     );
 
@@ -65,7 +68,7 @@ export const tweetConverter = {
         ? cast.hash.toString('hex')
         : Buffer.from((cast.hash as any).data).toString('hex'),
       text: formattedText,
-      images,
+      images: images.length > 0 ? images : null,
       parent,
       userLikes: [],
       createdBy: cast.fid.toString(),
