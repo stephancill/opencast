@@ -1,93 +1,77 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 
-import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { query, limit } from 'firebase/firestore';
-import { getCollectionCount } from '@lib/firebase/utils';
-import { Loading } from '@components/ui/loading';
-import { useCollection } from './useCollection';
-import type { UseCollectionOptions } from './useCollection';
-import type { Query, QueryConstraint } from 'firebase/firestore';
-import type { User } from '@lib/types/user';
+import { useCallback, useEffect, useState } from 'react';
+import { useInfiniteQuery } from 'react-query';
+import { Loading } from '../../components/ui/loading';
+import { PaginatedTweetsResponse } from '../paginated-tweets';
 
-type InfiniteScroll<T> = {
-  data: T[] | null;
-  loading: boolean;
-  LoadMore: () => JSX.Element;
-};
+export function useInfiniteScroll(
+  urlBuilder: (pageParam: string | null) => string,
+  options?: {
+    initialSize?: number;
+    stepSize?: number;
+    marginBottom?: number;
+    queryKey?: any[];
+  }
+) {
+  const { initialSize, stepSize, marginBottom, queryKey } = {
+    initialSize: 10,
+    stepSize: 10,
+    marginBottom: 100,
+    queryKey: [],
+    ...(options ?? {})
+  };
 
-type InfiniteScrollWithUser<T> = {
-  data: (T & { user: User })[] | null;
-  loading: boolean;
-  LoadMore: () => JSX.Element;
-};
-
-export function useInfiniteScroll<T>(
-  collection: Query<T>,
-  constraints: QueryConstraint[],
-  fetchOptions: UseCollectionOptions & { includeUser: true },
-  options?: { initialSize?: number; stepSize?: number; marginBottom?: number }
-): InfiniteScrollWithUser<T>;
-
-export function useInfiniteScroll<T>(
-  collection: Query<T>,
-  constraints: QueryConstraint[],
-  fetchOptions?: UseCollectionOptions,
-  options?: { initialSize?: number; stepSize?: number; marginBottom?: number }
-): InfiniteScroll<T>;
-
-export function useInfiniteScroll<T>(
-  collection: Query<T>,
-  queryConstraints?: QueryConstraint[],
-  fetchOptions?: UseCollectionOptions,
-  options?: { initialSize?: number; stepSize?: number; marginBottom?: number }
-): InfiniteScroll<T> | InfiniteScrollWithUser<T> {
-  const { initialSize, stepSize, marginBottom } = options ?? {};
-
-  const [tweetsLimit, setTweetsLimit] = useState(initialSize ?? 20);
-  const [tweetsSize, setTweetsSize] = useState<number | null>(null);
   const [reachedLimit, setReachedLimit] = useState(false);
   const [loadMoreInView, setLoadMoreInView] = useState(false);
 
-  const { data, loading } = useCollection(
-    query(
-      collection,
-      ...[
-        ...(queryConstraints ?? []),
-        ...(!reachedLimit ? [limit(tweetsLimit)] : [])
-      ]
-    ),
-    fetchOptions
-  );
+  const fetchData = async ({ pageParam = null }) => {
+    const response = await fetch(urlBuilder(pageParam));
+    if (!response.ok) {
+      throw new Error('Could not fetch the casts');
+    }
 
-  useEffect(() => {
-    const checkLimit = tweetsSize ? tweetsLimit >= tweetsSize : false;
-    setReachedLimit(checkLimit);
-  }, [tweetsSize, tweetsLimit]);
+    const { result } = (await response.json()) as PaginatedTweetsResponse;
 
-  useEffect(() => {
-    if (reachedLimit) return;
+    if (!result) {
+      throw new Error('Could not fetch the casts');
+      return;
+    }
 
-    const setTweetsLength = async (): Promise<void> => {
-      const currentTweetsSize = await getCollectionCount(
-        query(collection, ...(queryConstraints ?? []))
-      );
-      setTweetsSize(currentTweetsSize);
+    // Transform to tweet object
+    const { tweets, users, nextPageCursor } = result;
+
+    return {
+      tweets,
+      users,
+      nextPageCursor
     };
+  };
 
-    void setTweetsLength();
-  }, [data?.length]);
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isLoading: loading,
+    isFetchingNextPage
+  } = useInfiniteQuery(queryKey, fetchData, {
+    getNextPageParam: (lastPage) => {
+      return lastPage?.nextPageCursor ?? false;
+    }
+  });
 
   useEffect(() => {
     if (reachedLimit) return;
-    if (loadMoreInView) setTweetsLimit(tweetsLimit + (stepSize ?? 20));
+    if (loadMoreInView) {
+      fetchNextPage();
+    }
   }, [loadMoreInView]);
 
   const makeItInView = (): void => setLoadMoreInView(true);
   const makeItNotInView = (): void => setLoadMoreInView(false);
 
-  const isLoadMoreHidden =
-    reachedLimit && (data?.length ?? 0) >= (tweetsSize ?? 0);
+  const isLoadMoreHidden = !(hasNextPage || isFetchingNextPage);
 
   const LoadMore = useCallback(
     (): JSX.Element => (

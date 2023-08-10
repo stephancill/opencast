@@ -10,11 +10,11 @@ import { ViewTweet } from '@components/view/view-tweet';
 import { isPlural } from '@lib/utils';
 import { AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/router';
-import type { ReactElement, ReactNode } from 'react';
+import { ReactElement, ReactNode, useEffect } from 'react';
 import { useRef } from 'react';
 import { useQuery } from 'react-query';
 import { Tweet } from '../../components/tweet/tweet';
-import { useInfiniteScroll } from '../../lib/hooks/useInfiniteScrollReplies';
+import { useInfiniteScroll } from '../../lib/hooks/useInfiniteScroll';
 import { TweetResponse } from '../../lib/types/tweet';
 
 export default function TweetId(): JSX.Element {
@@ -52,7 +52,13 @@ export default function TweetId(): JSX.Element {
     data: repliesData,
     loading: repliesLoading,
     LoadMore
-  } = useInfiniteScroll(`${id}`, { marginBottom: 20 });
+  } = useInfiniteScroll(
+    (pageParam) =>
+      `/api/tweet/${id}/replies?limit=10${
+        pageParam ? `&cursor=${pageParam}` : ''
+      }`,
+    { marginBottom: 20, queryKey: ['replies', id] }
+  );
 
   const viewTweetRef = useRef<HTMLElement>(null);
 

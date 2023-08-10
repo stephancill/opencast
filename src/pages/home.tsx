@@ -8,11 +8,21 @@ import { Tweet } from '@components/tweet/tweet';
 import { Error } from '@components/ui/error';
 import { Loading } from '@components/ui/loading';
 import { useWindow } from '@lib/context/window-context';
-import { useInfiniteScroll } from '@lib/hooks/useInfiniteScrollByFeed';
+import { useInfiniteScroll } from '@lib/hooks/useInfiniteScroll';
 import type { ReactElement, ReactNode } from 'react';
+import { useAuth } from '../lib/context/auth-context';
 
 export default function Home(): JSX.Element {
-  const { data, loading, LoadMore } = useInfiniteScroll('1689');
+  const { user } = useAuth();
+  const { data, loading, LoadMore } = useInfiniteScroll(
+    (pageParam) =>
+      `/api/feed?fid=${user?.id}&limit=10${
+        pageParam ? `&cursor=${pageParam}` : ''
+      }`,
+    {
+      queryKey: ['feed', user?.id]
+    }
+  );
   const { isMobile } = useWindow();
 
   return (
