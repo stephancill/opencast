@@ -57,6 +57,32 @@ export function replaceOccurrencesMultiple(
   );
 }
 
+export type ParsedChainURL = {
+  scheme: string;
+  chainId: string;
+  contractType: string;
+  contractAddress: string;
+};
+
+export function parseChainURL(url: string): ParsedChainURL | null {
+  const matches = url.match(
+    /^(chain:\/\/)([\w\d]+):([\w\d]+)\/([\w\d]+):([\w\d]+)$/
+  );
+
+  if (!matches) {
+    return null;
+  }
+
+  const [_, scheme, , chainId, contractType, contractAddress] = matches;
+
+  return {
+    scheme,
+    chainId,
+    contractType,
+    contractAddress
+  };
+}
+
 const replacer = (_: any, value: any) =>
   typeof value === 'bigint' ? value.toString() : value;
 

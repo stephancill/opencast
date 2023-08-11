@@ -23,12 +23,18 @@ This project depends on the Farcaster PosgreSQL database. Follow the instruction
   - [x] Number of likes, comments, and reposts
   - [x] Paginated replies
 - [x] User profiles
+  - [x] Casts
+  - [ ] Casts with replies
+  - [ ] Media
+  - [ ] Likes
 - [ ] Auth
 - [ ] Engagement actions
 - [ ] Post creation
 - [ ] Post deletion
 - [ ] Search
-- [ ] Channels (may require modification of the Postgres replication)
+- [x] Channels
+  - [x] Channel detail
+  - [ ] Index channels
 
 ...
 

@@ -3,7 +3,6 @@ import { toast } from 'react-hot-toast';
 import cn from 'clsx';
 import { useUser } from '@lib/context/user-context';
 import { useModal } from '@lib/hooks/useModal';
-import { updateUserData, uploadImages } from '@lib/firebase/utils';
 import { sleep } from '@lib/utils';
 import { getImagesData } from '@lib/validation';
 import { Modal } from '@components/modal/modal';
@@ -70,17 +69,17 @@ export function UserEditProfile({ hide }: UserEditProfileProps): JSX.Element {
 
     const { photoURL, coverPhotoURL: coverURL } = userImages;
 
-    const [newPhotoURL, newCoverPhotoURL] = await Promise.all(
-      [photoURL, coverURL].map((image) => uploadImages(userId, image))
-    );
+    // const [newPhotoURL, newCoverPhotoURL] = await Promise.all(
+    //   [photoURL, coverURL].map((image) => uploadImages(userId, image))
+    // );
 
-    const newImages: Partial<Pick<User, 'photoURL' | 'coverPhotoURL'>> = {
-      coverPhotoURL:
-        coverPhotoURL === editUserData.coverPhotoURL
-          ? coverPhotoURL
-          : newCoverPhotoURL?.[0].src ?? null,
-      ...(newPhotoURL && { photoURL: newPhotoURL[0].src })
-    };
+    // const newImages: Partial<Pick<User, 'photoURL' | 'coverPhotoURL'>> = {
+    //   coverPhotoURL:
+    //     coverPhotoURL === editUserData.coverPhotoURL
+    //       ? coverPhotoURL
+    //       : newCoverPhotoURL?.[0].src ?? null,
+    //   ...(newPhotoURL && { photoURL: newPhotoURL[0].src })
+    // };
 
     const trimmedKeys: Readonly<EditableData[]> = [
       'name',
@@ -94,22 +93,22 @@ export function UserEditProfile({ hide }: UserEditProfileProps): JSX.Element {
       {} as TrimmedTexts
     );
 
-    const newUserData: Readonly<EditableUserData> = {
-      ...editUserData,
-      ...trimmedTexts,
-      ...newImages
-    };
+    // const newUserData: Readonly<EditableUserData> = {
+    //   ...editUserData,
+    //   ...trimmedTexts,
+    //   ...newImages
+    // };
 
     await sleep(500);
 
-    await updateUserData(userId, newUserData);
+    // await updateUserData(userId, newUserData);
 
     closeModal();
 
     cleanImage();
 
     setLoading(false);
-    setEditUserData(newUserData);
+    // setEditUserData(newUserData);
 
     toast.success('Profile updated successfully');
   };

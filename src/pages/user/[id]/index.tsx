@@ -8,35 +8,23 @@ import { Loading } from '@components/ui/loading';
 import { useUser } from '@lib/context/user-context';
 import { AnimatePresence } from 'framer-motion';
 import type { ReactElement, ReactNode } from 'react';
-import { useInfiniteScroll } from '../../../lib/hooks/useInfiniteScrollByAuthor';
+import { useInfiniteScroll } from '../../../lib/hooks/useInfiniteScroll';
 
 export default function UserTweets(): JSX.Element {
   const { user } = useUser();
 
-  const { id, username, pinnedTweet } = user ?? {};
-
-  // const { data: pinnedData } = useDocument(
-  //   doc(tweetsCollection, pinnedTweet ?? 'null'),
-  //   {
-  //     disabled: !pinnedTweet,
-  //     allowNull: true,
-  //     includeUser: true
-  //   }
-  // );
-
-  // const { data: ownerTweets, loading: ownerLoading } = useCollection(
-  //   query(
-  //     tweetsCollection,
-  //     where('createdBy', '==', id),
-  //     where('parent', '==', null)
-  //   ),
-  //   { includeUser: true, allowNull: true }
-  // );
+  const { id, username } = user ?? {};
   const {
     data: ownerTweets,
     loading: ownerLoading,
     LoadMore
-  } = useInfiniteScroll(`${id}`, { marginBottom: 20 });
+  } = useInfiniteScroll(
+    (pageParam) =>
+      `/api/user/${id}/tweets?limit=10${
+        pageParam ? `&cursor=${pageParam}` : ''
+      }`,
+    { marginBottom: 20, queryKey: ['user', id] }
+  );
 
   // const { data: peopleTweets, loading: peopleLoading } = useCollection(
   //   query(
