@@ -13,8 +13,6 @@ export default async function signerUserEndpoint(
 ): Promise<void> {
   const { pubKey } = req.query as SignerEndpointQuery;
 
-  console.log(`pubKey: ${pubKey}`);
-
   const signerRow = await prisma.signers.findFirst({
     where: {
       signer: Buffer.from(pubKey, 'hex'),

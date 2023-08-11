@@ -37,8 +37,6 @@ export const getServerSideProps: GetServerSideProps<ChannelPageProps> = async ({
 
   const channel = await resolveChannel(channelString);
 
-  console.log(channel);
-
   if (!channel) {
     return {
       notFound: true

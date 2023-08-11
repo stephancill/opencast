@@ -1,5 +1,4 @@
 import { getHubRpcClient, Message } from '@farcaster/hub-web';
-import { Dialog } from '@headlessui/react';
 import * as ed from '@noble/ed25519';
 import { useEffect, useState } from 'react';
 import QRCode from 'react-qr-code';

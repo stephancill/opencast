@@ -23,8 +23,6 @@ export default async function handle(
           ? Number(req.query.limit)
           : 10;
 
-      console.log('channel', parseChainURL(channel));
-
       const { tweets, users, nextPageCursor } = await getTweetsPaginated({
         where: {
           AND: [

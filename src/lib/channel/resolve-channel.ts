@@ -58,12 +58,9 @@ export async function resolveChannel(url: string) {
     args: [BigInt(1)]
   });
 
-  console.log('data', data);
-
   if (data.startsWith('data:application/json;base64,')) {
     const jsonString = Buffer.from(data.split(',')[1], 'base64').toString();
     const json = JSON.parse(jsonString);
-    console.log('json', json);
     if (!isValidChannel(json)) {
       return null;
     }

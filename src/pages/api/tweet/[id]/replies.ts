@@ -20,8 +20,6 @@ export default async function handle(
           ? Number(req.query.limit)
           : 10;
 
-      console.log({ id, cursor, limit });
-
       const { tweets, users, nextPageCursor } = await getTweetsPaginated({
         where: {
           AND: [

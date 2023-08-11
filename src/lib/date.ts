@@ -68,8 +68,6 @@ function getPostTime(date: Date): string {
 }
 
 function getJoinedTime(date: Date): string {
-  console.log('hello', date);
-
   return new Intl.DateTimeFormat('en-gb', {
     month: 'long',
     year: 'numeric'
