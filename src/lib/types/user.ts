@@ -33,6 +33,8 @@ export type EditableUserData = Pick<User, EditableData>;
 
 export type UserResponse = BaseResponse<User>;
 
+export type UsersMapType = { [key: string]: User };
+
 export const userConverter = {
   toUser(user: any): User {
     return {

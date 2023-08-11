@@ -1,6 +1,6 @@
 import { UserDataType } from '@farcaster/hub-web';
 import { prisma } from '../prisma';
-import { User, userConverter } from '../types/user';
+import { User, userConverter, UsersMapType } from '../types/user';
 
 export async function resolveUserFromFid(fid: bigint): Promise<User | null> {
   const userData = await prisma.user_data.findMany({
@@ -76,4 +76,23 @@ export async function resolveUserAmbiguous(
   }
 
   return await resolveUserFromFid(BigInt(fid));
+}
+
+// TODO: Combine into one query
+// TODO: Cache results
+// TODO: Only pass minimal user data and fetch on-demand
+export async function resolveUsersMap(fids: bigint[]): Promise<UsersMapType> {
+  const userOrNulls = await Promise.all(
+    fids.map((fid) => resolveUserFromFid(fid))
+  );
+  const users = userOrNulls.filter(
+    (userOrNull) => userOrNull !== null
+  ) as User[];
+  const usersMap = users.reduce((acc: UsersMapType, cur) => {
+    if (cur) {
+      acc[cur.id] = cur;
+    }
+    return acc;
+  }, {});
+  return usersMap;
 }

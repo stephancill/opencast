@@ -62,5 +62,5 @@ export function ViewParentTweet({
       </div>
     );
 
-  return <Tweet parentTweet {...data} />;
+  return <Tweet parentTweet {...data} user={data.users[data.createdBy]} />;
 }

@@ -10,8 +10,7 @@ import { ViewTweet } from '@components/view/view-tweet';
 import { isPlural } from '@lib/utils';
 import { AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/router';
-import { ReactElement, ReactNode, useEffect } from 'react';
-import { useRef } from 'react';
+import { ReactElement, ReactNode, useMemo, useRef } from 'react';
 import { useQuery } from 'react-query';
 import { Tweet } from '../../components/tweet/tweet';
 import { useInfiniteScroll } from '../../lib/hooks/useInfiniteScroll';
@@ -68,10 +67,21 @@ export default function TweetId(): JSX.Element {
   const parentId = tweetData?.parent?.id;
 
   const pageTitle = tweetData
-    ? `${tweetData.user?.name} on Twitter: "${text ?? ''}${
+    ? `${tweetData.users[tweetData.createdBy]?.name} on Twitter: "${
+        text ?? ''
+      }${
         images ? ` (${imagesLength} image${isPlural(imagesLength)})` : ''
       }" / Twitter`
     : null;
+
+  const resolvedMentions = useMemo(() => {
+    const resolvedMentions =
+      tweetData?.mentions.map((mention) => ({
+        ...mention,
+        username: tweetData?.users[mention.userId]?.username
+      })) || [];
+    return resolvedMentions;
+  }, [tweetData]);
 
   return (
     <MainContainer className='!pb-[1280px]'>
@@ -97,7 +107,12 @@ export default function TweetId(): JSX.Element {
                 viewTweetRef={viewTweetRef}
               />
             )}
-            <ViewTweet viewTweetRef={viewTweetRef} {...tweetData} />
+            <ViewTweet
+              viewTweetRef={viewTweetRef}
+              {...tweetData}
+              mentions={resolvedMentions}
+              user={tweetData.users[tweetData.createdBy]}
+            />
             {tweetData &&
               (repliesLoading ? (
                 <Loading className='mt-5' />

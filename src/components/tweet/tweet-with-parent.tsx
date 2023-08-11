@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { Tweet } from './tweet';
 import { TweetParent } from './tweet-parent';
-import type { TweetWithUser } from '@lib/types/tweet';
+import type { TweetWithUsers } from '@lib/types/tweet';
 
 type TweetWithParentProps = {
-  data: TweetWithUser[];
+  data: TweetWithUsers[];
 };
 
 export type LoadedParents = Record<'parentId' | 'childId', string>[];

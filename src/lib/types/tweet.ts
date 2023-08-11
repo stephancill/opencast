@@ -1,10 +1,15 @@
 import { Embed } from '@farcaster/hub-web';
 import { casts } from '@prisma/client';
-import { replaceOccurrencesMultiple } from '../utils';
 import { isValidImageExtension } from '../validation';
 import type { ImagesPreview } from './file';
 import { BaseResponse } from './responses';
-import type { User } from './user';
+import type { UsersMapType } from './user';
+
+export type Mention = {
+  userId: string;
+  position: number;
+  username?: string;
+};
 
 export type Tweet = {
   id: string;
@@ -17,17 +22,18 @@ export type Tweet = {
   updatedAt: Date | null;
   userReplies: number;
   userRetweets: string[];
+  mentions: Mention[];
 };
 
-export type TweetWithUser = Tweet & { user: User };
+export type TweetWithUsers = Tweet & { users: UsersMapType };
 
-export type TweetResponse = BaseResponse<TweetWithUser>;
+export type TweetResponse = BaseResponse<TweetWithUsers>;
 export interface TweetRepliesResponse
   extends BaseResponse<{
     tweets: Tweet[];
     nextPageCursor: string | null;
     // fid -> User
-    users: { [key: string]: User };
+    users: UsersMapType;
   }> {}
 
 export const tweetConverter = {
@@ -56,18 +62,18 @@ export const tweetConverter = {
             }))
         : [];
 
-    // Remove images links that will be embedded from text
-    const formattedText = replaceOccurrencesMultiple(
-      cast.text,
-      images.map((img) => img.src ?? '') ?? [],
-      ''
+    const mentions = cast.mentions.map(
+      (userId, index): Mention => ({
+        userId: userId.toString(),
+        position: cast.mentions_positions[index]
+      })
     );
 
     return {
       id: isBuffer
         ? cast.hash.toString('hex')
         : Buffer.from((cast.hash as any).data).toString('hex'),
-      text: formattedText,
+      text: cast.text,
       images: images.length > 0 ? images : null,
       parent,
       userLikes: [],
@@ -75,7 +81,8 @@ export const tweetConverter = {
       createdAt: cast.timestamp,
       updatedAt: null,
       userReplies: 0,
-      userRetweets: []
+      userRetweets: [],
+      mentions
     } as Tweet;
   }
 };

@@ -2,7 +2,7 @@ import { ReactionType } from '@farcaster/hub-web';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { prisma } from '../../../../lib/prisma';
 import { tweetConverter, TweetResponse } from '../../../../lib/types/tweet';
-import { userConverter } from '../../../../lib/types/user';
+import { resolveUsersMap } from '../../../../lib/user/resolveUser';
 
 type TweetEndpointQuery = {
   id: string;
@@ -48,38 +48,19 @@ export default async function tweetIdEndpoint(
     return acc;
   }, {});
 
-  const userData = await prisma.user_data.findMany({
-    where: {
-      fid: cast.fid
-    }
-  });
+  // Get all fids from cast and mentions
+  const fids = new Set<bigint>();
+  fids.add(cast.fid);
+  if (cast.parent_fid) fids.add(cast.parent_fid);
+  cast.mentions.forEach((mention) => fids.add(mention));
 
-  // Create a map of fid to user data
-  const userDataMap = userData.reduce((acc: any, cur) => {
-    const key = cur.fid.toString();
-    if (acc[key]) {
-      acc[key] = {
-        ...acc[key],
-        [cur.type]: cur.value
-      };
-    } else {
-      acc[key] = {
-        [cur.type]: cur.value
-      };
-    }
-    return acc;
-  }, {});
-
-  const users = Object.keys(userDataMap).map((fid) => {
-    const user = userDataMap[fid];
-    return userConverter.toUser({ ...user, fid });
-  });
+  const users = await resolveUsersMap([...fids]);
 
   const tweet = {
     ...tweetConverter.toTweet(cast),
     userLikes: reactions[ReactionType.LIKE] || [],
     userRetweets: reactions[ReactionType.RECAST] || [],
-    user: users[0]
+    users: users
   };
 
   res.json({

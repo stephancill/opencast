@@ -1,17 +1,17 @@
 import { ReactionType } from '@farcaster/hub-web';
-import { Prisma, PrismaClient } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import { prisma } from './prisma';
 import { BaseResponse } from './types/responses';
 import { Tweet, tweetConverter } from './types/tweet';
-import { User } from './types/user';
-import { resolveUserFromFid } from './user/resolveUser';
+import { UsersMapType } from './types/user';
+import { resolveUsersMap } from './user/resolveUser';
 
 export interface PaginatedTweetsResponse
   extends BaseResponse<{
     tweets: Tweet[];
     nextPageCursor: string | null;
     // fid -> User
-    users: { [key: string]: User };
+    users: UsersMapType;
   }> {}
 
 export async function getTweetsPaginated(
@@ -97,26 +97,14 @@ export async function getTweetsPaginated(
     };
   });
 
-  const fids = casts.reduce((acc: bigint[], cur) => {
-    if (!acc.includes(cur.fid)) {
-      acc.push(cur.fid);
-    }
-    if (cur.parent_fid && !acc.includes(cur.parent_fid)) {
-      acc.push(cur.parent_fid);
-    }
+  const fids: Set<bigint> = casts.reduce((acc: Set<bigint>, cur) => {
+    acc.add(cur.fid);
+    if (cur.parent_fid) acc.add(cur.parent_fid);
+    cur.mentions.forEach((mention) => acc.add(mention));
     return acc;
-  }, []);
+  }, new Set<bigint>());
 
-  // TODO: Combine into one query
-  // TODO: Cache results
-  // TODO: Only pass minimal user data and fetch on-demand
-  const users = await Promise.all(fids.map((fid) => resolveUserFromFid(fid)));
-  const usersMap = users.reduce((acc: any, cur) => {
-    if (cur) {
-      acc[cur.id] = cur;
-    }
-    return acc;
-  }, {});
+  const usersMap = await resolveUsersMap([...fids]);
 
   const nextPageCursor =
     casts.length > 0 ? casts[casts.length - 1].timestamp.toISOString() : null;

@@ -18,6 +18,7 @@ import { TweetActions } from './tweet-actions';
 import { TweetDate } from './tweet-date';
 import { TweetStats } from './tweet-stats';
 import { TweetStatus } from './tweet-status';
+import { TweetText } from './tweet-text';
 
 export type TweetProps = Tweet & {
   user: User;
@@ -48,6 +49,7 @@ export function Tweet(tweet: TweetProps): JSX.Element {
     parentTweet,
     userReplies,
     userRetweets,
+    mentions,
     user: tweetUserData
   } = tweet;
 
@@ -173,7 +175,9 @@ export function Tweet(tweet: TweetProps): JSX.Element {
                 </p>
               )}
               {text && (
-                <p className='whitespace-pre-line break-words'>{text}</p>
+                <div className='whitespace-pre-line break-words'>
+                  <TweetText text={text} images={images} mentions={mentions} />
+                </div>
               )}
               <div className='mt-1 flex flex-col gap-2'>
                 {images && (
@@ -192,6 +196,7 @@ export function Tweet(tweet: TweetProps): JSX.Element {
                     userLikes={userLikes}
                     userReplies={userReplies}
                     userRetweets={userRetweets}
+                    tweetAuthorId={ownerId}
                     openModal={!parent ? openModal : undefined}
                   />
                 )}
