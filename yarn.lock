@@ -355,7 +355,7 @@
     minimatch "^3.1.2"
     strip-json-comments "^3.1.1"
 
-"@farcaster/core@^0.12.0":
+"@farcaster/core@0.12.3", "@farcaster/core@^0.12.0":
   version "0.12.3"
   resolved "https://registry.yarnpkg.com/@farcaster/core/-/core-0.12.3.tgz#e9663306320a3991e538c501f345d16240ebe1eb"
   integrity sha512-htLC2MLZZRpSn2FeWl3dzRL9+sWyQIvsWNCER0R25w9aRpg6wvXU8MvVDxNqPbYHk8PfYM9qgBiT1lu9cHSSEQ==
@@ -366,6 +366,16 @@
     neverthrow "^6.0.0"
     ref-napi "^3.0.3"
     viem "^1.1.4"
+
+"@farcaster/hub-nodejs@^0.10.3":
+  version "0.10.3"
+  resolved "https://registry.yarnpkg.com/@farcaster/hub-nodejs/-/hub-nodejs-0.10.3.tgz#f503e001b16a7d174d366325c94f025b08e4ebf6"
+  integrity sha512-ZWb1Dih7/tuVoSMaV0TlQGoDMEZiiTN6k7MJ2F1UjkJgbwf3cRrGJkjyoZ+Zz5lbVhfxFbLksJugJ9HuZ8gF4g==
+  dependencies:
+    "@farcaster/core" "0.12.3"
+    "@grpc/grpc-js" "~1.8.21"
+    "@noble/hashes" "^1.3.0"
+    neverthrow "^6.0.0"
 
 "@farcaster/hub-web@^0.6.0":
   version "0.6.0"
@@ -752,6 +762,14 @@
   version "1.7.3"
   resolved "https://registry.yarnpkg.com/@grpc/grpc-js/-/grpc-js-1.7.3.tgz#f2ea79f65e31622d7f86d4b4c9ae38f13ccab99a"
   integrity sha512-H9l79u4kJ2PVSxUNA08HMYAnUBLj9v6KjYQ7SQ71hOZcEXhShE/y5iQCesP8+6/Ik/7i2O0a10bPquIcYfufog==
+  dependencies:
+    "@grpc/proto-loader" "^0.7.0"
+    "@types/node" ">=12.12.47"
+
+"@grpc/grpc-js@~1.8.21":
+  version "1.8.21"
+  resolved "https://registry.yarnpkg.com/@grpc/grpc-js/-/grpc-js-1.8.21.tgz#d282b122c71227859bf6c5866f4c40f4a2696513"
+  integrity sha512-KeyQeZpxeEBSqFVTi3q2K7PiPXmgBfECc4updA1ejCLjYmoAlvvM3ZMp5ztTDUCUQmoY3CpDxvchjO1+rFkoHg==
   dependencies:
     "@grpc/proto-loader" "^0.7.0"
     "@types/node" ">=12.12.47"

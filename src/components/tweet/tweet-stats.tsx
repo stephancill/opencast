@@ -1,12 +1,13 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 
-import { useState, useEffect, useMemo } from 'react';
 import cn from 'clsx';
+import { useEffect, useMemo, useState } from 'react';
 // import { manageRetweet, manageLike } from '@lib/firebase/utils';
 import { ViewTweetStats } from '@components/view/view-tweet-stats';
+import type { Tweet } from '@lib/types/tweet';
+import { createLikeMessage, submitHubMessage } from '../../lib/farcaster/utils';
 import { TweetOption } from './tweet-option';
 import { TweetShare } from './tweet-share';
-import type { Tweet } from '@lib/types/tweet';
 
 type TweetStatsProps = Pick<
   Tweet,
@@ -17,6 +18,7 @@ type TweetStatsProps = Pick<
   isOwner: boolean;
   tweetId: string;
   viewTweet?: boolean;
+  tweetAuthorId: string;
   openModal?: () => void;
 };
 
@@ -29,6 +31,7 @@ export function TweetStats({
   viewTweet,
   userRetweets,
   userReplies: totalReplies,
+  tweetAuthorId,
   openModal
 }: TweetStatsProps): JSX.Element {
   const totalLikes = userLikes.length;
@@ -132,11 +135,25 @@ export function TweetStats({
           stats={currentLikes}
           iconName='HeartIcon'
           viewTweet={viewTweet}
-          // onClick={manageLike(
-          //   tweetIsLiked ? 'unlike' : 'like',
-          //   userId,
-          //   tweetId
-          // )}
+          onClick={async () => {
+            console.log('hello', tweetAuthorId);
+            const privateKey = JSON.parse(
+              localStorage.getItem('keyPair') || '{}'
+            ).privateKey;
+            const message = await createLikeMessage({
+              castHash: tweetId,
+              castAuthorFid: parseInt(tweetAuthorId),
+              fid: parseInt(userId),
+              privateKey,
+              type: tweetIsLiked ? 'unlike' : 'like'
+            });
+            if (!message) {
+              console.error('Error creating like message');
+              return;
+            }
+            const result = await submitHubMessage(message);
+            console.log('result', result);
+          }}
         />
         <TweetShare userId={userId} tweetId={tweetId} viewTweet={viewTweet} />
         {isOwner && (
