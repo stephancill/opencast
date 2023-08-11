@@ -72,6 +72,7 @@ const WarpcastAuthPopup = () => {
   };
 
   // Poll for the status of the Signer request
+  // TODO: Loading indicators
   const pollForSigner = async (token: string) => {
     let tries = 0;
     // TODO: Loading indicators
@@ -87,18 +88,9 @@ const WarpcastAuthPopup = () => {
       const signerRequest = json.result.signerRequest;
 
       if (signerRequest.base64SignedMessage) {
-        submitSignerAddMessage(signerRequest.base64SignedMessage);
         break;
       }
     }
-  };
-
-  // Submit the SignerAdd message to the Hub
-  const submitSignerAddMessage = async (base64SignedMessage: string) => {
-    // TODO: Loading indicators
-    const client = getHubRpcClient('https://nemes.farcaster.xyz:2283', {});
-    const message = Message.decode(Buffer.from(base64SignedMessage, 'base64'));
-    client.submitMessage(message);
 
     // TODO: Poll server to check if signer has been indexed
     setTimeout(() => {
