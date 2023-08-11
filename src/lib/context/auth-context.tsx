@@ -1,4 +1,3 @@
-import { auth } from '@lib/firebase/app';
 import { getRandomId } from '@lib/random';
 import type { Bookmark } from '@lib/types/bookmark';
 import type { User } from '@lib/types/user';
@@ -156,7 +155,7 @@ export function AuthContextProvider({
   const signInWithGoogle = async (): Promise<void> => {
     try {
       const provider = new GoogleAuthProvider();
-      await signInWithPopup(auth, provider);
+      // await signInWithPopup(auth, provider);
     } catch (error) {
       setError(error as Error);
     }
@@ -164,7 +163,7 @@ export function AuthContextProvider({
 
   const signOut = async (): Promise<void> => {
     try {
-      await signOutFirebase(auth);
+      // await signOutFirebase(auth);
     } catch (error) {
       setError(error as Error);
     }

@@ -7,15 +7,15 @@ import cn from 'clsx';
 import { toast } from 'react-hot-toast';
 import { useAuth } from '@lib/context/auth-context';
 import { useModal } from '@lib/hooks/useModal';
-import { tweetsCollection } from '@lib/firebase/collections';
-import {
-  removeTweet,
-  manageReply,
-  manageFollow,
-  managePinnedTweet,
-  manageTotalTweets,
-  manageTotalPhotos
-} from '@lib/firebase/utils';
+// import { tweetsCollection } from '@lib/firebase/collections';
+// import {
+//   removeTweet,
+//   manageReply,
+//   manageFollow,
+//   managePinnedTweet,
+//   manageTotalTweets,
+//   manageTotalPhotos
+// } from '@lib/firebase/utils';
 import { delayScroll, preventBubbling, sleep } from '@lib/utils';
 import { Modal } from '@components/modal/modal';
 import { ActionModal } from '@components/modal/action-modal';
@@ -94,51 +94,51 @@ export function TweetActions({
   const isInAdminControl = isAdmin && !isOwner;
   const tweetIsPinned = pinnedTweet === tweetId;
 
-  const handleRemove = async (): Promise<void> => {
-    if (viewTweet)
-      if (parentId) {
-        const parentSnapshot = await getDoc(doc(tweetsCollection, parentId));
-        if (parentSnapshot.exists()) {
-          await push(`/tweet/${parentId}`, undefined, { scroll: false });
-          delayScroll(200)();
-          await sleep(50);
-        } else await push('/home');
-      } else await push('/home');
+  // const handleRemove = async (): Promise<void> => {
+  //   if (viewTweet)
+  //     if (parentId) {
+  //       const parentSnapshot = await getDoc(doc(tweetsCollection, parentId));
+  //       if (parentSnapshot.exists()) {
+  //         await push(`/tweet/${parentId}`, undefined, { scroll: false });
+  //         delayScroll(200)();
+  //         await sleep(50);
+  //       } else await push('/home');
+  //     } else await push('/home');
 
-    await Promise.all([
-      removeTweet(tweetId),
-      manageTotalTweets('decrement', ownerId),
-      hasImages && manageTotalPhotos('decrement', createdBy),
-      parentId && manageReply('decrement', parentId)
-    ]);
+  //   await Promise.all([
+  //     removeTweet(tweetId),
+  //     manageTotalTweets('decrement', ownerId),
+  //     hasImages && manageTotalPhotos('decrement', createdBy),
+  //     parentId && manageReply('decrement', parentId)
+  //   ]);
 
-    toast.success(
-      `${isInAdminControl ? `@${username}'s` : 'Your'} Tweet was deleted`
-    );
+  //   toast.success(
+  //     `${isInAdminControl ? `@${username}'s` : 'Your'} Tweet was deleted`
+  //   );
 
-    removeCloseModal();
-  };
+  //   removeCloseModal();
+  // };
 
-  const handlePin = async (): Promise<void> => {
-    await managePinnedTweet(tweetIsPinned ? 'unpin' : 'pin', userId, tweetId);
-    toast.success(
-      `Your tweet was ${tweetIsPinned ? 'unpinned' : 'pinned'} to your profile`
-    );
-    pinCloseModal();
-  };
+  // const handlePin = async (): Promise<void> => {
+  //   await managePinnedTweet(tweetIsPinned ? 'unpin' : 'pin', userId, tweetId);
+  //   toast.success(
+  //     `Your tweet was ${tweetIsPinned ? 'unpinned' : 'pinned'} to your profile`
+  //   );
+  //   pinCloseModal();
+  // };
 
-  const handleFollow =
-    (closeMenu: () => void, ...args: Parameters<typeof manageFollow>) =>
-    async (): Promise<void> => {
-      const [type] = args;
+  // const handleFollow =
+  //   (closeMenu: () => void, ...args: Parameters<typeof manageFollow>) =>
+  //   async (): Promise<void> => {
+  //     const [type] = args;
 
-      closeMenu();
-      await manageFollow(...args);
+  //     closeMenu();
+  //     await manageFollow(...args);
 
-      toast.success(
-        `You ${type === 'follow' ? 'followed' : 'unfollowed'} @${username}`
-      );
-    };
+  //     toast.success(
+  //       `You ${type === 'follow' ? 'followed' : 'unfollowed'} @${username}`
+  //     );
+  //   };
 
   const userIsFollowed = following.includes(createdBy);
 
@@ -174,7 +174,8 @@ export function TweetActions({
                             focus-visible:bg-accent-red/90'
           mainBtnLabel='Delete'
           focusOnMainBtn
-          action={handleRemove}
+          // action={handleRemove}
+          action={() => {}}
           closeModal={removeCloseModal}
         />
       </Modal>
@@ -188,7 +189,8 @@ export function TweetActions({
           mainBtnClassName='bg-light-primary hover:bg-light-primary/90 active:bg-light-primary/80 dark:text-light-primary
                             dark:bg-light-border dark:hover:bg-light-border/90 dark:active:bg-light-border/75'
           focusOnMainBtn
-          action={handlePin}
+          // action={handlePin}
+          action={() => {}}
           closeModal={pinCloseModal}
         />
       </Modal>
@@ -255,9 +257,9 @@ export function TweetActions({
                     <Popover.Button
                       className='accent-tab flex w-full gap-3 rounded-md rounded-t-none p-4 hover:bg-main-sidebar-background'
                       as={Button}
-                      onClick={preventBubbling(
-                        handleFollow(close, 'unfollow', userId, createdBy)
-                      )}
+                      // onClick={preventBubbling(
+                      //   handleFollow(close, 'unfollow', userId, createdBy)
+                      // )}
                     >
                       <HeroIcon iconName='UserMinusIcon' />
                       Unfollow @{username}
@@ -266,9 +268,9 @@ export function TweetActions({
                     <Popover.Button
                       className='accent-tab flex w-full gap-3 rounded-md rounded-t-none p-4 hover:bg-main-sidebar-background'
                       as={Button}
-                      onClick={preventBubbling(
-                        handleFollow(close, 'follow', userId, createdBy)
-                      )}
+                      // onClick={preventBubbling(
+                      //   handleFollow(close, 'follow', userId, createdBy)
+                      // )}
                     >
                       <HeroIcon iconName='UserPlusIcon' />
                       Follow @{username}

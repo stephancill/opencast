@@ -4,13 +4,13 @@ import { AnimatePresence, motion } from 'framer-motion';
 import cn from 'clsx';
 import { toast } from 'react-hot-toast';
 import { addDoc, getDoc, serverTimestamp } from 'firebase/firestore';
-import { tweetsCollection } from '@lib/firebase/collections';
-import {
-  manageReply,
-  uploadImages,
-  manageTotalTweets,
-  manageTotalPhotos
-} from '@lib/firebase/utils';
+// import { tweetsCollection } from '@lib/firebase/collections';
+// import {
+//   manageReply,
+//   uploadImages,
+//   manageTotalTweets,
+//   manageTotalPhotos
+// } from '@lib/firebase/utils';
 import { useAuth } from '@lib/context/auth-context';
 import { sleep } from '@lib/utils';
 import { getImagesData } from '@lib/validation';
@@ -81,28 +81,28 @@ export function Input({
 
     const userId = user?.id as string;
 
-    const tweetData: WithFieldValue<Omit<Tweet, 'id'>> = {
-      text: inputValue.trim() || null,
-      parent: isReplying && parent ? parent : null,
-      images: await uploadImages(userId, selectedImages),
-      userLikes: [],
-      createdBy: userId,
-      createdAt: serverTimestamp(),
-      updatedAt: null,
-      userReplies: 0,
-      userRetweets: []
-    };
+    // const tweetData: WithFieldValue<Omit<Tweet, 'id'>> = {
+    //   text: inputValue.trim() || null,
+    //   parent: isReplying && parent ? parent : null,
+    //   images: await uploadImages(userId, selectedImages),
+    //   userLikes: [],
+    //   createdBy: userId,
+    //   createdAt: serverTimestamp(),
+    //   updatedAt: null,
+    //   userReplies: 0,
+    //   userRetweets: []
+    // };
 
     await sleep(500);
 
-    const [tweetRef] = await Promise.all([
-      addDoc(tweetsCollection, tweetData),
-      manageTotalTweets('increment', userId),
-      tweetData.images && manageTotalPhotos('increment', userId),
-      isReplying && manageReply('increment', parent?.id as string)
-    ]);
+    // const [tweetRef] = await Promise.all([
+    //   addDoc(tweetsCollection, tweetData),
+    //   manageTotalTweets('increment', userId),
+    //   tweetData.images && manageTotalPhotos('increment', userId),
+    //   isReplying && manageReply('increment', parent?.id as string)
+    // ]);
 
-    const { id: tweetId } = await getDoc(tweetRef);
+    // const { id: tweetId } = await getDoc(tweetRef);
 
     if (!modal && !replyModal) {
       discardTweet();
@@ -111,17 +111,17 @@ export function Input({
 
     if (closeModal) closeModal();
 
-    toast.success(
-      () => (
-        <span className='flex gap-2'>
-          Your Tweet was sent
-          <Link href={`/tweet/${tweetId}`}>
-            <a className='custom-underline font-bold'>View</a>
-          </Link>
-        </span>
-      ),
-      { duration: 6000 }
-    );
+    // toast.success(
+    //   () => (
+    //     <span className='flex gap-2'>
+    //       Your Tweet was sent
+    //       <Link href={`/tweet/${tweetId}`}>
+    //         <a className='custom-underline font-bold'>View</a>
+    //       </Link>
+    //     </span>
+    //   ),
+    //   { duration: 6000 }
+    // );
   };
 
   const handleImageUpload = (
@@ -214,7 +214,7 @@ export function Input({
       {children}
       {reply && visited && (
         <motion.p
-          className='ml-[75px] -mb-2 mt-2 text-light-secondary dark:text-dark-secondary'
+          className='-mb-2 ml-[75px] mt-2 text-light-secondary dark:text-dark-secondary'
           {...fromTop}
         >
           Replying to{' '}
@@ -229,7 +229,7 @@ export function Input({
         className={cn(
           'hover-animation grid w-full grid-cols-[auto,1fr] gap-3 px-4 py-3',
           reply
-            ? 'pt-3 pb-1'
+            ? 'pb-1 pt-3'
             : replyModal
             ? 'pt-0'
             : 'border-b-2 border-light-border dark:border-dark-border',
