@@ -25,10 +25,12 @@ function splitAndInsert(
     lastIndex = index;
   });
 
-  result.push(input.slice(lastIndex)); // get remaining part of string
+  result.push(elementBuilder(input.slice(lastIndex))); // get remaining part of string
 
   return result;
 }
+
+const urlRegex = /(https?:\/\/[^\s]+)/g;
 
 export function TweetText({
   text,
@@ -51,15 +53,29 @@ export function TweetText({
           </Link>
         );
       }),
-      (s) => (
-        <p className='inline'>
-          {replaceOccurrencesMultiple(
-            s,
-            images?.map((img) => img.src ?? '') ?? [],
-            ''
-          )}
-        </p>
-      )
+      (s) => {
+        return (
+          <p className='inline'>
+            {s.split(urlRegex).map((part, index) => {
+              if (part.match(urlRegex)) {
+                return (
+                  <a target={'_blank'} key={index} href={part}>
+                    <p className='inline text-main-accent hover:cursor-pointer hover:underline'>
+                      {part}
+                    </p>
+                  </a>
+                );
+              } else {
+                return replaceOccurrencesMultiple(
+                  part,
+                  images?.map((img) => img.src ?? '') ?? [],
+                  ''
+                );
+              }
+            })}
+          </p>
+        );
+      }
     );
     return segments;
   }, [text, indices, mentions, images]);
