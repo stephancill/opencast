@@ -1,13 +1,12 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { prisma } from '../../../../lib/prisma';
-import { userConverter, UserResponse } from '../../../../lib/types/user';
+import { UserResponse } from '../../../../lib/types/user';
 import { resolveUserAmbiguous } from '../../../../lib/user/resolveUser';
 
 type UserEndpointQuery = {
   id: string;
 };
 
-export default async function tweetIdEndpoint(
+export default async function userIdEndpoint(
   req: NextApiRequest,
   res: NextApiResponse<UserResponse>
 ): Promise<void> {

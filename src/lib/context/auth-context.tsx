@@ -1,13 +1,9 @@
 import { getRandomId } from '@lib/random';
 import type { Bookmark } from '@lib/types/bookmark';
 import type { User } from '@lib/types/user';
-import {
-  GoogleAuthProvider,
-  signInWithPopup,
-  signOut as signOutFirebase
-} from 'firebase/auth';
 import type { ReactNode } from 'react';
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { KeyPair } from '../types/keypair';
 
 type AuthContext = {
   user: User | null;
@@ -17,7 +13,7 @@ type AuthContext = {
   randomSeed: string;
   userBookmarks: Bookmark[] | null;
   signOut: () => Promise<void>;
-  signInWithGoogle: () => Promise<void>;
+  handleUserAuth: () => void;
 };
 
 export const AuthContext = createContext<AuthContext | null>(null);
@@ -29,141 +25,47 @@ type AuthContextProviderProps = {
 export function AuthContextProvider({
   children
 }: AuthContextProviderProps): JSX.Element {
-  const [userId, setUserId] = useState<string | null>('1689');
+  const [userId, setUserId] = useState<string | null>(null); // '1689'
 
   const [user, setUser] = useState<User | null>(null);
   const [userBookmarks, setUserBookmarks] = useState<Bookmark[] | null>(null);
   const [error, setError] = useState<Error | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const manageUser = async (fid: string): Promise<void> => {
-      // const { uid, displayName, photoURL } = authUser;
+  const manageUser = async (keyPair: KeyPair): Promise<void> => {
+    const userResponse = await fetch(`/api/signer/${keyPair.publicKey}/user`);
 
-      // const userSnapshot = await getDoc(doc(usersCollection, uid));
+    if (userResponse.ok) {
+      const { result: user } = await userResponse.json();
+      console.log('User changed', user);
+      setUser(user);
+    }
 
-      // if (!userSnapshot.exists()) {
-      //   let available = false;
-      //   let randomUsername = '';
+    setLoading(false);
+  };
 
-      //   while (!available) {
-      //     const normalizeName = displayName?.replace(/\s/g, '').toLowerCase();
-      //     const randomInt = getRandomInt(1, 10_000);
+  const handleUserAuth = (): void => {
+    setLoading(true);
 
-      //     randomUsername = `${normalizeName as string}${randomInt}`;
+    // Get signer from local storage
+    const keyPairRaw = localStorage.getItem('keyPair') as string | null;
+    const keyPair = keyPairRaw ? JSON.parse(keyPairRaw) : null;
 
-      //     const randomUserSnapshot = await getDoc(
-      //       doc(usersCollection, randomUsername)
-      //     );
-
-      //     if (!randomUserSnapshot.exists()) available = true;
-      //   }
-
-      //   const userData: WithFieldValue<User> = {
-      //     id: uid,
-      //     bio: null,
-      //     name: displayName as string,
-      //     theme: null,
-      //     accent: null,
-      //     website: null,
-      //     location: null,
-      //     photoURL: photoURL as string,
-      //     username: randomUsername,
-      //     verified: false,
-      //     following: [],
-      //     followers: [],
-      //     createdAt: serverTimestamp(),
-      //     updatedAt: null,
-      //     totalTweets: 0,
-      //     totalPhotos: 0,
-      //     pinnedTweet: null,
-      //     coverPhotoURL: null
-      //   };
-
-      //   const userStatsData: WithFieldValue<Stats> = {
-      //     likes: [],
-      //     tweets: [],
-      //     updatedAt: null
-      //   };
-
-      //   try {
-      //     await Promise.all([
-      //       setDoc(doc(usersCollection, uid), userData),
-      //       setDoc(doc(userStatsCollection(uid), 'stats'), userStatsData)
-      //     ]);
-
-      //     const newUser = (await getDoc(doc(usersCollection, uid))).data();
-      //     setUser(newUser as User);
-      //   } catch (error) {
-      //     setError(error as Error);
-      //   }
-      // } else {
-      //   const userData = userSnapshot.data();
-      //   setUser(userData);
-      // }
-
-      const userResponse = await fetch(`/api/user/${fid}`);
-
-      if (userResponse.ok) {
-        const { result: user } = await userResponse.json();
-        console.log('User changed', user);
-        setUser(user);
-      }
-
+    if (keyPair) void manageUser(keyPair);
+    else {
+      setUser(null);
       setLoading(false);
-    };
-
-    const handleUserAuth = (): void => {
-      setLoading(true);
-
-      if (userId) void manageUser(userId);
-      else {
-        setUser(null);
-        setLoading(false);
-      }
-    };
-
-    handleUserAuth();
-
-    // onAuthStateChanged(auth, handleUserAuth);
-  }, []);
-
-  // useEffect(() => {
-  //   if (!user) return;
-
-  //   const { id } = user;
-
-  //   const unsubscribeUser = onSnapshot(doc(usersCollection, id), (doc) => {
-  //     setUser(doc.data() as User);
-  //   });
-
-  //   const unsubscribeBookmarks = onSnapshot(
-  //     userBookmarksCollection(id),
-  //     (snapshot) => {
-  //       const bookmarks = snapshot.docs.map((doc) => doc.data());
-  //       setUserBookmarks(bookmarks);
-  //     }
-  //   );
-
-  //   return () => {
-  //     unsubscribeUser();
-  //     unsubscribeBookmarks();
-  //   };
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [user?.id]);
-
-  const signInWithGoogle = async (): Promise<void> => {
-    try {
-      const provider = new GoogleAuthProvider();
-      // await signInWithPopup(auth, provider);
-    } catch (error) {
-      setError(error as Error);
     }
   };
 
+  useEffect(() => {
+    handleUserAuth();
+  }, []);
+
   const signOut = async (): Promise<void> => {
     try {
-      // await signOutFirebase(auth);
+      localStorage.removeItem('keyPair');
+      handleUserAuth();
     } catch (error) {
       setError(error as Error);
     }
@@ -180,7 +82,7 @@ export function AuthContextProvider({
     randomSeed,
     userBookmarks,
     signOut,
-    signInWithGoogle
+    handleUserAuth
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -27,7 +27,7 @@ This project depends on the Farcaster PosgreSQL database. Follow the instruction
   - [ ] Casts with replies
   - [ ] Media
   - [ ] Likes
-- [ ] Auth
+- [x] Auth
 - [ ] Engagement actions
 - [ ] Post creation
 - [ ] Post deletion
