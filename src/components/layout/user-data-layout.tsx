@@ -1,8 +1,5 @@
 import { useRouter } from 'next/router';
-import { query, where, limit } from 'firebase/firestore';
 import { UserContextProvider } from '@lib/context/user-context';
-import { useCollection } from '@lib/hooks/useCollection';
-import { usersCollection } from '@lib/firebase/collections';
 import { SEO } from '@components/common/seo';
 import { MainContainer } from '@components/home/main-container';
 import { MainHeader } from '@components/home/main-header';
