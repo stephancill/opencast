@@ -17,6 +17,7 @@ type UserCardsProps = {
   type: CombinedTypes;
   follow?: boolean;
   loading: boolean;
+  LoadMore?: () => JSX.Element;
 };
 
 type NoStatsData = Record<CombinedTypes, StatsEmptyProps>;
@@ -50,7 +51,8 @@ export function UserCards({
   data,
   type,
   follow,
-  loading
+  loading,
+  LoadMore
 }: UserCardsProps): JSX.Element {
   const noStatsData = allNoStatsData[type];
   const modal = ['retweets', 'likes'].includes(type);
@@ -75,6 +77,7 @@ export function UserCards({
           ) : (
             <StatsEmpty {...noStatsData} modal={modal} />
           )}
+          {LoadMore && <LoadMore />}
         </AnimatePresence>
       )}
     </section>

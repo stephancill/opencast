@@ -1,11 +1,14 @@
-import { useState } from 'react';
-import cn from 'clsx';
-import { useModal } from '@lib/hooks/useModal';
 import { Modal } from '@components/modal/modal';
 import { TweetStatsModal } from '@components/modal/tweet-stats-modal';
 import { NumberStats } from '@components/tweet/number-stats';
 import { UserCards } from '@components/user/user-cards';
+import { ReactionType } from '@farcaster/hub-web';
+import { useModal } from '@lib/hooks/useModal';
 import type { Tweet } from '@lib/types/tweet';
+import cn from 'clsx';
+import { useState } from 'react';
+import { useInfiniteScrollUsers } from '../../lib/hooks/useInfiniteScrollUsers';
+import { User } from '../../lib/types/user';
 
 type viewTweetStats = Pick<Tweet, 'userRetweets' | 'userLikes'> & {
   likeMove: number;
@@ -15,6 +18,7 @@ type viewTweetStats = Pick<Tweet, 'userRetweets' | 'userLikes'> & {
   currentTweets: number;
   currentReplies: number;
   isStatsVisible: boolean;
+  tweetId: string;
 };
 
 export type StatsType = 'retweets' | 'likes';
@@ -30,17 +34,23 @@ export function ViewTweetStats({
   currentLikes,
   currentTweets,
   currentReplies,
-  isStatsVisible
+  isStatsVisible,
+  tweetId
 }: viewTweetStats): JSX.Element {
   const [statsType, setStatsType] = useState<StatsType | null>(null);
 
   const { open, openModal, closeModal } = useModal();
 
-  // const { data, loading } = useArrayDocument(
-  //   statsType ? (statsType === 'likes' ? userLikes : userRetweets) : [],
-  //   usersCollection,
-  //   { disabled: !statsType }
-  // );
+  const { data, loading, LoadMore } = useInfiniteScrollUsers(
+    (pageParam) => {
+      return `/api/tweet/${tweetId}/engagers?type=${
+        statsType === 'likes' ? ReactionType.LIKE : ReactionType.RECAST
+      }&limit=10${pageParam ? `&cursor=${pageParam}` : ''}`;
+    },
+    {
+      queryKey: [statsType, tweetId]
+    }
+  );
 
   const handleOpen = (type: StatsType) => (): void => {
     setStatsType(type);
@@ -70,10 +80,14 @@ export function ViewTweetStats({
           <UserCards
             follow
             type={statsType as StatsType}
-            data={null}
-            loading={false}
-            // data={data}
-            // loading={loading}
+            data={
+              (data?.pages
+                .map((page) => page?.users)
+                .flat()
+                .filter((user) => user !== undefined) as User[]) ?? []
+            }
+            loading={loading}
+            LoadMore={LoadMore}
           />
         </TweetStatsModal>
       </Modal>
