@@ -85,6 +85,7 @@ export function TweetStats({
           currentTweets={currentTweets}
           currentReplies={currentReplies}
           isStatsVisible={isStatsVisible}
+          tweetId={tweetId}
         />
       )}
       <div

@@ -4,9 +4,9 @@ import { motion } from 'framer-motion';
 import { useCallback, useEffect, useState } from 'react';
 import { useInfiniteQuery } from 'react-query';
 import { Loading } from '../../components/ui/loading';
-import { PaginatedTweetsResponse } from '../paginated-tweets';
+import { PaginatedUsersResponse } from '../paginated-reactions';
 
-export function useInfiniteScroll(
+export function useInfiniteScrollUsers(
   urlBuilder: (pageParam: string | null) => string,
   options?: {
     initialSize?: number;
@@ -29,20 +29,19 @@ export function useInfiniteScroll(
   const fetchData = async ({ pageParam = null }) => {
     const response = await fetch(urlBuilder(pageParam));
     if (!response.ok) {
-      throw new Error('Could not fetch the casts');
+      throw new Error('Could not fetch the data');
     }
 
-    const { result } = (await response.json()) as PaginatedTweetsResponse;
+    const { result } = (await response.json()) as PaginatedUsersResponse;
 
     if (!result) {
-      throw new Error('Could not fetch the casts');
+      throw new Error('Could not fetch the data');
       return;
     }
 
-    const { tweets, users, nextPageCursor } = result;
+    const { users, nextPageCursor } = result;
 
     return {
-      tweets,
       users,
       nextPageCursor
     };

@@ -79,6 +79,12 @@ export async function resolveUserAmbiguous(
 }
 
 // TODO: Combine into one query
+export async function resolveUsers(fids: bigint[]): Promise<User[]> {
+  const users = await Promise.all(fids.map((fid) => resolveUserFromFid(fid)));
+  return users.filter((user) => user !== null) as User[];
+}
+
+// TODO: Combine into one query
 // TODO: Cache results
 // TODO: Only pass minimal user data and fetch on-demand
 export async function resolveUsersMap(fids: bigint[]): Promise<UsersMapType> {
