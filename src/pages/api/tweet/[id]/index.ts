@@ -29,7 +29,8 @@ export default async function tweetIdEndpoint(
 
   const engagements = await prisma.reactions.findMany({
     where: {
-      target_hash: cast.hash
+      target_hash: cast.hash,
+      deleted_at: null
     },
     select: {
       fid: true,

@@ -22,19 +22,11 @@ export default async function handle(
 
       const { tweets, users, nextPageCursor } = await getTweetsPaginated({
         where: {
-          AND: [
-            {
-              timestamp: {
-                lt: cursor || undefined
-              }
-            },
-            {
-              parent_hash: Buffer.from(id as string, 'hex')
-            },
-            {
-              deleted_at: null
-            }
-          ]
+          timestamp: {
+            lt: cursor || undefined
+          },
+          parent_hash: Buffer.from(id as string, 'hex'),
+          deleted_at: null
         },
         take: limit,
         orderBy: {

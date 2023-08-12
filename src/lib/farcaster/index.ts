@@ -5,8 +5,7 @@ const globalForFarcaster = global as unknown as {
 };
 
 export const hubClient =
-  globalForFarcaster.hubClient ??
-  getSSLHubRpcClient('nemes.farcaster.xyz:2283');
+  globalForFarcaster.hubClient ?? getSSLHubRpcClient(process.env.FC_HUB_URL!);
 
 if (process.env.NODE_ENV !== 'production')
   globalForFarcaster.hubClient = hubClient;

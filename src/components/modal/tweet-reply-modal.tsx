@@ -15,7 +15,11 @@ export function TweetReplyModal({
     <Input
       modal
       replyModal
-      parent={{ id: tweet.id, username: tweet.user.username }}
+      parent={{
+        id: tweet.id,
+        username: tweet.user.username,
+        userId: tweet.user.id
+      }}
       closeModal={closeModal}
     >
       <Tweet modal parentTweet {...tweet} />

@@ -35,24 +35,14 @@ export default async function handle(
 
       const { tweets, users, nextPageCursor } = await getTweetsPaginated({
         where: {
-          AND: [
-            {
-              fid: {
-                in: targetFids
-              }
-            },
-            {
-              timestamp: {
-                lt: cursor || undefined
-              }
-            },
-            {
-              parent_hash: null
-            },
-            {
-              deleted_at: null
-            }
-          ]
+          fid: {
+            in: targetFids
+          },
+          timestamp: {
+            lt: cursor || undefined
+          },
+          parent_hash: null,
+          deleted_at: null
         },
         take: limit,
         orderBy: {

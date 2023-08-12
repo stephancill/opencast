@@ -2,12 +2,15 @@
 
 import cn from 'clsx';
 import { useEffect, useMemo, useState } from 'react';
-// import { manageRetweet, manageLike } from '@lib/firebase/utils';
 import { ViewTweetStats } from '@components/view/view-tweet-stats';
 import type { Tweet } from '@lib/types/tweet';
-import { createLikeMessage, submitHubMessage } from '../../lib/farcaster/utils';
+import {
+  createReactionMessage,
+  submitHubMessage
+} from '../../lib/farcaster/utils';
 import { TweetOption } from './tweet-option';
 import { TweetShare } from './tweet-share';
+import { ReactionType } from '@farcaster/hub-web';
 
 type TweetStatsProps = Pick<
   Tweet,
@@ -118,11 +121,20 @@ export function TweetStats({
           stats={currentTweets}
           iconName='ArrowPathRoundedSquareIcon'
           viewTweet={viewTweet}
-          // onClick={manageRetweet(
-          //   tweetIsRetweeted ? 'unretweet' : 'retweet',
-          //   userId,
-          //   tweetId
-          // )}
+          onClick={async () => {
+            const message = await createReactionMessage({
+              castHash: tweetId,
+              castAuthorFid: parseInt(tweetAuthorId),
+              fid: parseInt(userId),
+              type: ReactionType.RECAST,
+              remove: tweetIsRetweeted
+            });
+            if (!message) {
+              console.error('Error creating like message');
+              return;
+            }
+            const result = await submitHubMessage(message);
+          }}
         />
         <TweetOption
           className={cn(
@@ -137,16 +149,15 @@ export function TweetStats({
           iconName='HeartIcon'
           viewTweet={viewTweet}
           onClick={async () => {
-            console.log('hello', tweetAuthorId);
             const privateKey = JSON.parse(
               localStorage.getItem('keyPair') || '{}'
             ).privateKey;
-            const message = await createLikeMessage({
+            const message = await createReactionMessage({
               castHash: tweetId,
               castAuthorFid: parseInt(tweetAuthorId),
               fid: parseInt(userId),
-              privateKey,
-              type: tweetIsLiked ? 'unlike' : 'like'
+              type: ReactionType.LIKE,
+              remove: tweetIsLiked
             });
             if (!message) {
               console.error('Error creating like message');

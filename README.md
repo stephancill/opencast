@@ -28,8 +28,8 @@ This project depends on the Farcaster PosgreSQL database. Follow the instruction
   - [ ] Media
   - [ ] Likes
 - [x] Auth
-- [ ] Engagement actions
-- [ ] Post creation
+- [x] Engagement actions
+- [x] Post creation
 - [ ] Post deletion
 - [ ] Search
 - [x] Channels

@@ -1,34 +1,26 @@
-import Link from 'next/link';
-import { useState, useEffect, useRef, useId } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
 import cn from 'clsx';
+import { AnimatePresence, motion } from 'framer-motion';
+import Link from 'next/link';
+import { useEffect, useId, useRef, useState } from 'react';
 import { toast } from 'react-hot-toast';
-import { addDoc, getDoc, serverTimestamp } from 'firebase/firestore';
-// import { tweetsCollection } from '@lib/firebase/collections';
-// import {
-//   manageReply,
-//   uploadImages,
-//   manageTotalTweets,
-//   manageTotalPhotos
-// } from '@lib/firebase/utils';
+import { UserAvatar } from '@components/user/user-avatar';
+import { Message } from '@farcaster/hub-web';
 import { useAuth } from '@lib/context/auth-context';
+import type { FilesWithId, ImageData, ImagesPreview } from '@lib/types/file';
+import type { User } from '@lib/types/user';
 import { sleep } from '@lib/utils';
 import { getImagesData } from '@lib/validation';
-import { UserAvatar } from '@components/user/user-avatar';
-import { InputForm, fromTop } from './input-form';
-import { ImagePreview } from './image-preview';
-import { InputOptions } from './input-options';
-import type { ReactNode, FormEvent, ChangeEvent, ClipboardEvent } from 'react';
-import type { WithFieldValue } from 'firebase/firestore';
 import type { Variants } from 'framer-motion';
-import type { User } from '@lib/types/user';
-import type { Tweet } from '@lib/types/tweet';
-import type { FilesWithId, ImagesPreview, ImageData } from '@lib/types/file';
+import type { ChangeEvent, ClipboardEvent, FormEvent, ReactNode } from 'react';
+import { createCastMessage, submitHubMessage } from '../../lib/farcaster/utils';
+import { ImagePreview } from './image-preview';
+import { fromTop, InputForm } from './input-form';
+import { InputOptions } from './input-options';
 
 type InputProps = {
   modal?: boolean;
   reply?: boolean;
-  parent?: { id: string; username: string };
+  parent?: { id: string; username: string; userId: string };
   disabled?: boolean;
   children?: ReactNode;
   replyModal?: boolean;
@@ -77,32 +69,25 @@ export function Input({
 
     setLoading(true);
 
+    if (!inputValue) return;
+
     const isReplying = reply ?? replyModal;
 
     const userId = user?.id as string;
 
-    // const tweetData: WithFieldValue<Omit<Tweet, 'id'>> = {
-    //   text: inputValue.trim() || null,
-    //   parent: isReplying && parent ? parent : null,
-    //   images: await uploadImages(userId, selectedImages),
-    //   userLikes: [],
-    //   createdBy: userId,
-    //   createdAt: serverTimestamp(),
-    //   updatedAt: null,
-    //   userReplies: 0,
-    //   userRetweets: []
-    // };
+    if (isReplying && !parent) return;
+
+    const castMessage = await createCastMessage({
+      text: inputValue.trim(),
+      fid: parseInt(userId),
+      parentCastHash: isReplying && parent ? parent.id : undefined,
+      parentCastFid: isReplying && parent ? parseInt(parent.userId) : undefined
+    });
+
+    const res = await submitHubMessage(castMessage);
+    const message = Message.fromJSON(res);
 
     await sleep(500);
-
-    // const [tweetRef] = await Promise.all([
-    //   addDoc(tweetsCollection, tweetData),
-    //   manageTotalTweets('increment', userId),
-    //   tweetData.images && manageTotalPhotos('increment', userId),
-    //   isReplying && manageReply('increment', parent?.id as string)
-    // ]);
-
-    // const { id: tweetId } = await getDoc(tweetRef);
 
     if (!modal && !replyModal) {
       discardTweet();
@@ -111,17 +96,19 @@ export function Input({
 
     if (closeModal) closeModal();
 
-    // toast.success(
-    //   () => (
-    //     <span className='flex gap-2'>
-    //       Your Tweet was sent
-    //       <Link href={`/tweet/${tweetId}`}>
-    //         <a className='custom-underline font-bold'>View</a>
-    //       </Link>
-    //     </span>
-    //   ),
-    //   { duration: 6000 }
-    // );
+    const tweetId = Buffer.from(message.hash).toString('hex');
+
+    toast.success(
+      () => (
+        <span className='flex gap-2'>
+          Your Tweet was sent
+          <Link href={`/tweet/${tweetId}`}>
+            <a className='custom-underline font-bold'>View</a>
+          </Link>
+        </span>
+      ),
+      { duration: 6000 }
+    );
   };
 
   const handleImageUpload = (
