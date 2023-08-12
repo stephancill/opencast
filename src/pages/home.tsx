@@ -11,6 +11,7 @@ import { useWindow } from '@lib/context/window-context';
 import { useInfiniteScroll } from '@lib/hooks/useInfiniteScroll';
 import type { ReactElement, ReactNode } from 'react';
 import { useAuth } from '../lib/context/auth-context';
+import { populateTweetUsers } from '../lib/types/tweet';
 
 export default function Home(): JSX.Element {
   const { user } = useAuth();
@@ -51,22 +52,9 @@ export default function Home(): JSX.Element {
                   return <></>;
                 }
 
-                // Look up username in users object if it's not there and can be resolved
-                const parent = tweet.parent;
-                if (parent && !tweet.parent?.username && tweet.parent?.userId) {
-                  tweet.parent.username = users[tweet.parent.userId]?.username;
-                }
-
-                // Look up mentions in users object
-                const resolvedMentions = tweet.mentions.map((mention) => ({
-                  ...mention,
-                  username: users[mention.userId]?.username
-                }));
-
                 return (
                   <Tweet
-                    {...tweet}
-                    mentions={resolvedMentions}
+                    {...populateTweetUsers(tweet, users)}
                     user={users[tweet.createdBy]}
                     key={tweet.id}
                   />

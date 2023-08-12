@@ -14,7 +14,7 @@ import { ReactElement, ReactNode, useMemo, useRef } from 'react';
 import { useQuery } from 'react-query';
 import { Tweet } from '../../components/tweet/tweet';
 import { useInfiniteScroll } from '../../lib/hooks/useInfiniteScroll';
-import { TweetResponse } from '../../lib/types/tweet';
+import { populateTweetUsers, TweetResponse } from '../../lib/types/tweet';
 
 export default function TweetId(): JSX.Element {
   const {
@@ -128,30 +128,10 @@ export default function TweetId(): JSX.Element {
                         return <></>;
                       }
 
-                      // Look up username in users object
-                      const parent = tweet.parent;
-                      if (
-                        parent &&
-                        !tweet.parent?.username &&
-                        tweet.parent?.userId
-                      ) {
-                        tweet.parent.username =
-                          users[tweet.parent.userId]?.username;
-                      }
-
-                      // Look up mentions in users object
-                      const resolvedMentions = tweet.mentions.map(
-                        (mention) => ({
-                          ...mention,
-                          username: users[mention.userId]?.username
-                        })
-                      );
-
                       return (
                         <Tweet
-                          {...tweet}
+                          {...populateTweetUsers(tweet, users)}
                           user={users[tweet.createdBy]}
-                          mentions={resolvedMentions}
                           key={tweet.id}
                         />
                       );

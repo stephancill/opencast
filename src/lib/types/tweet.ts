@@ -37,6 +37,29 @@ export interface TweetRepliesResponse
     users: UsersMapType;
   }> {}
 
+export const populateTweetUsers = (
+  tweet: Tweet,
+  users: UsersMapType
+): Tweet => {
+  // Look up username in users object
+  const resolvedParent = tweet.parent;
+  if (resolvedParent && !tweet.parent?.username && tweet.parent?.userId) {
+    tweet.parent.username = users[tweet.parent.userId]?.username;
+  }
+
+  // Look up mentions in users object
+  const resolvedMentions = tweet.mentions.map((mention) => ({
+    ...mention,
+    username: users[mention.userId]?.username
+  }));
+
+  return {
+    ...tweet,
+    mentions: resolvedMentions,
+    parent: resolvedParent
+  };
+};
+
 export const tweetConverter = {
   toTweet(cast: casts & { client?: string }): Tweet {
     // Check if cast.hash is a buffer
