@@ -75,7 +75,17 @@ export async function resolveChannel(url: string): Promise<ChannelType | null> {
           args: [BigInt(1)]
         });
       } catch {
-        return null;
+        const truncatedAddress = `${parsed.contractAddress.slice(
+          0,
+          6
+        )}...${parsed.contractAddress.slice(
+          parsed.contractAddress.length - 4,
+          parsed.contractAddress.length
+        )}`;
+        return {
+          name: `${chainById[chainId].name}: ${truncatedAddress}`,
+          description: 'NFT'
+        };
       }
 
       if (!uri) return null;
