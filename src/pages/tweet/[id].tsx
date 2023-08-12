@@ -139,10 +139,19 @@ export default function TweetId(): JSX.Element {
                           users[tweet.parent.userId]?.username;
                       }
 
+                      // Look up mentions in users object
+                      const resolvedMentions = tweet.mentions.map(
+                        (mention) => ({
+                          ...mention,
+                          username: users[mention.userId]?.username
+                        })
+                      );
+
                       return (
                         <Tweet
                           {...tweet}
                           user={users[tweet.createdBy]}
+                          mentions={resolvedMentions}
                           key={tweet.id}
                         />
                       );
