@@ -9,6 +9,7 @@ import type { IconName } from '@components/ui/hero-icon';
 type HomeHeaderProps = {
   tip?: string;
   title?: string;
+  description?: string;
   children?: ReactNode;
   iconName?: IconName;
   className?: string;
@@ -21,6 +22,7 @@ type HomeHeaderProps = {
 export function MainHeader({
   tip,
   title,
+  description,
   children,
   iconName,
   className,
@@ -51,13 +53,22 @@ export function MainHeader({
         </Button>
       )}
       {title && (
-        <div className='flex gap-8'>
+        <div className='flex flex-col'>
           {useMobileSidebar && <MobileSidebar />}
           <h2 className='text-xl font-bold' key={title}>
             {title}
           </h2>
+          {description && (
+            <p
+              className='text-light-secondary dark:text-dark-secondary'
+              key={description}
+            >
+              {description}
+            </p>
+          )}
         </div>
       )}
+
       {children}
     </header>
   );

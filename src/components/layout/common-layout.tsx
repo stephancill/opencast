@@ -1,8 +1,8 @@
-import { useRequireAuth } from '@lib/hooks/useRequireAuth';
 import { Aside } from '@components/aside/aside';
-import { Suggestions } from '@components/aside/suggestions';
 import { Placeholder } from '@components/common/placeholder';
+import { useRequireAuth } from '@lib/hooks/useRequireAuth';
 import type { ReactNode } from 'react';
+import { AsideTrends } from '../aside/trends';
 
 export type LayoutProps = {
   children: ReactNode;
@@ -22,7 +22,7 @@ export function HomeLayout({ children }: LayoutProps): JSX.Element {
       {children}
       <Aside>
         {/* <Suggestions /> */}
-        <></>
+        <AsideTrends />
       </Aside>
     </>
   );

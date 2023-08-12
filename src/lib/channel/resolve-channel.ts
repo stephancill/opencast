@@ -1,71 +1,108 @@
-import { parseChainURL, ParsedChainURL } from '../utils';
 import { createPublicClient, http } from 'viem';
-import { mainnet } from 'viem/chains';
-import {} from 'viem';
+import * as chains from 'viem/chains';
+import { parseChainURL } from '../utils';
+
+const chainById = Object.values(chains).reduce(
+  (acc: { [key: string]: chains.Chain }, cur) => {
+    if (cur.id) acc[cur.id] = cur;
+    return acc;
+  },
+  {}
+);
 
 export type ChannelType = {
   name: string;
   description: string;
-  image: string;
-  properties: {
-    number: number;
-    name: string;
-  };
+  image?: string;
 };
 
-function isValidChannel(json: any): json is ChannelType {
-  return (
-    typeof json === 'object' &&
-    json !== null &&
-    typeof json.name === 'string' &&
-    typeof json.description === 'string' &&
-    typeof json.image === 'string' &&
-    typeof json.properties === 'object' &&
-    json.properties !== null &&
-    typeof json.properties.number === 'number' &&
-    typeof json.properties.name === 'string'
-  );
-}
-
 // CAIP-19 URL
-export async function resolveChannel(url: string) {
-  const parsed = parseChainURL(url);
-  if (!parsed) {
-    return null;
-  }
+// TODO: Cache result
+export async function resolveChannel(url: string): Promise<ChannelType | null> {
+  if (url.startsWith('https://')) {
+    return {
+      name: url,
+      description: 'Link'
+    };
+  } else if (url.startsWith('chain://')) {
+    const parsed = parseChainURL(url);
 
-  if (parsed.chainId !== '1' && parsed.contractType !== 'erc721') {
-    return null;
-  }
-
-  const client = createPublicClient({
-    chain: mainnet,
-    transport: http()
-  });
-
-  const data = await client.readContract({
-    address: parsed.contractAddress as `0x${string}`,
-    abi: [
-      {
-        inputs: [{ name: 'tokenId', type: 'uint256' }],
-        name: 'tokenURI',
-        outputs: [{ name: '', type: 'string' }],
-        stateMutability: 'view',
-        type: 'function'
-      }
-    ],
-    functionName: 'tokenURI',
-    args: [BigInt(1)]
-  });
-
-  if (data.startsWith('data:application/json;base64,')) {
-    const jsonString = Buffer.from(data.split(',')[1], 'base64').toString();
-    const json = JSON.parse(jsonString);
-    if (!isValidChannel(json)) {
+    if (!parsed || parsed.contractType !== 'erc721') {
       return null;
     }
-    return json as ChannelType;
-  }
 
-  return null;
+    let chainId: number;
+    try {
+      chainId = parseInt(parsed?.chainId);
+    } catch {
+      return null;
+    }
+
+    const client = createPublicClient({
+      chain: chainById[chainId],
+      transport: http()
+    });
+
+    let uri: string;
+    try {
+      uri = await client.readContract({
+        address: parsed.contractAddress as `0x${string}`,
+        abi: [
+          {
+            inputs: [],
+            name: 'contractURI',
+            outputs: [{ name: '', type: 'string' }],
+            stateMutability: 'view',
+            type: 'function'
+          }
+        ],
+        functionName: 'contractURI'
+      });
+    } catch (e) {
+      try {
+        uri = await client.readContract({
+          address: parsed.contractAddress as `0x${string}`,
+          abi: [
+            {
+              inputs: [{ name: 'tokenId', type: 'uint256' }],
+              name: 'tokenURI',
+              outputs: [{ name: '', type: 'string' }],
+              stateMutability: 'view',
+              type: 'function'
+            }
+          ],
+          functionName: 'tokenURI',
+          args: [BigInt(1)]
+        });
+      } catch {
+        return null;
+      }
+
+      if (!uri) return null;
+    }
+
+    if (uri.startsWith('data:application/json;base64,')) {
+      const jsonString = Buffer.from(uri.split(',')[1], 'base64').toString();
+
+      let json: any;
+      try {
+        json = JSON.parse(jsonString);
+      } catch (e) {
+        return null;
+      }
+
+      return {
+        name: json.name,
+        description: json.description,
+        image: json.image
+      };
+    }
+
+    return null;
+  } else {
+    return {
+      name: url,
+      description: 'Other'
+    };
+  }
 }

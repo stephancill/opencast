@@ -10,10 +10,10 @@ import { Loading } from '@components/ui/loading';
 import { useWindow } from '@lib/context/window-context';
 import { useInfiniteScroll } from '@lib/hooks/useInfiniteScroll';
 import { GetServerSideProps } from 'next';
-import { useRouter } from 'next/router';
 import type { ReactElement, ReactNode } from 'react';
 import { ChannelType, resolveChannel } from '../../lib/channel/resolve-channel';
 import { useAuth } from '../../lib/context/auth-context';
+import { populateTweetUsers } from '../../lib/types/tweet';
 
 interface ChannelPageProps {
   channelString: string;
@@ -21,19 +21,15 @@ interface ChannelPageProps {
 }
 
 export const getServerSideProps: GetServerSideProps<ChannelPageProps> = async ({
-  req,
-  res,
-  params
+  query
 }) => {
-  if (!params?.channel) {
+  if (!query?.url) {
     return {
       notFound: true
     };
   }
 
-  const channelString = (params.channel as string[])
-    .join('/')
-    .replace('chain:/', 'chain://');
+  const channelString = query.url as string;
 
   const channel = await resolveChannel(channelString);
 
@@ -54,7 +50,7 @@ export default function ChannelPage({
   const { user } = useAuth();
   const { data, loading, LoadMore } = useInfiniteScroll(
     (pageParam) => {
-      const url = `/api/channel/${channelString}?limit=10${
+      const url = `/api/channel?url=${channelString}&limit=10${
         pageParam ? `&cursor=${pageParam}` : ''
       }`;
       return url;
@@ -67,14 +63,13 @@ export default function ChannelPage({
 
   return (
     <MainContainer>
-      <SEO title={`${channel.properties.name} / Twitter`} />
+      <SEO title={`${channel.name} / Twitter`} />
       <MainHeader
         useMobileSidebar
-        title={`${channel.properties.name}`}
+        title={`${channel.name}`}
+        description={channel.description}
         className='flex items-center justify-between'
-      >
-        {/* <UpdateUsername /> */}
-      </MainHeader>
+      ></MainHeader>
       {!isMobile && <Input />}
       <section className='mt-0.5 xs:mt-0'>
         {loading ? (
@@ -91,15 +86,9 @@ export default function ChannelPage({
                   return <></>;
                 }
 
-                // Look up username in users object
-                const parent = tweet.parent;
-                if (parent && !tweet.parent?.username && tweet.parent?.userId) {
-                  tweet.parent.username = users[tweet.parent.userId]?.username;
-                }
-
                 return (
                   <Tweet
-                    {...tweet}
+                    {...populateTweetUsers(tweet, users)}
                     user={users[tweet.createdBy]}
                     key={tweet.id}
                   />
