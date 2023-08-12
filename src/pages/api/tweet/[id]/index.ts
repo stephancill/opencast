@@ -1,7 +1,11 @@
 import { ReactionType } from '@farcaster/hub-web';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { prisma } from '../../../../lib/prisma';
-import { tweetConverter, TweetResponse } from '../../../../lib/types/tweet';
+import {
+  tweetConverter,
+  TweetResponse,
+  TweetWithUsers
+} from '../../../../lib/types/tweet';
 import { resolveUsersMap } from '../../../../lib/user/resolveUser';
 
 type TweetEndpointQuery = {
@@ -17,6 +21,9 @@ export default async function tweetIdEndpoint(
   const cast = await prisma.casts.findUnique({
     where: {
       hash: Buffer.from(id, 'hex')
+    },
+    include: {
+      messages: true
     }
   });
 
@@ -26,6 +33,12 @@ export default async function tweetIdEndpoint(
     });
     return;
   }
+
+  const signer = await prisma.signers.findFirst({
+    where: {
+      signer: cast.messages.signer
+    }
+  });
 
   const engagements = await prisma.reactions.findMany({
     where: {
@@ -57,11 +70,12 @@ export default async function tweetIdEndpoint(
 
   const users = await resolveUsersMap([...fids]);
 
-  const tweet = {
+  const tweet: TweetWithUsers = {
     ...tweetConverter.toTweet(cast),
     userLikes: reactions[ReactionType.LIKE] || [],
     userRetweets: reactions[ReactionType.RECAST] || [],
-    users: users
+    users: users,
+    client: signer?.name || null
   };
 
   res.json({

@@ -23,6 +23,7 @@ export type Tweet = {
   userReplies: number;
   userRetweets: string[];
   mentions: Mention[];
+  client: string | null;
 };
 
 export type TweetWithUsers = Tweet & { users: UsersMapType };
@@ -37,7 +38,7 @@ export interface TweetRepliesResponse
   }> {}
 
 export const tweetConverter = {
-  toTweet(cast: casts): Tweet {
+  toTweet(cast: casts & { client?: string }): Tweet {
     // Check if cast.hash is a buffer
     const isBuffer = Buffer.isBuffer(cast.hash);
 
@@ -82,7 +83,8 @@ export const tweetConverter = {
       updatedAt: null,
       userReplies: 0,
       userRetweets: [],
-      mentions
+      mentions,
+      client: cast.client || null
     } as Tweet;
   }
 };

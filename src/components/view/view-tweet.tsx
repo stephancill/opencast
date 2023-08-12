@@ -38,6 +38,7 @@ export function ViewTweet(tweet: ViewTweetProps): JSX.Element {
     userReplies,
     viewTweetRef,
     mentions,
+    client,
     user: tweetUserData
   } = tweet;
 
@@ -139,7 +140,16 @@ export function ViewTweet(tweet: ViewTweetProps): JSX.Element {
           className='inner:hover-animation inner:border-b inner:border-light-border
                      dark:inner:border-dark-border'
         >
-          <TweetDate viewTweet tweetLink={tweetLink} createdAt={createdAt} />
+          <div className='flex '>
+            <TweetDate viewTweet tweetLink={tweetLink} createdAt={createdAt} />
+
+            {client && (
+              <p className='gap-1 py-4 text-light-secondary dark:text-dark-secondary'>
+                <i className='px-1  '>·</i>{' '}
+                <p className='inline '>via {client}</p>
+              </p>
+            )}
+          </div>
           <TweetStats
             viewTweet
             reply={reply}
@@ -153,7 +163,14 @@ export function ViewTweet(tweet: ViewTweetProps): JSX.Element {
             tweetAuthorId={ownerId}
           />
         </div>
-        <Input reply parent={{ id: tweetId, username: username }} />
+        <Input
+          reply
+          parent={
+            parent
+              ? { id: tweetId, username: username, userId: parent.userId! }
+              : undefined
+          }
+        />
       </div>
     </motion.article>
   );

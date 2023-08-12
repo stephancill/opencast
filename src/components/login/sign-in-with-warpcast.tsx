@@ -1,4 +1,3 @@
-import { getHubRpcClient, Message } from '@farcaster/hub-web';
 import * as ed from '@noble/ed25519';
 import { useEffect, useState } from 'react';
 import QRCode from 'react-qr-code';
@@ -59,7 +58,7 @@ const WarpcastAuthPopup = () => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         publicKey: `0x${keyPair.publicKey}`,
-        name: 'Opencaster'
+        name: 'Opencast'
       })
     });
 
