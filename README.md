@@ -35,6 +35,7 @@ This project depends on the Farcaster PosgreSQL database. Follow the instruction
 - [x] Channels
   - [x] Channel detail
   - [ ] Index channels
+- [ ] Rebrand
 
 ...
 
