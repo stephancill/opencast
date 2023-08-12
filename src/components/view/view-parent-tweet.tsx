@@ -1,5 +1,5 @@
 import { Tweet } from '@components/tweet/tweet';
-import type { RefObject } from 'react';
+import { RefObject, useMemo } from 'react';
 import { useEffect } from 'react';
 import { useQuery } from 'react-query';
 import { TweetResponse } from '../../lib/types/tweet';
@@ -34,7 +34,19 @@ export function ViewParentTweet({
     return tweet;
   };
 
-  const { data, isLoading: loading } = useQuery('parentTweet', fetchCast);
+  const { data, isLoading: loading } = useQuery(
+    ['parentTweet', parentId],
+    fetchCast
+  );
+
+  const mentions = useMemo(() => {
+    // Look up mentions in users object
+    const resolvedMentions = data?.mentions.map((mention) => ({
+      ...mention,
+      username: data.users[mention.userId]?.username
+    }));
+    return resolvedMentions;
+  }, [data]);
 
   useEffect(() => {
     if (!loading) viewTweetRef.current?.scrollIntoView();
@@ -62,5 +74,12 @@ export function ViewParentTweet({
       </div>
     );
 
-  return <Tweet parentTweet {...data} user={data.users[data.createdBy]} />;
+  return (
+    <Tweet
+      parentTweet
+      {...data}
+      mentions={mentions || []}
+      user={data.users[data.createdBy]}
+    />
+  );
 }
