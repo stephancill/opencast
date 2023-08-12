@@ -24,6 +24,7 @@ type InputProps = {
   disabled?: boolean;
   children?: ReactNode;
   replyModal?: boolean;
+  parentUrl?: string;
   closeModal?: () => void;
 };
 
@@ -39,6 +40,7 @@ export function Input({
   disabled,
   children,
   replyModal,
+  parentUrl,
   closeModal
 }: InputProps): JSX.Element {
   const [selectedImages, setSelectedImages] = useState<FilesWithId>([]);
@@ -81,7 +83,8 @@ export function Input({
       text: inputValue.trim(),
       fid: parseInt(userId),
       parentCastHash: isReplying && parent ? parent.id : undefined,
-      parentCastFid: isReplying && parent ? parseInt(parent.userId) : undefined
+      parentCastFid: isReplying && parent ? parseInt(parent.userId) : undefined,
+      parentUrl
     });
 
     const res = await submitHubMessage(castMessage);

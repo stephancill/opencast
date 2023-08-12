@@ -70,7 +70,7 @@ export default function ChannelPage({
         description={channel.description}
         className='flex items-center justify-between'
       ></MainHeader>
-      {!isMobile && <Input />}
+      {!isMobile && <Input parentUrl={channelString} />}
       <section className='mt-0.5 xs:mt-0'>
         {loading ? (
           <Loading className='mt-5' />
