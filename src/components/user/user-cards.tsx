@@ -67,7 +67,8 @@ export function UserCards({
       {loading ? (
         <Loading className={modal ? 'mt-[52px]' : 'mt-5'} />
       ) : (
-        <AnimatePresence mode='popLayout'>
+        // <AnimatePresence mode='popLayout'>
+        <div className='mt-10'>
           {data?.length ? (
             data.map((userData) => (
               <motion.div layout='position' key={userData.id} {...variants}>
@@ -78,7 +79,8 @@ export function UserCards({
             <StatsEmpty {...noStatsData} modal={modal} />
           )}
           {LoadMore && <LoadMore />}
-        </AnimatePresence>
+        </div>
+        // </AnimatePresence>
       )}
     </section>
   );

@@ -149,9 +149,6 @@ export function TweetStats({
           iconName='HeartIcon'
           viewTweet={viewTweet}
           onClick={async () => {
-            const privateKey = JSON.parse(
-              localStorage.getItem('keyPair') || '{}'
-            ).privateKey;
             const message = await createReactionMessage({
               castHash: tweetId,
               castAuthorFid: parseInt(tweetAuthorId),
@@ -164,7 +161,6 @@ export function TweetStats({
               return;
             }
             const result = await submitHubMessage(message);
-            console.log('result', result);
           }}
         />
         <TweetShare userId={userId} tweetId={tweetId} viewTweet={viewTweet} />

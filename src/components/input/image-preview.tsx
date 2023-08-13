@@ -141,7 +141,7 @@ export function ImagePreview({
             />
             {removeImage && (
               <Button
-                className='group absolute top-0 left-0 translate-x-1 translate-y-1
+                className='group absolute left-0 top-0 translate-x-1 translate-y-1
                            bg-light-primary/75 p-1 backdrop-blur-sm 
                            hover:bg-image-preview-hover/75'
                 onClick={preventBubbling(removeImage(id))}

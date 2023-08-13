@@ -94,7 +94,7 @@ export function TweetShare({
                   <HeroIcon iconName='LinkIcon' />
                   Copy link to Tweet
                 </Popover.Button>
-                {!tweetIsBookmarked ? (
+                {/* {!tweetIsBookmarked ? (
                   <Popover.Button
                     className='accent-tab flex w-full gap-3 rounded-md rounded-t-none p-4 hover:bg-main-sidebar-background'
                     as={Button}
@@ -116,7 +116,7 @@ export function TweetShare({
                     <HeroIcon iconName='BookmarkSlashIcon' />
                     Remove Tweet from Bookmarks
                   </Popover.Button>
-                )}
+                )} */}
               </Popover.Panel>
             )}
           </AnimatePresence>

@@ -46,23 +46,23 @@ export function TweetText({
     const segments = splitAndInsert(
       text,
       indices,
-      mentions.map((mention) => {
+      mentions.map((mention, index) => {
         return (
-          <Link href={`/user/${mention.username}`}>
-            <p className='inline text-main-accent hover:cursor-pointer hover:underline'>{`@${mention.username}`}</p>
+          <Link href={`/user/${mention.username}`} key={index}>
+            <span className='inline text-main-accent hover:cursor-pointer hover:underline'>{`@${mention.username}`}</span>
           </Link>
         );
       }),
       (s) => {
         return (
-          <p className='inline'>
+          <p className='inline' key={s}>
             {s.split(urlRegex).map((part, index) => {
               if (part.match(urlRegex)) {
                 return (
-                  <a target={'_blank'} key={index} href={part}>
-                    <p className='inline text-main-accent hover:cursor-pointer hover:underline'>
+                  <a target={'_blank'} key={part} href={part}>
+                    <span className='inline text-main-accent hover:cursor-pointer hover:underline'>
                       {part}
-                    </p>
+                    </span>
                   </a>
                 );
               } else {

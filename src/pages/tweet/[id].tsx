@@ -8,7 +8,6 @@ import { Loading } from '@components/ui/loading';
 import { ViewParentTweet } from '@components/view/view-parent-tweet';
 import { ViewTweet } from '@components/view/view-tweet';
 import { isPlural } from '@lib/utils';
-import { AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/router';
 import { ReactElement, ReactNode, useMemo, useRef } from 'react';
 import { useQuery } from 'react-query';
@@ -119,7 +118,7 @@ export default function TweetId(): JSX.Element {
               ) : !repliesData ? (
                 <div>No replies</div>
               ) : (
-                <AnimatePresence mode='popLayout'>
+                <div>
                   {repliesData.pages.map((page) => {
                     if (!page) return;
                     const { tweets, users } = page;
@@ -138,7 +137,7 @@ export default function TweetId(): JSX.Element {
                     });
                   })}
                   <LoadMore />
-                </AnimatePresence>
+                </div>
               ))}
           </>
         )}

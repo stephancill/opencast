@@ -146,7 +146,7 @@ export function ViewTweet(tweet: ViewTweetProps): JSX.Element {
             {client && (
               <p className='gap-1 py-4 text-light-secondary dark:text-dark-secondary'>
                 <i className='px-1  '>·</i>{' '}
-                <p className='inline '>via {client}</p>
+                <span className='inline '>via {client}</span>
               </p>
             )}
           </div>

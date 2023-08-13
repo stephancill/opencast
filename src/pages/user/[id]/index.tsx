@@ -6,7 +6,6 @@ import { StatsEmpty } from '@components/tweet/stats-empty';
 import { Tweet } from '@components/tweet/tweet';
 import { Loading } from '@components/ui/loading';
 import { useUser } from '@lib/context/user-context';
-import { AnimatePresence } from 'framer-motion';
 import type { ReactElement, ReactNode } from 'react';
 import { useInfiniteScroll } from '../../../lib/hooks/useInfiniteScroll';
 
@@ -48,7 +47,8 @@ export default function UserTweets(): JSX.Element {
           description='When they do, their Tweets will show up here.'
         />
       ) : (
-        <AnimatePresence mode='popLayout'>
+        // <AnimatePresence mode='popLayout'>
+        <div>
           {/* {pinnedData && (
             <Tweet pinned {...pinnedData} key={`pinned-${pinnedData.id}`} />
           )}
@@ -86,7 +86,8 @@ export default function UserTweets(): JSX.Element {
             });
           })}
           <LoadMore />
-        </AnimatePresence>
+          {/* </AnimatePresence> */}
+        </div>
       )}
     </section>
   );
