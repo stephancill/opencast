@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
 import cn from 'clsx';
 import { useModal } from '@lib/hooks/useModal';
 import { preventBubbling } from '@lib/utils';
@@ -105,54 +104,48 @@ export function ImagePreview({
           handleNextIndex={handleNextIndex}
         />
       </Modal>
-      <AnimatePresence mode='popLayout'>
-        {imagesPreview.map(({ id, src, alt }, index) => (
-          <motion.button
-            type='button'
-            className={cn(
-              'accent-tab relative transition-shadow',
+      {imagesPreview.map(({ id, src, alt }, index) => (
+        <button
+          className={cn(
+            'accent-tab relative transition-shadow',
+            isTweet
+              ? postImageBorderRadius[previewCount][index]
+              : 'rounded-2xl',
+            {
+              'col-span-2 row-span-2': previewCount === 1,
+              'row-span-2':
+                previewCount === 2 || (index === 0 && previewCount === 3)
+            }
+          )}
+          onClick={preventBubbling(handleSelectedImage(index))}
+          key={id}
+        >
+          <NextImage
+            className='relative h-full w-full cursor-pointer transition 
+                         hover:brightness-75 hover:duration-200'
+            imgClassName={cn(
               isTweet
                 ? postImageBorderRadius[previewCount][index]
-                : 'rounded-2xl',
-              {
-                'col-span-2 row-span-2': previewCount === 1,
-                'row-span-2':
-                  previewCount === 2 || (index === 0 && previewCount === 3)
-              }
+                : 'rounded-2xl'
             )}
-            {...variants}
-            onClick={preventBubbling(handleSelectedImage(index))}
-            layout={!isTweet ? true : false}
-            key={id}
-          >
-            <NextImage
-              className='relative h-full w-full cursor-pointer transition 
-                         hover:brightness-75 hover:duration-200'
-              imgClassName={cn(
-                isTweet
-                  ? postImageBorderRadius[previewCount][index]
-                  : 'rounded-2xl'
-              )}
-              previewCount={previewCount}
-              layout='fill'
-              src={src}
-              alt={alt}
-              useSkeleton={isTweet}
-            />
-            {removeImage && (
-              <Button
-                className='group absolute left-0 top-0 translate-x-1 translate-y-1
+            previewCount={previewCount}
+            layout='fill'
+            src={src}
+            alt={alt}
+          />
+          {removeImage && (
+            <Button
+              className='group absolute left-0 top-0 translate-x-1 translate-y-1
                            bg-light-primary/75 p-1 backdrop-blur-sm 
                            hover:bg-image-preview-hover/75'
-                onClick={preventBubbling(removeImage(id))}
-              >
-                <HeroIcon className='h-5 w-5 text-white' iconName='XMarkIcon' />
-                <ToolTip className='translate-y-2' tip='Remove' />
-              </Button>
-            )}
-          </motion.button>
-        ))}
-      </AnimatePresence>
+              onClick={preventBubbling(removeImage(id))}
+            >
+              <HeroIcon className='h-5 w-5 text-white' iconName='XMarkIcon' />
+              <ToolTip className='translate-y-2' tip='Remove' />
+            </Button>
+          )}
+        </button>
+      ))}
     </div>
   );
 }
