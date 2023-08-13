@@ -80,13 +80,7 @@ export function Tweet(tweet: TweetProps): JSX.Element {
   const tweetIsRetweeted = userRetweets.includes(profileId ?? '');
 
   return (
-    <motion.article
-      {...(!modal ? { ...variants, layout: 'position' } : {})}
-      animate={{
-        ...variants.animate,
-        ...(parentTweet && { transition: { duration: 0.2 } })
-      }}
-    >
+    <article>
       <Modal
         className='flex items-start justify-center'
         modalClassName='bg-main-background rounded-2xl max-w-xl w-full my-8 overflow-hidden'
@@ -97,18 +91,26 @@ export function Tweet(tweet: TweetProps): JSX.Element {
       </Modal>
       <div
         className={cn(
-          `accent-tab hover-card relative flex flex-col 
-             gap-y-4 px-4 py-3 outline-none duration-200`,
+          `accent-tab hover-card relative flex cursor-pointer 
+             flex-col gap-y-4 px-4 py-3 outline-none duration-200`,
           parentTweet
             ? 'mt-0.5 pb-0 pt-2.5'
             : 'border-b border-light-border dark:border-dark-border'
         )}
         onClick={(event) => {
-          if (
-            (event.target as any).tagName === 'A' ||
-            (event.target as any).tagName === 'P'
-          )
+          // Prevent click when clicking on a link or a paragraph
+          if ((event.target as any).tagName === 'A') {
+            event.stopPropagation();
             return;
+          }
+
+          // Prevent click when selecting text
+          const text = window.getSelection()?.toString();
+          if (text) {
+            event.stopPropagation();
+            return;
+          }
+
           push(tweetLink);
         }}
       >
@@ -213,6 +215,6 @@ export function Tweet(tweet: TweetProps): JSX.Element {
           </div>
         </div>
       </div>
-    </motion.article>
+    </article>
   );
 }
