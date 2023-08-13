@@ -164,16 +164,6 @@ export function TweetStats({
           }}
         />
         <TweetShare userId={userId} tweetId={tweetId} viewTweet={viewTweet} />
-        {isOwner && (
-          <TweetOption
-            className='hover:text-accent-blue focus-visible:text-accent-blue'
-            iconClassName='group-hover:bg-accent-blue/10 group-active:bg-accent-blue/20 
-                           group-focus-visible:bg-accent-blue/10 group-focus-visible:ring-accent-blue/80'
-            tip='Analytics'
-            iconName='ChartPieIcon'
-            disabled
-          />
-        )}
       </div>
     </>
   );
