@@ -26,6 +26,10 @@ import { CustomIcon } from '@components/ui/custom-icon';
 import type { Variants } from 'framer-motion';
 import type { Tweet } from '@lib/types/tweet';
 import type { User } from '@lib/types/user';
+import {
+  createRemoveCastMessage,
+  submitHubMessage
+} from '../../lib/farcaster/utils';
 
 export const variants: Variants = {
   initial: { opacity: 0, y: -25 },
@@ -94,30 +98,20 @@ export function TweetActions({
   const isInAdminControl = isAdmin && !isOwner;
   const tweetIsPinned = pinnedTweet === tweetId;
 
-  // const handleRemove = async (): Promise<void> => {
-  //   if (viewTweet)
-  //     if (parentId) {
-  //       const parentSnapshot = await getDoc(doc(tweetsCollection, parentId));
-  //       if (parentSnapshot.exists()) {
-  //         await push(`/tweet/${parentId}`, undefined, { scroll: false });
-  //         delayScroll(200)();
-  //         await sleep(50);
-  //       } else await push('/home');
-  //     } else await push('/home');
+  const handleRemove = async (): Promise<void> => {
+    const message = await createRemoveCastMessage({
+      castHash: tweetId,
+      castAuthorFid: parseInt(userId)
+    });
 
-  //   await Promise.all([
-  //     removeTweet(tweetId),
-  //     manageTotalTweets('decrement', ownerId),
-  //     hasImages && manageTotalPhotos('decrement', createdBy),
-  //     parentId && manageReply('decrement', parentId)
-  //   ]);
+    const res = await submitHubMessage(message);
 
-  //   toast.success(
-  //     `${isInAdminControl ? `@${username}'s` : 'Your'} Tweet was deleted`
-  //   );
+    toast.success(
+      `${isInAdminControl ? `@${username}'s` : 'Your'} Tweet was deleted`
+    );
 
-  //   removeCloseModal();
-  // };
+    removeCloseModal();
+  };
 
   // const handlePin = async (): Promise<void> => {
   //   await managePinnedTweet(tweetIsPinned ? 'unpin' : 'pin', userId, tweetId);
@@ -174,8 +168,7 @@ export function TweetActions({
                             focus-visible:bg-accent-red/90'
           mainBtnLabel='Delete'
           focusOnMainBtn
-          // action={handleRemove}
-          action={() => {}}
+          action={handleRemove}
           closeModal={removeCloseModal}
         />
       </Modal>

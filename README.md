@@ -30,7 +30,7 @@ This project depends on the Farcaster PosgreSQL database. Follow the instruction
 - [x] Auth
 - [x] Engagement actions
 - [x] Post creation
-- [ ] Post deletion
+- [x] Post deletion
 - [ ] Search
 - [x] Channels
   - [x] Channel detail
@@ -45,7 +45,6 @@ This project depends on the Farcaster PosgreSQL database. Follow the instruction
 - [Next.js](https://nextjs.org)
 - [TypeScript](https://www.typescriptlang.org)
 - [Tailwind CSS](https://tailwindcss.com)
-- [Firebase](https://firebase.google.com)
 - [SWR](https://swr.vercel.app)
 - [Headless UI](https://headlessui.com)
 - [React Hot Toast](https://react-hot-toast.com)

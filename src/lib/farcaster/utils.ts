@@ -1,6 +1,7 @@
 import {
   FarcasterNetwork,
   makeCastAdd,
+  makeCastRemove,
   makeReactionAdd,
   makeReactionRemove,
   Message,
@@ -50,7 +51,11 @@ export async function createReactionMessage({
     signer
   );
 
-  return message.unwrapOr(null);
+  const unwrapped = message.unwrapOr(null);
+
+  if (!unwrapped) throw new Error('Could not create message');
+
+  return unwrapped;
 }
 
 export async function createCastMessage({
@@ -90,6 +95,33 @@ export async function createCastMessage({
       mentionsPositions: [],
       parentCastId,
       parentUrl
+    },
+    messageDataOptions,
+    signer
+  );
+
+  const unwrapped = message.unwrapOr(null);
+
+  if (!unwrapped) throw new Error('Could not create message');
+
+  return unwrapped;
+}
+
+export async function createRemoveCastMessage({
+  castHash,
+  castAuthorFid
+}: {
+  castHash: string;
+  castAuthorFid: number;
+}) {
+  const signer = getSigner();
+  const messageDataOptions = {
+    fid: castAuthorFid,
+    network: FarcasterNetwork.MAINNET
+  };
+  const message = await makeCastRemove(
+    {
+      targetHash: new Uint8Array(Buffer.from(castHash, 'hex'))
     },
     messageDataOptions,
     signer
