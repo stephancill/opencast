@@ -59,15 +59,15 @@ export function ViewTweet(tweet: ViewTweetProps): JSX.Element {
   const { id: parentId, username: parentUsername = username } = parent ?? {};
 
   return (
-    <motion.article
+    <article
       className={cn(
         `accent-tab h- relative flex cursor-default flex-col gap-3 border-b
          border-light-border px-4 py-3 outline-none dark:border-dark-border`,
         reply && 'scroll-m-[3.25rem] pt-0'
       )}
-      {...variants}
-      animate={{ ...variants.animate, transition: { duration: 0.2 } }}
-      exit={undefined}
+      // {...variants}
+      // animate={{ ...variants.animate, transition: { duration: 0.2 } }}
+      // exit={undefined}
       ref={viewTweetRef}
     >
       <Modal
@@ -89,7 +89,7 @@ export function ViewTweet(tweet: ViewTweetProps): JSX.Element {
             <UserAvatar src={photoURL} alt={name} username={username} />
           </UserTooltip>
           <div className='flex min-w-0 justify-between'>
-            <div className='flex flex-col truncate xs:overflow-visible xs:whitespace-normal'>
+            <div className='flex cursor-pointer flex-col truncate xs:overflow-visible xs:whitespace-normal '>
               <UserTooltip {...tweetUserData}>
                 <UserName
                   className='-mb-1'
@@ -172,6 +172,6 @@ export function ViewTweet(tweet: ViewTweetProps): JSX.Element {
           }
         />
       </div>
-    </motion.article>
+    </article>
   );
 }

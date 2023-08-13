@@ -57,7 +57,7 @@ export function UserTooltip({
   return (
     <div
       className={cn(
-        'group relative self-start text-light-primary dark:text-dark-primary',
+        'group relative cursor-pointer self-start text-light-primary dark:text-dark-primary ',
         avatar ? '[&>div]:translate-y-2' : 'grid [&>div]:translate-y-7'
       )}
     >
@@ -91,8 +91,8 @@ export function UserTooltip({
               <div className='mb-10'>
                 <UserAvatar
                   className='absolute -translate-y-1/2 bg-main-background p-1 
-                             hover:brightness-100 [&>figure>span]:[transition:200ms]
-                             [&:hover>figure>span]:brightness-75'
+                             hover:brightness-100 [&:hover>figure>span]:brightness-75
+                             [&>figure>span]:[transition:200ms]'
                   src={photoURL}
                   alt={name}
                   size={64}
