@@ -1,8 +1,3 @@
-import cn from 'clsx';
-import { AnimatePresence, motion } from 'framer-motion';
-import Link from 'next/link';
-import { useEffect, useId, useRef, useState } from 'react';
-import { toast } from 'react-hot-toast';
 import { UserAvatar } from '@components/user/user-avatar';
 import { Message } from '@farcaster/hub-web';
 import { useAuth } from '@lib/context/auth-context';
@@ -10,8 +5,13 @@ import type { FilesWithId, ImageData, ImagesPreview } from '@lib/types/file';
 import type { User } from '@lib/types/user';
 import { sleep } from '@lib/utils';
 import { getImagesData } from '@lib/validation';
+import cn from 'clsx';
 import type { Variants } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
+import Link from 'next/link';
 import type { ChangeEvent, ClipboardEvent, FormEvent, ReactNode } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
+import { toast } from 'react-hot-toast';
 import { createCastMessage, submitHubMessage } from '../../lib/farcaster/utils';
 import { ImagePreview } from './image-preview';
 import { fromTop, InputForm } from './input-form';
@@ -87,31 +87,38 @@ export function Input({
       parentUrl
     });
 
-    const res = await submitHubMessage(castMessage);
-    const message = Message.fromJSON(res);
+    if (castMessage) {
+      const res = await submitHubMessage(castMessage);
+      const message = Message.fromJSON(res);
 
-    await sleep(500);
+      await sleep(500);
 
-    if (!modal && !replyModal) {
-      discardTweet();
-      setLoading(false);
+      if (!modal && !replyModal) {
+        discardTweet();
+        setLoading(false);
+      }
+
+      if (closeModal) closeModal();
+
+      const tweetId = Buffer.from(message.hash).toString('hex');
+
+      toast.success(
+        () => (
+          <span className='flex gap-2'>
+            Your post was sent
+            <Link href={`/tweet/${tweetId}`}>
+              <a className='custom-underline font-bold'>View</a>
+            </Link>
+          </span>
+        ),
+        { duration: 6000 }
+      );
+    } else {
+      toast.error(
+        () => <span className='flex gap-2'>Failed to create post</span>,
+        { duration: 6000 }
+      );
     }
-
-    if (closeModal) closeModal();
-
-    const tweetId = Buffer.from(message.hash).toString('hex');
-
-    toast.success(
-      () => (
-        <span className='flex gap-2'>
-          Your Tweet was sent
-          <Link href={`/tweet/${tweetId}`}>
-            <a className='custom-underline font-bold'>View</a>
-          </Link>
-        </span>
-      ),
-      { duration: 6000 }
-    );
   };
 
   const handleImageUpload = (

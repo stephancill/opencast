@@ -27,6 +27,7 @@ import type { Variants } from 'framer-motion';
 import type { Tweet } from '@lib/types/tweet';
 import type { User } from '@lib/types/user';
 import {
+  createFollowMessage,
   createRemoveCastMessage,
   submitHubMessage
 } from '../../lib/farcaster/utils';
@@ -104,13 +105,17 @@ export function TweetActions({
       castAuthorFid: parseInt(userId)
     });
 
-    const res = await submitHubMessage(message);
+    if (message) {
+      const res = await submitHubMessage(message);
 
-    toast.success(
-      `${isInAdminControl ? `@${username}'s` : 'Your'} Tweet was deleted`
-    );
+      toast.success(
+        `${isInAdminControl ? `@${username}'s` : 'Your'} Tweet was deleted`
+      );
 
-    removeCloseModal();
+      removeCloseModal();
+    } else {
+      toast.error(`Failed to delete cast`);
+    }
   };
 
   // const handlePin = async (): Promise<void> => {
@@ -121,18 +126,29 @@ export function TweetActions({
   //   pinCloseModal();
   // };
 
-  // const handleFollow =
-  //   (closeMenu: () => void, ...args: Parameters<typeof manageFollow>) =>
-  //   async (): Promise<void> => {
-  //     const [type] = args;
+  const handleFollow =
+    (closeMenu: () => void, type: 'follow' | 'unfollow') =>
+    async (): Promise<void> => {
+      const message = await createFollowMessage({
+        fid: parseInt(createdBy),
+        targetFid: parseInt(userId),
+        remove: type === 'unfollow'
+      });
 
-  //     closeMenu();
-  //     await manageFollow(...args);
+      if (message) {
+        const res = await submitHubMessage(message);
 
-  //     toast.success(
-  //       `You ${type === 'follow' ? 'followed' : 'unfollowed'} @${username}`
-  //     );
-  //   };
+        closeMenu();
+
+        toast.success(
+          `You ${type === 'follow' ? 'followed' : 'unfollowed'} @${username}`
+        );
+      } else {
+        toast.error(
+          `Failed to ${type === 'follow' ? 'follow' : 'unfollow'} @${username}`
+        );
+      }
+    };
 
   const userIsFollowed = following.includes(createdBy);
 
@@ -250,9 +266,7 @@ export function TweetActions({
                     <Popover.Button
                       className='accent-tab flex w-full gap-3 rounded-md rounded-t-none p-4 hover:bg-main-sidebar-background'
                       as={Button}
-                      // onClick={preventBubbling(
-                      //   handleFollow(close, 'unfollow', userId, createdBy)
-                      // )}
+                      onClick={preventBubbling(handleFollow(close, 'unfollow'))}
                     >
                       <HeroIcon iconName='UserMinusIcon' />
                       Unfollow @{username}
@@ -261,9 +275,7 @@ export function TweetActions({
                     <Popover.Button
                       className='accent-tab flex w-full gap-3 rounded-md rounded-t-none p-4 hover:bg-main-sidebar-background'
                       as={Button}
-                      // onClick={preventBubbling(
-                      //   handleFollow(close, 'follow', userId, createdBy)
-                      // )}
+                      onClick={preventBubbling(handleFollow(close, 'follow'))}
                     >
                       <HeroIcon iconName='UserPlusIcon' />
                       Follow @{username}

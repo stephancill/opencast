@@ -2,6 +2,8 @@ import {
   FarcasterNetwork,
   makeCastAdd,
   makeCastRemove,
+  makeLinkAdd,
+  makeLinkRemove,
   makeReactionAdd,
   makeReactionRemove,
   Message,
@@ -51,11 +53,7 @@ export async function createReactionMessage({
     signer
   );
 
-  const unwrapped = message.unwrapOr(null);
-
-  if (!unwrapped) throw new Error('Could not create message');
-
-  return unwrapped;
+  return message.unwrapOr(null);
 }
 
 export async function createCastMessage({
@@ -100,11 +98,7 @@ export async function createCastMessage({
     signer
   );
 
-  const unwrapped = message.unwrapOr(null);
-
-  if (!unwrapped) throw new Error('Could not create message');
-
-  return unwrapped;
+  return message.unwrapOr(null);
 }
 
 export async function createRemoveCastMessage({
@@ -127,11 +121,36 @@ export async function createRemoveCastMessage({
     signer
   );
 
-  const unwrapped = message.unwrapOr(null);
+  return message.unwrapOr(null);
+}
 
-  if (!unwrapped) throw new Error('Could not create message');
+export async function createFollowMessage({
+  targetFid,
+  fid,
+  remove
+}: {
+  targetFid: number;
+  fid: number;
+  remove?: boolean;
+}) {
+  const signer = getSigner();
+  const messageDataOptions = {
+    fid: fid,
+    network: FarcasterNetwork.MAINNET
+  };
 
-  return unwrapped;
+  const maker = remove ? makeLinkRemove : makeLinkAdd;
+
+  const message = await maker(
+    {
+      type: 'follow',
+      targetFid: targetFid
+    },
+    messageDataOptions,
+    signer
+  );
+
+  return message.unwrapOr(null);
 }
 
 export async function submitHubMessage(message: Message) {
