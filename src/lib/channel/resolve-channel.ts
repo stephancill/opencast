@@ -83,8 +83,8 @@ export async function resolveChannel(url: string): Promise<ChannelType | null> {
           parsed.contractAddress.length
         )}`;
         return {
-          name: `${chainById[chainId].name}: ${truncatedAddress}`,
-          description: 'NFT'
+          name: `${chainById[chainId].name} ${truncatedAddress}`,
+          description: `NFT on ${chainById[chainId].name}`
         };
       }
 

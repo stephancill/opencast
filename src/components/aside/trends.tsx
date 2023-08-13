@@ -71,24 +71,6 @@ export function AsideTrends({ inTrendsPage }: AsideTrendsProps): JSX.Element {
                 className='hover-animation accent-tab hover-card relative 
                            flex cursor-pointer flex-col gap-0.5'
               >
-                <div className='absolute right-2 top-2'>
-                  <div
-                    className='hover-animation group relative p-2
-                               hover:bg-accent-blue/10 focus-visible:bg-accent-blue/20 
-                               focus-visible:!ring-accent-blue/80'
-                    // onClick={preventBubbling()}
-                  >
-                    <HeroIcon
-                      className='h-5 w-5 text-light-secondary group-hover:text-accent-blue 
-                                 group-focus-visible:text-accent-blue dark:text-dark-secondary'
-                      iconName='EllipsisHorizontalIcon'
-                    />
-                    <ToolTip tip='More' />
-                  </div>
-                </div>
-                <p className='text-sm text-light-secondary dark:text-dark-secondary'>
-                  Trending
-                </p>
                 <p className='font-bold'>{channel?.name}</p>
                 <p className='text-sm text-light-secondary dark:text-dark-secondary'>
                   {formatNumber(volume)} posts today
