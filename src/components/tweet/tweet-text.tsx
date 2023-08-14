@@ -19,8 +19,6 @@ function splitAndInsert(
   let result = [];
   let lastIndex = 0;
 
-  console.log(input, indices);
-
   indices.forEach((index, i) => {
     result.push(
       elementBuilder(Buffer.from(input).slice(lastIndex, index).toString())

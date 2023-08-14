@@ -27,7 +27,8 @@ export function useInfiniteScroll(
   const [loadMoreInView, setLoadMoreInView] = useState(false);
 
   const fetchData = async ({ pageParam = null }) => {
-    const response = await fetch(urlBuilder(pageParam));
+    const url = urlBuilder(pageParam);
+    const response = await fetch(url);
     if (!response.ok) {
       throw new Error('Could not fetch the casts');
     }
