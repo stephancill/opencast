@@ -15,7 +15,6 @@ import type { Tweet } from '@lib/types/tweet';
 import type { User } from '@lib/types/user';
 import cn from 'clsx';
 import Link from 'next/link';
-import { useRouter } from 'next/router';
 import { RefObject } from 'react';
 import { TweetText } from '../tweet/tweet-text';
 import { TweetTopic } from '../tweet/tweet-topic';
@@ -129,7 +128,7 @@ export function ViewTweet(tweet: ViewTweetProps): JSX.Element {
         </p>
       )}
       <div>
-        {text && <TweetText text={text} images={images} mentions={mentions} />}
+        <TweetText text={text || ''} images={images} mentions={mentions} />
         {images && (
           <ImagePreview
             viewTweet

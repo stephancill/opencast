@@ -189,11 +189,13 @@ export function Tweet(tweet: TweetProps): JSX.Element {
                 </Link>
               </p>
             )}
-            {text && (
-              <div className='whitespace-pre-line break-words'>
-                <TweetText text={text} images={images} mentions={mentions} />
-              </div>
-            )}
+            <div className='whitespace-pre-line break-words'>
+              <TweetText
+                text={text || ''}
+                images={images}
+                mentions={mentions}
+              />
+            </div>
             <div className='mt-1 flex flex-col gap-2'>
               {images && (
                 <ImagePreview

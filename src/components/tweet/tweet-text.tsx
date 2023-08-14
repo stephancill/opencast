@@ -19,13 +19,17 @@ function splitAndInsert(
   let result = [];
   let lastIndex = 0;
 
+  console.log(input, indices);
+
   indices.forEach((index, i) => {
-    result.push(elementBuilder(input.slice(lastIndex, index)));
+    result.push(
+      elementBuilder(Buffer.from(input).slice(lastIndex, index).toString())
+    );
     result.push(insertions[i]);
     lastIndex = index;
   });
 
-  result.push(elementBuilder(input.slice(lastIndex))); // get remaining part of string
+  result.push(elementBuilder(Buffer.from(input).slice(lastIndex).toString())); // get remaining part of string
 
   return result;
 }
