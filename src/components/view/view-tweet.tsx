@@ -16,6 +16,7 @@ import type { User } from '@lib/types/user';
 import cn from 'clsx';
 import Link from 'next/link';
 import { RefObject } from 'react';
+import { TweetEmbed } from '../tweet/tweet-embed';
 import { TweetText } from '../tweet/tweet-text';
 import { TweetTopic } from '../tweet/tweet-topic';
 
@@ -39,6 +40,7 @@ export function ViewTweet(tweet: ViewTweetProps): JSX.Element {
     mentions,
     client,
     topic,
+    embeds,
     user: tweetUserData
   } = tweet;
 
@@ -135,6 +137,13 @@ export function ViewTweet(tweet: ViewTweetProps): JSX.Element {
             imagesPreview={images}
             previewCount={images.length}
           />
+        )}
+        {embeds && (
+          <div className='mt-4'>
+            {embeds.map((embed) => (
+              <TweetEmbed key={embed.url} {...embed} />
+            ))}
+          </div>
         )}
         {topic && <TweetTopic topic={topic} />}
         <div

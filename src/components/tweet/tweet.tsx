@@ -16,6 +16,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { TweetActions } from './tweet-actions';
 import { TweetDate } from './tweet-date';
+import { TweetEmbed } from './tweet-embed';
 import { TweetStats } from './tweet-stats';
 import { TweetStatus } from './tweet-status';
 import { TweetText } from './tweet-text';
@@ -52,6 +53,8 @@ export function Tweet(tweet: TweetProps): JSX.Element {
     userRetweets,
     mentions,
     topic,
+    retweet,
+    embeds,
     user: tweetUserData
   } = tweet;
 
@@ -78,7 +81,7 @@ export function Tweet(tweet: TweetProps): JSX.Element {
   } = profile ?? {};
 
   const reply = !!parent;
-  const tweetIsRetweeted = userRetweets.includes(profileId ?? '');
+  const tweetIsRetweeted = retweet !== null;
 
   return (
     <article>
@@ -125,11 +128,13 @@ export function Tweet(tweet: TweetProps): JSX.Element {
                 <p className='text-sm font-bold'>Pinned Tweet</p>
               </TweetStatus>
             ) : (
-              tweetIsRetweeted && (
+              tweetIsRetweeted &&
+              retweet.username && (
                 <TweetStatus type='tweet'>
-                  <Link href={profileUsername as string}>
+                  <Link href={retweet.username as string}>
                     <a className='custom-underline truncate text-sm font-bold'>
-                      {userId === profileId ? 'You' : profileName} Retweeted
+                      {retweet.userId === profileId ? 'You' : retweet.username}{' '}
+                      Retweeted
                     </a>
                   </Link>
                 </TweetStatus>
@@ -204,6 +209,10 @@ export function Tweet(tweet: TweetProps): JSX.Element {
                   previewCount={images.length}
                 />
               )}
+              {embeds &&
+                embeds.map((embed) => (
+                  <TweetEmbed key={embed.url} {...embed} />
+                ))}
               {topic && <TweetTopic topic={topic} />}
               {!modal && (
                 <TweetStats

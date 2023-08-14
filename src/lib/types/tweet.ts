@@ -12,10 +12,20 @@ export type Mention = {
   username?: string;
 };
 
+export type ExternalEmbed = {
+  title?: string;
+  text?: string;
+  icon?: string;
+  image?: string;
+  provider?: string;
+  url: string;
+};
+
 export type Tweet = {
   id: string;
   text: string | null;
   images: ImagesPreview | null;
+  embeds: ExternalEmbed[];
   parent: { id: string; username?: string; userId?: string } | null;
   userLikes: string[];
   createdBy: string;
@@ -27,6 +37,7 @@ export type Tweet = {
   client: string | null;
   topic: TopicType | null;
   topicUrl: string | null;
+  retweet: { username?: string; userId?: string } | null;
 };
 
 export type TweetWithUsers = Tweet & { users: UsersMapType };
@@ -44,7 +55,7 @@ export const populateTweetUsers = (
   tweet: Tweet,
   users: UsersMapType
 ): Tweet => {
-  // Look up username in users object
+  // Look up parent tweet username in users object
   const resolvedParent = tweet.parent;
   if (resolvedParent && !tweet.parent?.username && tweet.parent?.userId) {
     tweet.parent.username = users[tweet.parent.userId]?.username;
@@ -56,10 +67,22 @@ export const populateTweetUsers = (
     username: users[mention.userId]?.username
   }));
 
+  // Look up recast username in users object
+  const resolvedRetweet = tweet.retweet;
+  if (
+    resolvedRetweet &&
+    !tweet.retweet?.username &&
+    tweet.retweet?.userId &&
+    users[tweet.retweet.userId]
+  ) {
+    tweet.retweet.username = users[tweet.retweet.userId]?.username;
+  }
+
   return {
     ...tweet,
     mentions: resolvedMentions,
-    parent: resolvedParent
+    parent: resolvedParent,
+    retweet: resolvedRetweet
   };
 };
 
@@ -105,6 +128,15 @@ export const tweetConverter = {
             }))
         : [];
 
+    const externalEmbeds: ExternalEmbed[] =
+      embeds.length > 0
+        ? embeds
+            .filter((embed) => embed.url && !isValidImageExtension(embed.url))
+            .map((embed) => ({
+              url: embed.url!
+            }))
+        : [];
+
     const mentions = cast.mentions.map(
       (userId, index): Mention => ({
         userId: userId.toString(),
@@ -118,6 +150,7 @@ export const tweetConverter = {
         : Buffer.from((cast.hash as any).data).toString('hex'),
       text: cast.text,
       images: images.length > 0 ? images : null,
+      embeds: externalEmbeds,
       parent,
       topic: null,
       topicUrl: cast.parent_url,
@@ -128,7 +161,8 @@ export const tweetConverter = {
       userReplies: 0,
       userRetweets: [],
       mentions,
-      client: cast.client || null
+      client: cast.client || null,
+      retweet: null
     } as Tweet;
   }
 };

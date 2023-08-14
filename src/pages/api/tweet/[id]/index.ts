@@ -1,8 +1,11 @@
 import { ReactionType } from '@farcaster/hub-web';
 import type { NextApiRequest, NextApiResponse } from 'next';
+import { populateEmbed } from '../../../../lib/embeds';
 import { prisma } from '../../../../lib/prisma';
 import { resolveTopic, TopicType } from '../../../../lib/topics/resolve-topic';
 import {
+  ExternalEmbed,
+  Tweet,
   tweetConverter,
   TweetResponse,
   TweetWithUsers
@@ -76,8 +79,15 @@ export default async function tweetIdEndpoint(
     topic = await resolveTopic(cast.parent_url);
   }
 
-  const tweet: TweetWithUsers = {
-    ...tweetConverter.toTweet(cast),
+  let tweet: Tweet = tweetConverter.toTweet(cast);
+
+  const resolvedEmbeds = (
+    await Promise.all(tweet.embeds.map(populateEmbed))
+  ).filter((embed) => embed !== null) as ExternalEmbed[];
+
+  const tweetWithUsers: TweetWithUsers = {
+    ...tweet,
+    embeds: resolvedEmbeds,
     topic: topic,
     userLikes: reactions[ReactionType.LIKE] || [],
     userRetweets: reactions[ReactionType.RECAST] || [],
@@ -86,6 +96,6 @@ export default async function tweetIdEndpoint(
   };
 
   res.json({
-    result: tweet
+    result: tweetWithUsers
   });
 }
