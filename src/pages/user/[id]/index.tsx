@@ -8,6 +8,10 @@ import { Loading } from '@components/ui/loading';
 import { useUser } from '@lib/context/user-context';
 import type { ReactElement, ReactNode } from 'react';
 import { useInfiniteScroll } from '../../../lib/hooks/useInfiniteScroll';
+import {
+  populateTweetTopic,
+  populateTweetUsers
+} from '../../../lib/types/tweet';
 
 export default function UserTweets(): JSX.Element {
   const { user } = useUser();
@@ -57,28 +61,18 @@ export default function UserTweets(): JSX.Element {
           ))} */}
           {mergedTweets.pages.map((page) => {
             if (!page) return;
-            const { tweets, users } = page;
+            const { tweets, users, topics } = page;
             return tweets.map((tweet) => {
               if (!users[tweet.createdBy]) {
                 return <></>;
               }
 
-              // Look up username in users object
-              const parent = tweet.parent;
-              if (parent && !tweet.parent?.username && tweet.parent?.userId) {
-                tweet.parent.username = users[tweet.parent.userId]?.username;
-              }
-
-              // Look up mentions in users object
-              const resolvedMentions = tweet.mentions.map((mention) => ({
-                ...mention,
-                username: users[mention.userId]?.username
-              }));
-
               return (
                 <Tweet
-                  {...tweet}
-                  mentions={resolvedMentions}
+                  {...populateTweetTopic(
+                    populateTweetUsers(tweet, users),
+                    topics
+                  )}
                   user={users[tweet.createdBy]}
                   key={tweet.id}
                 />
