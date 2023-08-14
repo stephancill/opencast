@@ -39,7 +39,7 @@ export default async function handle(
         }
       }
 
-      const { tweets, users, nextPageCursor } = await getTweetsPaginated({
+      const result = await getTweetsPaginated({
         where: {
           AND: [
             {
@@ -65,7 +65,7 @@ export default async function handle(
       });
 
       res.json({
-        result: { tweets, users, nextPageCursor }
+        result
       });
       break;
     default:

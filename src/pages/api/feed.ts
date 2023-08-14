@@ -13,7 +13,6 @@ export default async function handle(
   switch (method) {
     case 'GET':
       const userFid = Number(req.query.fid); // assuming 'fid' is passed as query param
-      // const skip = req.query.skip ? Number(req.query.skip) : undefined;
       const cursor = req.query.cursor
         ? new Date(req.query.cursor as string)
         : undefined;
@@ -33,7 +32,7 @@ export default async function handle(
       });
       const targetFids = links.map((link) => link.target_fid) as bigint[];
 
-      const { tweets, users, nextPageCursor } = await getTweetsPaginated({
+      const result = await getTweetsPaginated({
         where: {
           fid: {
             in: targetFids
@@ -51,7 +50,7 @@ export default async function handle(
       });
 
       res.json({
-        result: { tweets, users, nextPageCursor }
+        result
       });
       break;
     default:

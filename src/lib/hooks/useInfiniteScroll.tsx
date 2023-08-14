@@ -39,13 +39,7 @@ export function useInfiniteScroll(
       return;
     }
 
-    const { tweets, users, nextPageCursor } = result;
-
-    return {
-      tweets,
-      users,
-      nextPageCursor
-    };
+    return result;
   };
 
   const {

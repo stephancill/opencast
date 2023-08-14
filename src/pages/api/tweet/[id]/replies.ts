@@ -20,7 +20,7 @@ export default async function handle(
           ? Number(req.query.limit)
           : 10;
 
-      const { tweets, users, nextPageCursor } = await getTweetsPaginated({
+      const result = await getTweetsPaginated({
         where: {
           timestamp: {
             lt: cursor || undefined
@@ -35,7 +35,7 @@ export default async function handle(
       });
 
       res.json({
-        result: { tweets, users, nextPageCursor }
+        result
       });
       break;
     default:

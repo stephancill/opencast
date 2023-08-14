@@ -20,24 +20,23 @@ export default async function handle(
           ? Number(req.query.limit)
           : 10;
 
-      const { tweets, users, topics, nextPageCursor } =
-        await getTweetsPaginated({
-          where: {
-            timestamp: {
-              lt: cursor || undefined
-            },
-            parent_hash: null,
-            deleted_at: null,
-            parent_url: topicUrl
+      const result = await getTweetsPaginated({
+        where: {
+          timestamp: {
+            lt: cursor || undefined
           },
-          take: limit,
-          orderBy: {
-            timestamp: 'desc'
-          }
-        });
+          parent_hash: null,
+          deleted_at: null,
+          parent_url: topicUrl
+        },
+        take: limit,
+        orderBy: {
+          timestamp: 'desc'
+        }
+      });
 
       res.json({
-        result: { tweets, users, topics, nextPageCursor }
+        result
       });
       break;
     default:
