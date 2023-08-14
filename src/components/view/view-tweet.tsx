@@ -17,6 +17,7 @@ import type { User } from '@lib/types/user';
 import cn from 'clsx';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import { RefObject } from 'react';
 import { TweetText } from '../tweet/tweet-text';
 
@@ -39,6 +40,7 @@ export function ViewTweet(tweet: ViewTweetProps): JSX.Element {
     viewTweetRef,
     mentions,
     client,
+    topic,
     user: tweetUserData
   } = tweet;
 
@@ -47,6 +49,8 @@ export function ViewTweet(tweet: ViewTweetProps): JSX.Element {
   const { user } = useAuth();
 
   const { open, openModal, closeModal } = useModal();
+
+  const router = useRouter();
 
   const tweetLink = `/tweet/${tweetId}`;
 
@@ -135,6 +139,14 @@ export function ViewTweet(tweet: ViewTweetProps): JSX.Element {
             imagesPreview={images}
             previewCount={images.length}
           />
+        )}
+        {topic && (
+          <span
+            onClick={(e) => router.push(`/topic?url=${topic.url}`)}
+            className='cursor-pointer whitespace-nowrap pt-3 text-light-secondary hover:underline dark:text-dark-secondary'
+          >
+            #{topic.name}
+          </span>
         )}
         <div
           className='inner:hover-animation inner:border-b inner:border-light-border

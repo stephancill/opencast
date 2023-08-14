@@ -70,8 +70,14 @@ export default async function tweetIdEndpoint(
 
   const users = await resolveUsersMap([...fids]);
 
+  let topic: TopicType | null = null;
+  if (cast.parent_url) {
+    topic = await resolveTopic(cast.parent_url);
+  }
+
   const tweet: TweetWithUsers = {
     ...tweetConverter.toTweet(cast),
+    topic: topic,
     userLikes: reactions[ReactionType.LIKE] || [],
     userRetweets: reactions[ReactionType.RECAST] || [],
     users: users,

@@ -32,7 +32,7 @@ This project depends on the Farcaster PosgreSQL database. Follow the instruction
 - [x] Post creation
 - [x] Post deletion
 - [ ] Search
-- [x] Channels
+- [x] Channels (now called Topics)
   - [x] Channel detail
   - [x] Channel discovery
   - [ ] Index channels

@@ -11,7 +11,7 @@ export default async function handle(
   const { method } = req;
   switch (method) {
     case 'GET':
-      const channel = req.query.url as string;
+      const topicUrl = req.query.url as string;
       const cursor = req.query.cursor
         ? new Date(req.query.cursor as string)
         : undefined;
@@ -20,23 +20,24 @@ export default async function handle(
           ? Number(req.query.limit)
           : 10;
 
-      const { tweets, users, nextPageCursor } = await getTweetsPaginated({
-        where: {
-          timestamp: {
-            lt: cursor || undefined
+      const { tweets, users, topics, nextPageCursor } =
+        await getTweetsPaginated({
+          where: {
+            timestamp: {
+              lt: cursor || undefined
+            },
+            parent_hash: null,
+            deleted_at: null,
+            parent_url: topicUrl
           },
-          parent_hash: null,
-          deleted_at: null,
-          parent_url: channel
-        },
-        take: limit,
-        orderBy: {
-          timestamp: 'desc'
-        }
-      });
+          take: limit,
+          orderBy: {
+            timestamp: 'desc'
+          }
+        });
 
       res.json({
-        result: { tweets, users, nextPageCursor }
+        result: { tweets, users, topics, nextPageCursor }
       });
       break;
     default:

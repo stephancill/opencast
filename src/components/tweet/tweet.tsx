@@ -51,6 +51,7 @@ export function Tweet(tweet: TweetProps): JSX.Element {
     userReplies,
     userRetweets,
     mentions,
+    topic,
     user: tweetUserData
   } = tweet;
 
@@ -59,6 +60,8 @@ export function Tweet(tweet: TweetProps): JSX.Element {
   const { user } = useAuth();
 
   const { open, openModal, closeModal } = useModal();
+
+  const router = useRouter();
 
   const tweetLink = `/tweet/${tweetId}`;
 
@@ -99,7 +102,10 @@ export function Tweet(tweet: TweetProps): JSX.Element {
         )}
         onClick={(event) => {
           // Prevent click when clicking on a link or a paragraph
-          if ((event.target as any).tagName === 'A') {
+          if (
+            (event.target as any).tagName === 'A' ||
+            (event.target as any).tagName === 'SPAN'
+          ) {
             event.stopPropagation();
             return;
           }
@@ -197,6 +203,14 @@ export function Tweet(tweet: TweetProps): JSX.Element {
                   imagesPreview={images}
                   previewCount={images.length}
                 />
+              )}
+              {topic && (
+                <span
+                  onClick={(e) => router.push(`/topic?url=${topic.url}`)}
+                  className='cursor-pointer whitespace-nowrap pt-3 text-light-secondary hover:underline dark:text-dark-secondary'
+                >
+                  #{topic.name}
+                </span>
               )}
               {!modal && (
                 <TweetStats

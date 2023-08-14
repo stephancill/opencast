@@ -60,8 +60,8 @@ export function AsideTrends({ inTrendsPage }: AsideTrendsProps): JSX.Element {
           {!inTrendsPage && (
             <h2 className='text-xl font-extrabold'>Trending topics</h2>
           )}
-          {trends.map(({ channel, volume, url }) => (
-            <Link href={`/channel?url=${url}`} key={url}>
+          {trends.map(({ topic: topic, volume }) => (
+            <Link href={`/topic?url=${topic?.url}`} key={topic?.url}>
               {/* <a
                 className='hover-animation accent-tab hover-card relative 
                            flex cursor-not-allowed flex-col gap-0.5'
@@ -71,7 +71,7 @@ export function AsideTrends({ inTrendsPage }: AsideTrendsProps): JSX.Element {
                 className='hover-animation accent-tab hover-card relative 
                            flex cursor-pointer flex-col gap-0.5'
               >
-                <p className='font-bold'>{channel?.name}</p>
+                <p className='font-bold'>{topic?.name}</p>
                 <p className='text-sm text-light-secondary dark:text-dark-secondary'>
                   {formatNumber(volume)} posts today
                 </p>

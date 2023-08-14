@@ -26,7 +26,7 @@ const navLinks: Readonly<NavLink[]> = [
     iconName: 'HomeIcon'
   },
   {
-    href: '/channel?url=chain://eip155:1/erc721:0x7dd4e31f1530ac682c8ea4d8016e95773e08d8b0',
+    href: '/topic?url=chain://eip155:1/erc721:0x7dd4e31f1530ac682c8ea4d8016e95773e08d8b0',
     linkName: '/dev',
     iconName: 'HashtagIcon'
   }

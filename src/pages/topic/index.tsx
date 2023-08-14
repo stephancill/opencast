@@ -11,16 +11,16 @@ import { useWindow } from '@lib/context/window-context';
 import { useInfiniteScroll } from '@lib/hooks/useInfiniteScroll';
 import { GetServerSideProps } from 'next';
 import type { ReactElement, ReactNode } from 'react';
-import { ChannelType, resolveChannel } from '../../lib/channel/resolve-channel';
+import { TopicType, resolveTopic } from '../../lib/topics/resolve-topic';
 import { useAuth } from '../../lib/context/auth-context';
-import { populateTweetUsers } from '../../lib/types/tweet';
+import { populateTweetTopic, populateTweetUsers } from '../../lib/types/tweet';
 
-interface ChannelPageProps {
-  channelString: string;
-  channel: ChannelType;
+interface TopicPageProps {
+  topicUrl: string;
+  topic: TopicType;
 }
 
-export const getServerSideProps: GetServerSideProps<ChannelPageProps> = async ({
+export const getServerSideProps: GetServerSideProps<TopicPageProps> = async ({
   query
 }) => {
   if (!query?.url) {
@@ -29,48 +29,48 @@ export const getServerSideProps: GetServerSideProps<ChannelPageProps> = async ({
     };
   }
 
-  const channelString = query.url as string;
+  const topicUrl = query.url as string;
 
-  const channel = await resolveChannel(channelString);
+  const topic = await resolveTopic(topicUrl);
 
-  if (!channel) {
+  if (!topic) {
     return {
       notFound: true
     };
   }
 
   return {
-    props: { channelString: channelString, channel }
+    props: { topicUrl: topicUrl, topic: topic }
   };
 };
-export default function ChannelPage({
-  channelString,
-  channel
-}: ChannelPageProps): JSX.Element {
+export default function TopicPage({
+  topicUrl: topicUrl,
+  topic: topic
+}: TopicPageProps): JSX.Element {
   const { user } = useAuth();
   const { data, loading, LoadMore } = useInfiniteScroll(
     (pageParam) => {
-      const url = `/api/channel?url=${channelString}&limit=10${
+      const url = `/api/topic?url=${topicUrl}&limit=10${
         pageParam ? `&cursor=${pageParam}` : ''
       }`;
       return url;
     },
     {
-      queryKey: ['channel', channelString]
+      queryKey: ['topic', topicUrl]
     }
   );
   const { isMobile } = useWindow();
 
   return (
     <MainContainer>
-      <SEO title={`${channel.name} / Twitter`} />
+      <SEO title={`${topic.name} / Twitter`} />
       <MainHeader
         useMobileSidebar
-        title={`${channel.name}`}
-        description={channel.description}
+        title={`${topic.name}`}
+        description={topic.description}
         className='flex items-center justify-between'
       ></MainHeader>
-      {!isMobile && <Input parentUrl={channelString} />}
+      {!isMobile && <Input parentUrl={topicUrl} />}
       <section className='mt-0.5 xs:mt-0'>
         {loading ? (
           <Loading className='mt-5' />
@@ -80,7 +80,7 @@ export default function ChannelPage({
           <>
             {data.pages.map((page) => {
               if (!page) return;
-              const { tweets, users } = page;
+              const { tweets, users, topics } = page;
               return tweets.map((tweet) => {
                 if (!users[tweet.createdBy]) {
                   return <></>;
@@ -88,7 +88,10 @@ export default function ChannelPage({
 
                 return (
                   <Tweet
-                    {...populateTweetUsers(tweet, users)}
+                    {...populateTweetTopic(
+                      populateTweetUsers(tweet, users),
+                      topics
+                    )}
                     user={users[tweet.createdBy]}
                     key={tweet.id}
                   />
@@ -103,7 +106,7 @@ export default function ChannelPage({
   );
 }
 
-ChannelPage.getLayout = (page: ReactElement): ReactNode => (
+TopicPage.getLayout = (page: ReactElement): ReactNode => (
   <ProtectedLayout>
     <MainLayout>
       <HomeLayout>{page}</HomeLayout>

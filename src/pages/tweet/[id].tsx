@@ -13,7 +13,11 @@ import { ReactElement, ReactNode, useMemo, useRef } from 'react';
 import { useQuery } from 'react-query';
 import { Tweet } from '../../components/tweet/tweet';
 import { useInfiniteScroll } from '../../lib/hooks/useInfiniteScroll';
-import { populateTweetUsers, TweetResponse } from '../../lib/types/tweet';
+import {
+  populateTweetTopic,
+  populateTweetUsers,
+  TweetResponse
+} from '../../lib/types/tweet';
 
 export default function TweetId(): JSX.Element {
   const {
@@ -121,7 +125,7 @@ export default function TweetId(): JSX.Element {
                 <div>
                   {repliesData.pages.map((page) => {
                     if (!page) return;
-                    const { tweets, users } = page;
+                    const { tweets, users, topics } = page;
                     return tweets.map((tweet) => {
                       if (!users[tweet.createdBy]) {
                         return <></>;
@@ -129,7 +133,10 @@ export default function TweetId(): JSX.Element {
 
                       return (
                         <Tweet
-                          {...populateTweetUsers(tweet, users)}
+                          {...populateTweetTopic(
+                            populateTweetUsers(tweet, users),
+                            topics
+                          )}
                           user={users[tweet.createdBy]}
                           key={tweet.id}
                         />

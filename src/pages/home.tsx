@@ -11,7 +11,7 @@ import { useWindow } from '@lib/context/window-context';
 import { useInfiniteScroll } from '@lib/hooks/useInfiniteScroll';
 import type { ReactElement, ReactNode } from 'react';
 import { useAuth } from '../lib/context/auth-context';
-import { populateTweetUsers } from '../lib/types/tweet';
+import { populateTweetTopic, populateTweetUsers } from '../lib/types/tweet';
 
 export default function Home(): JSX.Element {
   const { user } = useAuth();
@@ -46,7 +46,7 @@ export default function Home(): JSX.Element {
           <>
             {data.pages.map((page) => {
               if (!page) return;
-              const { tweets, users } = page;
+              const { tweets, users, topics } = page;
               return tweets.map((tweet) => {
                 if (!users[tweet.createdBy]) {
                   return <></>;
@@ -54,7 +54,10 @@ export default function Home(): JSX.Element {
 
                 return (
                   <Tweet
-                    {...populateTweetUsers(tweet, users)}
+                    {...populateTweetTopic(
+                      populateTweetUsers(tweet, users),
+                      topics
+                    )}
                     user={users[tweet.createdBy]}
                     key={tweet.id}
                   />

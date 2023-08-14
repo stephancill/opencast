@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { resolveChannel } from '../../../lib/channel/resolve-channel';
+import { resolveTopic } from '../../../lib/topics/resolve-topic';
 import { prisma } from '../../../lib/prisma';
 import { TrendsResponse } from '../../../lib/types/trends';
 
@@ -38,18 +38,18 @@ export default async function handle(
         take: limit
       });
 
-      const channels = await Promise.all(
+      const topics = await Promise.all(
         results.map(async (result) => {
           const url = result.parent_url!;
-          const channel = await resolveChannel(url);
-          if (!channel) {
+          const topic = await resolveTopic(url);
+          if (!topic) {
             console.log(result.parent_url);
           }
-          return { channel, volume: result._count.hash, url };
+          return { topic, volume: result._count.hash };
         })
       );
 
-      res.json({ result: channels });
+      res.json({ result: topics });
       break;
     default:
       res.setHeader('Allow', ['GET']);

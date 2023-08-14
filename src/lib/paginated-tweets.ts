@@ -1,10 +1,11 @@
 import { ReactionType } from '@farcaster/hub-web';
 import { Prisma } from '@prisma/client';
+import { TopicsMapType, resolveTopicsMap } from './topics/resolve-topic';
 import { prisma } from './prisma';
 import { BaseResponse } from './types/responses';
 import { Tweet, tweetConverter } from './types/tweet';
 import { UsersMapType } from './types/user';
-import { resolveUsersMap } from './user/resolveUser';
+import { resolveUsersMap } from './user/resolve-user';
 
 export interface PaginatedTweetsResponse
   extends BaseResponse<{
@@ -12,6 +13,8 @@ export interface PaginatedTweetsResponse
     nextPageCursor: string | null;
     // fid -> User
     users: UsersMapType;
+    // url -> Topic
+    topics: TopicsMapType;
   }> {}
 
 export async function getTweetsPaginated(
@@ -104,7 +107,14 @@ export async function getTweetsPaginated(
     return acc;
   }, new Set<bigint>());
 
-  const usersMap = await resolveUsersMap([...fids]);
+  const [usersMap, topicsMap] = await Promise.all([
+    resolveUsersMap([...fids]),
+    resolveTopicsMap(
+      casts
+        .map((cast) => cast.parent_url)
+        .filter((url) => url !== null) as string[]
+    )
+  ]);
 
   const nextPageCursor =
     casts.length > 0 ? casts[casts.length - 1].timestamp.toISOString() : null;
@@ -112,6 +122,7 @@ export async function getTweetsPaginated(
   return {
     tweets,
     users: usersMap,
+    topics: topicsMap,
     nextPageCursor
   };
 }

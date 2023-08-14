@@ -1,5 +1,6 @@
 import { Embed } from '@farcaster/hub-web';
 import { casts } from '@prisma/client';
+import { TopicsMapType, TopicType } from '../topics/resolve-topic';
 import { isValidImageExtension } from '../validation';
 import type { ImagesPreview } from './file';
 import { BaseResponse } from './responses';
@@ -24,6 +25,8 @@ export type Tweet = {
   userRetweets: string[];
   mentions: Mention[];
   client: string | null;
+  topic: TopicType | null;
+  topicUrl: string | null;
 };
 
 export type TweetWithUsers = Tweet & { users: UsersMapType };
@@ -58,6 +61,22 @@ export const populateTweetUsers = (
     mentions: resolvedMentions,
     parent: resolvedParent
   };
+};
+
+export const populateTweetTopic = (
+  tweet: Tweet,
+  topics: TopicsMapType
+): Tweet => {
+  if (tweet.topicUrl) {
+    const topic = topics[tweet.topicUrl];
+    if (topic) {
+      return {
+        ...tweet,
+        topic
+      };
+    }
+  }
+  return tweet;
 };
 
 export const tweetConverter = {
@@ -100,6 +119,8 @@ export const tweetConverter = {
       text: cast.text,
       images: images.length > 0 ? images : null,
       parent,
+      topic: null,
+      topicUrl: cast.parent_url,
       userLikes: [],
       createdBy: cast.fid.toString(),
       createdAt: cast.timestamp,

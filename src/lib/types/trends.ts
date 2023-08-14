@@ -1,10 +1,9 @@
-import { ChannelType } from '../channel/resolve-channel';
+import { TopicType } from '../topics/resolve-topic';
 import { BaseResponse } from './responses';
 
 export type TrendsResponse = BaseResponse<
   {
-    channel: ChannelType | null;
+    topic: TopicType | null;
     volume: number;
-    url: string;
   }[]
 >;

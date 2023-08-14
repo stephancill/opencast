@@ -1,5 +1,7 @@
+import getMetadata from 'metadata-scraper';
 import { createPublicClient, http } from 'viem';
 import * as chains from 'viem/chains';
+import { LRU } from '../lru-cache';
 import { parseChainURL } from '../utils';
 
 const chainById = Object.values(chains).reduce(
@@ -10,19 +12,34 @@ const chainById = Object.values(chains).reduce(
   {}
 );
 
-export type ChannelType = {
+export type TopicType = {
   name: string;
   description: string;
   image?: string;
+  url: string;
 };
 
+export type TopicsMapType = { [key: string]: TopicType };
+
+export async function resolveTopic(url: string): Promise<TopicType | null> {
+  const cached = LRU.get(url);
+  if (cached) {
+    return cached as TopicType;
+  }
+
+  const resolved = await _resolveTopic(url);
+  LRU.set(url, resolved);
+  return resolved;
+}
+
 // CAIP-19 URL
-// TODO: Cache result
-export async function resolveChannel(url: string): Promise<ChannelType | null> {
+async function _resolveTopic(url: string): Promise<TopicType | null> {
   if (url.startsWith('https://')) {
+    const metadata = await getMetadata(url);
     return {
-      name: url,
-      description: 'Link'
+      name: metadata.title || url,
+      description: metadata.description || 'Link',
+      url
     };
   } else if (url.startsWith('chain://')) {
     const parsed = parseChainURL(url);
@@ -84,7 +101,8 @@ export async function resolveChannel(url: string): Promise<ChannelType | null> {
         )}`;
         return {
           name: `${chainById[chainId].name} ${truncatedAddress}`,
-          description: `NFT on ${chainById[chainId].name}`
+          description: `NFT on ${chainById[chainId].name}`,
+          url
         };
       }
 
@@ -104,7 +122,8 @@ export async function resolveChannel(url: string): Promise<ChannelType | null> {
       return {
         name: json.name,
         description: json.description,
-        image: json.image
+        image: json.image,
+        url
       };
     }
 
@@ -112,7 +131,22 @@ export async function resolveChannel(url: string): Promise<ChannelType | null> {
   } else {
     return {
       name: url,
-      description: 'Other'
+      description: 'Other',
+      url
     };
   }
+}
+
+export async function resolveTopicsMap(urls: string[]): Promise<TopicsMapType> {
+  const topicOrNulls = await Promise.all(urls.map((url) => resolveTopic(url)));
+  const topics = topicOrNulls.filter(
+    (topicOrNull) => topicOrNull !== null
+  ) as TopicType[];
+  const topicsMap = topics.reduce((acc: TopicsMapType, cur) => {
+    if (cur) {
+      acc[cur.url] = cur;
+    }
+    return acc;
+  }, {});
+  return topicsMap;
 }
