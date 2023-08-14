@@ -1,4 +1,4 @@
-import getMetadata from 'metadata-scraper';
+import getMetadata, { MetaData } from 'metadata-scraper';
 import { createPublicClient, http } from 'viem';
 import * as chains from 'viem/chains';
 import { LRU } from '../lru-cache';
@@ -45,7 +45,19 @@ function cleanUrl(url: string): string {
 // CAIP-19 URL
 async function _resolveTopic(url: string): Promise<TopicType | null> {
   if (url.startsWith('https://')) {
-    const metadata = await getMetadata(url);
+    let metadata: MetaData | null;
+    try {
+      metadata = await getMetadata(url, {
+        maxRedirects: 1
+      });
+    } catch {
+      return {
+        name: cleanUrl(url),
+        description: 'Link',
+        url
+      };
+    }
+
     const { description, title, icon } = metadata;
     const cleanedUrl = cleanUrl(url);
     let name = title || cleanedUrl;
