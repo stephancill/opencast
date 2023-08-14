@@ -1,12 +1,13 @@
 import { ReactionType } from '@farcaster/hub-web';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { prisma } from '../../../../lib/prisma';
+import { resolveTopic, TopicType } from '../../../../lib/topics/resolve-topic';
 import {
   tweetConverter,
   TweetResponse,
   TweetWithUsers
 } from '../../../../lib/types/tweet';
-import { resolveUsersMap } from '../../../../lib/user/resolveUser';
+import { resolveUsersMap } from '../../../../lib/user/resolve-user';
 
 type TweetEndpointQuery = {
   id: string;

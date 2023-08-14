@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { UserResponse } from '../../../../lib/types/user';
-import { resolveUserAmbiguous } from '../../../../lib/user/resolveUser';
+import { resolveUserAmbiguous } from '../../../../lib/user/resolve-user';
 
 type UserEndpointQuery = {
   id: string;

@@ -2,7 +2,7 @@ import { Prisma } from '@prisma/client';
 import { prisma } from './prisma';
 import { BaseResponse } from './types/responses';
 import { User } from './types/user';
-import { resolveUsers } from './user/resolveUser';
+import { resolveUsers } from './user/resolve-user';
 
 export interface PaginatedUsersResponse
   extends BaseResponse<{

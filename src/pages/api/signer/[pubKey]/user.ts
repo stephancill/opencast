@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { prisma } from '../../../../lib/prisma';
 import { UserResponse } from '../../../../lib/types/user';
-import { resolveUserFromFid } from '../../../../lib/user/resolveUser';
+import { resolveUserFromFid } from '../../../../lib/user/resolve-user';
 
 type SignerEndpointQuery = {
   pubKey: string;
