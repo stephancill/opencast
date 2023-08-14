@@ -32,14 +32,30 @@ export async function resolveTopic(url: string): Promise<TopicType | null> {
   return resolved;
 }
 
+function cleanUrl(url: string): string {
+  if (url.startsWith('https://')) {
+    return cleanUrl(url.slice(8));
+  } else if (url.startsWith('www.')) {
+    return url.slice(4);
+  } else {
+    return url;
+  }
+}
+
 // CAIP-19 URL
 async function _resolveTopic(url: string): Promise<TopicType | null> {
   if (url.startsWith('https://')) {
-    const { description, title, image } = await getMetadata(url);
+    const metadata = await getMetadata(url);
+    const { description, title, icon } = metadata;
+    const cleanedUrl = cleanUrl(url);
+    let name = title || cleanedUrl;
+    if (name.length > 20) {
+      name = cleanedUrl;
+    }
     return {
-      name: title || url,
+      name,
       description: description || 'Link',
-      image: image,
+      image: icon,
       url
     };
   } else if (url.startsWith('chain://')) {
