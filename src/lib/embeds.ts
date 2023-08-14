@@ -13,10 +13,6 @@ const KNOWN_HOSTS_MAP: {
     urlBuilder: (url: string) => url.replace('twitter.com', 'fxtwitter.com'),
     userAgent: 'bot'
   },
-  'warpcast.com': {
-    userAgent:
-      'Mozilla/5.0 (compatible; TelegramBot/1.0; +https://core.telegram.org/bots/webhooks)'
-  },
   'arxiv.org': {
     userAgent:
       'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36'
@@ -37,7 +33,9 @@ export async function populateEmbed(
     const userAgent = KNOWN_HOSTS_MAP[host]?.userAgent || undefined;
     const metadata = await getMetadata(url, {
       maxRedirects: 1,
-      ua: userAgent
+      ua:
+        userAgent ||
+        'Mozilla/5.0 (compatible; TelegramBot/1.0; +https://core.telegram.org/bots/webhooks)'
     });
     const { title, description, icon, image } = metadata;
 
