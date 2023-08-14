@@ -102,7 +102,7 @@ async function _resolveTopic(url: string): Promise<TopicType | null> {
         )}`;
         return {
           name: `${chainById[chainId].name} ${truncatedAddress}`,
-          description: `NFT on ${chainById[chainId].name}`,
+          description: `NFT on ${chainById[chainId].name} at ${parsed.contractAddress}`,
           url
         };
       }
@@ -133,6 +133,36 @@ async function _resolveTopic(url: string): Promise<TopicType | null> {
         image: image,
         url
       };
+    } else if (uri.startsWith('ipfs://') || uri.startsWith('https://')) {
+      try {
+        let metadata: any;
+        if (uri.startsWith('ipfs://')) {
+          // Resolve IPFS URI
+          const url = `https://ipfs.io/ipfs/${uri.slice(7)}`;
+          const res = await fetch(url);
+          metadata = await res.json();
+        } else if (uri.startsWith('https://')) {
+          // Resolve HTTPS URI
+          const res = await fetch(uri);
+          metadata = await res.json();
+        }
+
+        let image = metadata.image as string;
+        if (image) {
+          if (image.startsWith('ipfs://')) {
+            image = `https://ipfs.io/ipfs/${image.slice(7)}`;
+          }
+        }
+
+        return {
+          name: metadata.name,
+          description: metadata.description,
+          image: image,
+          url
+        };
+      } catch (e) {
+        console.error(e);
+      }
     }
 
     return null;
