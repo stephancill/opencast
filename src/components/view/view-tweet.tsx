@@ -2,7 +2,6 @@ import { ImagePreview } from '@components/input/image-preview';
 import { Input } from '@components/input/input';
 import { Modal } from '@components/modal/modal';
 import { TweetReplyModal } from '@components/modal/tweet-reply-modal';
-import { variants } from '@components/tweet/tweet';
 import { TweetActions } from '@components/tweet/tweet-actions';
 import { TweetDate } from '@components/tweet/tweet-date';
 import { TweetStats } from '@components/tweet/tweet-stats';
@@ -15,11 +14,11 @@ import { useModal } from '@lib/hooks/useModal';
 import type { Tweet } from '@lib/types/tweet';
 import type { User } from '@lib/types/user';
 import cn from 'clsx';
-import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { RefObject } from 'react';
 import { TweetText } from '../tweet/tweet-text';
+import { TweetTopic } from '../tweet/tweet-topic';
 
 type ViewTweetProps = Tweet & {
   user: User;
@@ -49,8 +48,6 @@ export function ViewTweet(tweet: ViewTweetProps): JSX.Element {
   const { user } = useAuth();
 
   const { open, openModal, closeModal } = useModal();
-
-  const router = useRouter();
 
   const tweetLink = `/tweet/${tweetId}`;
 
@@ -140,14 +137,7 @@ export function ViewTweet(tweet: ViewTweetProps): JSX.Element {
             previewCount={images.length}
           />
         )}
-        {topic && (
-          <span
-            onClick={(e) => router.push(`/topic?url=${topic.url}`)}
-            className='cursor-pointer whitespace-nowrap pt-3 text-light-secondary hover:underline dark:text-dark-secondary'
-          >
-            #{topic.name}
-          </span>
-        )}
+        {topic && <TweetTopic topic={topic} />}
         <div
           className='inner:hover-animation inner:border-b inner:border-light-border
                      dark:inner:border-dark-border'

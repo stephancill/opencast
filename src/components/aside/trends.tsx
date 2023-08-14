@@ -1,7 +1,5 @@
 import { Error } from '@components/ui/error';
-import { HeroIcon } from '@components/ui/hero-icon';
 import { Loading } from '@components/ui/loading';
-import { ToolTip } from '@components/ui/tooltip';
 import { formatNumber } from '@lib/date';
 import cn from 'clsx';
 import type { MotionProps } from 'framer-motion';
@@ -9,6 +7,7 @@ import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { useQuery } from 'react-query';
 import { TrendsResponse } from '../../lib/types/trends';
+import { NextImage } from '../ui/next-image';
 
 export const variants: MotionProps = {
   initial: { opacity: 0 },
@@ -71,10 +70,25 @@ export function AsideTrends({ inTrendsPage }: AsideTrendsProps): JSX.Element {
                 className='hover-animation accent-tab hover-card relative 
                            flex cursor-pointer flex-col gap-0.5'
               >
-                <p className='font-bold'>{topic?.name}</p>
-                <p className='text-sm text-light-secondary dark:text-dark-secondary'>
-                  {formatNumber(volume)} posts today
-                </p>
+                <div className='flex items-center'>
+                  {topic?.image && (
+                    <div className='mr-2 overflow-hidden rounded-md'>
+                      <NextImage
+                        src={topic.image}
+                        alt={topic.name}
+                        // layout='fill'
+                        width={36}
+                        height={36}
+                      ></NextImage>
+                    </div>
+                  )}
+                  <div>
+                    <p className='font-bold'>{topic?.name}</p>
+                    <p className='text-sm text-light-secondary dark:text-dark-secondary'>
+                      {formatNumber(volume)} posts today
+                    </p>
+                  </div>
+                </div>
               </div>
               {/* </a> */}
             </Link>

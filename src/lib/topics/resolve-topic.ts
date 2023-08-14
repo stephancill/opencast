@@ -35,10 +35,11 @@ export async function resolveTopic(url: string): Promise<TopicType | null> {
 // CAIP-19 URL
 async function _resolveTopic(url: string): Promise<TopicType | null> {
   if (url.startsWith('https://')) {
-    const metadata = await getMetadata(url);
+    const { description, title, image } = await getMetadata(url);
     return {
-      name: metadata.title || url,
-      description: metadata.description || 'Link',
+      name: title || url,
+      description: description || 'Link',
+      image: image,
       url
     };
   } else if (url.startsWith('chain://')) {
@@ -119,10 +120,17 @@ async function _resolveTopic(url: string): Promise<TopicType | null> {
         return null;
       }
 
+      let image = json.image as string;
+      if (image) {
+        if (image.startsWith('ipfs://')) {
+          image = `https://ipfs.io/ipfs/${image.slice(7)}`;
+        }
+      }
+
       return {
         name: json.name,
         description: json.description,
-        image: json.image,
+        image: image,
         url
       };
     }

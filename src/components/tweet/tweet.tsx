@@ -9,10 +9,9 @@ import { useAuth } from '@lib/context/auth-context';
 import { useModal } from '@lib/hooks/useModal';
 import type { Tweet } from '@lib/types/tweet';
 import type { User } from '@lib/types/user';
-import { delayScroll } from '@lib/utils';
 import cn from 'clsx';
 import type { Variants } from 'framer-motion';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { TweetActions } from './tweet-actions';
@@ -20,6 +19,7 @@ import { TweetDate } from './tweet-date';
 import { TweetStats } from './tweet-stats';
 import { TweetStatus } from './tweet-status';
 import { TweetText } from './tweet-text';
+import { TweetTopic } from './tweet-topic';
 
 export type TweetProps = Tweet & {
   user: User;
@@ -60,8 +60,6 @@ export function Tweet(tweet: TweetProps): JSX.Element {
   const { user } = useAuth();
 
   const { open, openModal, closeModal } = useModal();
-
-  const router = useRouter();
 
   const tweetLink = `/tweet/${tweetId}`;
 
@@ -204,14 +202,7 @@ export function Tweet(tweet: TweetProps): JSX.Element {
                   previewCount={images.length}
                 />
               )}
-              {topic && (
-                <span
-                  onClick={(e) => router.push(`/topic?url=${topic.url}`)}
-                  className='cursor-pointer whitespace-nowrap pt-3 text-light-secondary hover:underline dark:text-dark-secondary'
-                >
-                  #{topic.name}
-                </span>
-              )}
+              {topic && <TweetTopic topic={topic} />}
               {!modal && (
                 <TweetStats
                   reply={reply}
