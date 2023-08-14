@@ -10,7 +10,8 @@ const nextConfig = {
           hostname: '**'
         }
       ]
-    }
+    },
+    scrollRestoration: true
   },
   images: {
     domains: [
