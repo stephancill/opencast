@@ -18,7 +18,7 @@ export function useInfiniteScroll(
   const { initialSize, stepSize, marginBottom, queryKey } = {
     initialSize: 10,
     stepSize: 10,
-    marginBottom: 100,
+    marginBottom: 1000,
     queryKey: [],
     ...(options ?? {})
   };

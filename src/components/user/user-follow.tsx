@@ -1,10 +1,8 @@
-import { query, where } from 'firebase/firestore';
-import { useUser } from '@lib/context/user-context';
-import { useCollection } from '@lib/hooks/useCollection';
-import { usersCollection } from '@lib/firebase/collections';
 import { SEO } from '@components/common/seo';
 import { UserCards } from '@components/user/user-cards';
+import { useUser } from '@lib/context/user-context';
 import type { User } from '@lib/types/user';
+import { useInfiniteScrollUsers } from '../../lib/hooks/useInfiniteScrollUsers';
 
 type UserFollowProps = {
   type: 'following' | 'followers';
@@ -12,18 +10,17 @@ type UserFollowProps = {
 
 export function UserFollow({ type }: UserFollowProps): JSX.Element {
   const { user } = useUser();
-  const { name, username } = user as User;
+  const { name, username, id: userId } = user as User;
 
-  const { data, loading } = useCollection(
-    query(
-      usersCollection,
-      where(
-        type === 'following' ? 'followers' : 'following',
-        'array-contains',
-        user?.id
-      )
-    ),
-    { allowNull: true }
+  const { data, loading, LoadMore } = useInfiniteScrollUsers(
+    (pageParam) => {
+      return `/api/user/${userId}/links?type=${type}&limit=10${
+        pageParam ? `&cursor=${pageParam}` : ''
+      }`;
+    },
+    {
+      queryKey: [userId, type]
+    }
   );
 
   return (
@@ -33,7 +30,18 @@ export function UserFollow({ type }: UserFollowProps): JSX.Element {
           type === 'following' ? 'followed by' : 'following'
         } ${name} (@${username}) / Twitter`}
       />
-      <UserCards follow data={data} type={type} loading={loading} />
+      <UserCards
+        follow
+        data={
+          (data?.pages
+            .map((page) => page?.users)
+            .flat()
+            .filter((user) => user !== undefined) as User[]) ?? []
+        }
+        type={type}
+        loading={loading}
+        LoadMore={LoadMore}
+      />
     </>
   );
 }

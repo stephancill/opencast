@@ -59,7 +59,7 @@ export default function TweetId(): JSX.Element {
       `/api/tweet/${id}/replies?limit=10${
         pageParam ? `&cursor=${pageParam}` : ''
       }`,
-    { marginBottom: 20, queryKey: ['replies', id] }
+    { queryKey: ['replies', id] }
   );
 
   const viewTweetRef = useRef<HTMLElement>(null);

@@ -71,9 +71,9 @@ export function UserCards({
         <div className='mt-10'>
           {data?.length ? (
             data.map((userData) => (
-              <motion.div layout='position' key={userData.id} {...variants}>
+              <div key={userData.id}>
                 <UserCard {...userData} follow={follow} modal={modal} />
-              </motion.div>
+              </div>
             ))
           ) : (
             <StatsEmpty {...noStatsData} modal={modal} />

@@ -77,6 +77,7 @@ export function ViewTweetStats({
         closeModal={handleClose}
       >
         <TweetStatsModal statsType={statsType} handleClose={handleClose}>
+          {/* <div className='mt-10'></div> */}
           <UserCards
             follow
             type={statsType as StatsType}
