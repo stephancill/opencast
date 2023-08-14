@@ -1,8 +1,16 @@
+# Opencast
+
+A fully open source Twitter flavoured Farcaster client.
+
+The goal of this project is to provide a reference implementation of a Farcaster client in order to make it easier for developers to explore their ideas without having to start from scratch.
+
+It only depends on the reference Farcaster postgres indexer and optionally a hub for submitting messages.
+
 ## Development 💻
 
 ### Farcaster Replicator
 
-This project depends on the Farcaster PosgreSQL database. Follow the instructions at [replicate-data-postgres](https://github.com/farcasterxyz/hub-monorepo/tree/main/packages/hub-nodejs/examples/replicate-data-postgres) to set up an instance.
+This project depends on the reference Farcaster PosgreSQL indexer. Follow the instructions at [replicate-data-postgres](https://github.com/farcasterxyz/hub-monorepo/tree/main/packages/hub-nodejs/examples/replicate-data-postgres) to set up an instance.
 
 ### Local
 
