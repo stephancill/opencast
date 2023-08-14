@@ -29,7 +29,9 @@ This project depends on the Farcaster PosgreSQL database. Follow the instruction
   - [ ] Likes
 - [x] Auth
 - [x] Engagement actions
-- [x] Post creation
+- [ ] Post creation
+  - [x] Text only
+  - [ ] Media
 - [x] Post deletion
 - [ ] Search
 - [x] Channels (now called Topics)
