@@ -4,6 +4,6 @@ const globalForLRU = global as unknown as {
   LRU: LRUCache<string, any> | undefined;
 };
 
-export const LRU = globalForLRU.LRU ?? new LRUCache({ max: 1000 });
+export const LRU = globalForLRU.LRU ?? new LRUCache({ max: 200 });
 
 if (process.env.NODE_ENV !== 'production') globalForLRU.LRU = LRU;

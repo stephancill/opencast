@@ -6,7 +6,7 @@ export function TweetTopic({ topic }: { topic: TopicType }) {
   const router = useRouter();
 
   return (
-    <span className='flex'>
+    <span className='w-full'>
       <span
         onClick={(e) => router.push(`/topic?url=${topic.url}`)}
         className='flex shrink cursor-pointer items-center whitespace-nowrap pt-3 text-light-secondary hover:underline dark:text-dark-secondary'
@@ -23,7 +23,7 @@ export function TweetTopic({ topic }: { topic: TopicType }) {
             ></NextImage>
           </span>
         )}
-        {topic.name}
+        <span className='inline truncate'>{topic.name}</span>
       </span>
     </span>
   );
