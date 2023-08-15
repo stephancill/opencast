@@ -95,7 +95,7 @@ export function Tweet(tweet: TweetProps): JSX.Element {
       </Modal>
       <div
         className={cn(
-          `accent-tab hover-card relative flex cursor-pointer 
+          `accent-tab sm:hover-card relative flex cursor-pointer 
              flex-col gap-y-4 px-4 py-3 outline-none duration-200`,
           parentTweet
             ? 'mt-0.5 pb-0 pt-2.5'
