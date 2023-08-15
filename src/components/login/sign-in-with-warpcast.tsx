@@ -109,7 +109,23 @@ const WarpcastAuthPopup = () => {
     }
   }, [initiated]);
 
-  return <div>{deepLinkUrl && <QRCode value={deepLinkUrl} />}</div>;
+  return (
+    <div>
+      {deepLinkUrl && (
+        <div>
+          <div>
+            <QRCode value={deepLinkUrl} />{' '}
+          </div>
+          <span className='pt-4 text-gray-500'>
+            On mobile?{' '}
+            <a className='underline' href={deepLinkUrl} target={'_blank'}>
+              Open in Warpcast
+            </a>
+          </span>
+        </div>
+      )}
+    </div>
+  );
 };
 
 export default WarpcastAuthPopup;
