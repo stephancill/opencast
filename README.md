@@ -48,7 +48,7 @@ This project depends on the reference Farcaster PosgreSQL indexer. Follow the in
   - [x] Channel detail
   - [x] Channel discovery
   - [ ] Index channels
-- [ ] Fix mobile layout
+- [x] Fix mobile layout
 - [ ] Rebrand
 
 ...
