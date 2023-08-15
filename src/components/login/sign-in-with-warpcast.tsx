@@ -58,7 +58,7 @@ const WarpcastAuthPopup = () => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         publicKey: `0x${keyPair.publicKey}`,
-        name: 'Opencast'
+        name: process.env.NEXT_PUBLIC_FC_CLIENT_NAME || 'Opencast'
       })
     });
 
@@ -98,6 +98,7 @@ const WarpcastAuthPopup = () => {
   };
 
   useEffect(() => {
+    console.log(process.env.NEXT_PUBLIC_FC_CLIENT_NAME);
     setInitiated(true);
   }, []);
 
