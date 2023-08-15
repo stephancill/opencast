@@ -39,7 +39,7 @@ export async function populateEmbed(
     });
     const { title, description, icon, image } = metadata;
 
-    if (title || description || icon || image) {
+    if (title || description) {
       const populatedEmbed: ExternalEmbed = {
         url: embed.url,
         title: title,
