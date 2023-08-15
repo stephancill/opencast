@@ -40,7 +40,10 @@ function getFullTime(date: Date): string {
     year: 'numeric'
   }).format(date);
 
-  const splittedDate = fullDate.split(', ');
+  let splittedDate = fullDate.split(', ');
+
+  // Safari workaround
+  if (splittedDate.length === 1) splittedDate = fullDate.split(' at ');
 
   const formattedDate =
     splittedDate.length === 2
