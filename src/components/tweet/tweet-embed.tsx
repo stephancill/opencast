@@ -21,7 +21,7 @@ export function TweetEmbed({
     >
       <a href={url} target={'_blank'}>
         <div className='flex items-center'>
-          <div className='w-full'>
+          <div className='flex-shrink'>
             <div className='flex items-center'>
               {icon && (
                 <span className='mx-1'>
@@ -48,7 +48,7 @@ export function TweetEmbed({
             )}
           </div>
           {image && (
-            <div className='ml-2 mr-1 h-28 w-28 flex-shrink-0 flex-grow-0 overflow-hidden rounded-md'>
+            <div className='ml-2 mr-1 block hidden h-28 w-28 flex-shrink-0 flex-grow-0 overflow-hidden rounded-md sm:block'>
               <img
                 src={image}
                 title={title || 'Unknown'}
