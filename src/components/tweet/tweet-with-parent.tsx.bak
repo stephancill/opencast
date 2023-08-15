@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Tweet } from './tweet';
-import { TweetParent } from './tweet-parent';
+import { TweetParent } from './tweet-parent.tsx.bak';
 import type { TweetWithUsers } from '@lib/types/tweet';
 
 type TweetWithParentProps = {

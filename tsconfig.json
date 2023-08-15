@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
-    "target": "es2015",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "target": "ES2021", // Setting this to `ES2021` enables native support for `Node v16+`: https://github.com/microsoft/TypeScript/wiki/Node-Target-Mapping.
+    "lib": ["dom", "dom.iterable", "esnext", "ES2022"],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -22,5 +22,5 @@
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
-  "exclude": ["node_modules", "functions"]
+  "exclude": ["node_modules", "functions", "**/*.bak"]
 }

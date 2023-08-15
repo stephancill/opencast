@@ -91,7 +91,7 @@ async function _resolveTopic(url: string): Promise<TopicType | null> {
 
     let uri: string;
     try {
-      uri = await client.readContract({
+      uri = (await client.readContract({
         address: parsed.contractAddress as `0x${string}`,
         abi: [
           {
@@ -103,10 +103,10 @@ async function _resolveTopic(url: string): Promise<TopicType | null> {
           }
         ],
         functionName: 'contractURI'
-      });
+      })) as string;
     } catch (e) {
       try {
-        uri = await client.readContract({
+        uri = (await client.readContract({
           address: parsed.contractAddress as `0x${string}`,
           abi: [
             {
@@ -119,7 +119,7 @@ async function _resolveTopic(url: string): Promise<TopicType | null> {
           ],
           functionName: 'tokenURI',
           args: [BigInt(1)]
-        });
+        })) as string;
       } catch {
         const truncatedAddress = `${parsed.contractAddress.slice(
           0,
