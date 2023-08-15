@@ -40,6 +40,8 @@ This project depends on the reference Farcaster PosgreSQL indexer. Follow the in
 - [ ] Post creation
   - [x] Text only
   - [ ] Media
+  - [ ] Mentions
+  - [ ] Embeds
 - [x] Post deletion
 - [ ] Search
 - [x] Channels (now called Topics)
