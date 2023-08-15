@@ -151,14 +151,19 @@ export function ViewTweet(tweet: ViewTweetProps): JSX.Element {
                      dark:inner:border-dark-border'
         >
           <div className='flex '>
-            <TweetDate viewTweet tweetLink={tweetLink} createdAt={createdAt} />
-
-            {client && (
-              <p className='gap-1 py-4 text-light-secondary dark:text-dark-secondary'>
-                <i className='px-1  '>·</i>{' '}
-                <span className='inline '>via {client}</span>
-              </p>
-            )}
+            <span className='flex items-center gap-1 py-4 text-light-secondary dark:text-dark-secondary'>
+              <TweetDate
+                viewTweet
+                tweetLink={tweetLink}
+                createdAt={createdAt}
+              />
+              {client && (
+                <>
+                  <i className='px-1  '>·</i>{' '}
+                  <span className='inline '>via {client}</span>
+                </>
+              )}
+            </span>
           </div>
           <TweetStats
             viewTweet
