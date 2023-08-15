@@ -25,9 +25,11 @@ export async function populateEmbed(
   const host = new URL(embed.url).host;
   const url = KNOWN_HOSTS_MAP[host]?.urlBuilder?.(embed.url) || embed.url;
   const cached = LRU.get(url);
-  if (cached) {
+  if (cached !== undefined) {
     return cached;
   }
+
+  let result: ExternalEmbed | null = null;
 
   try {
     const userAgent = KNOWN_HOSTS_MAP[host]?.userAgent || undefined;
@@ -48,16 +50,16 @@ export async function populateEmbed(
         image
       };
       LRU.set(url, populatedEmbed);
-      return populatedEmbed;
-    } else {
-      return null;
+      result = populatedEmbed;
     }
   } catch (e) {
-    console.log(`Error fetching metadata for ${url}`);
-    // console.error(e);
+    console.error(e);
   }
 
-  return null;
+  // If we get an error, cache the error for an hour
+  LRU.set(url, result, { ttl: result === null ? 1000 * 60 * 60 : undefined });
+
+  return result;
 }
 
 export async function populateTweetEmbeds(tweet: Tweet): Promise<Tweet> {

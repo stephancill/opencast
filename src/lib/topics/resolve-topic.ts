@@ -23,12 +23,16 @@ export type TopicsMapType = { [key: string]: TopicType };
 
 export async function resolveTopic(url: string): Promise<TopicType | null> {
   const cached = LRU.get(url);
-  if (cached) {
+  if (cached !== undefined) {
     return cached as TopicType;
   }
 
   const resolved = await _resolveTopic(url);
-  LRU.set(url, resolved);
+  // If we can't resolve the topic, cache it for 5 minutes
+  LRU.set(url, resolved, {
+    ttl: resolved === null ? 5 * 60 * 1000 : undefined
+  });
+
   return resolved;
 }
 
