@@ -10,12 +10,13 @@ export function useInfiniteScroll(
   urlBuilder: (pageParam: string | null) => string,
   options?: {
     initialSize?: number;
+    enabled?: boolean;
     stepSize?: number;
     marginBottom?: number;
     queryKey?: any[];
   }
 ) {
-  const { initialSize, stepSize, marginBottom, queryKey } = {
+  const { initialSize, stepSize, marginBottom, queryKey, enabled } = {
     initialSize: 10,
     stepSize: 10,
     marginBottom: 1000,
@@ -27,6 +28,9 @@ export function useInfiniteScroll(
   const [loadMoreInView, setLoadMoreInView] = useState(false);
 
   const fetchData = async ({ pageParam = null }) => {
+    if (!enabled) {
+      return;
+    }
     const url = urlBuilder(pageParam);
     const response = await fetch(url);
     if (!response.ok) {
@@ -52,7 +56,8 @@ export function useInfiniteScroll(
   } = useInfiniteQuery(queryKey, fetchData, {
     getNextPageParam: (lastPage) => {
       return lastPage?.nextPageCursor ?? false;
-    }
+    },
+    enabled: enabled !== undefined ? enabled : true
   });
 
   useEffect(() => {

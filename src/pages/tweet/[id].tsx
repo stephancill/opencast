@@ -9,7 +9,14 @@ import { ViewParentTweet } from '@components/view/view-parent-tweet';
 import { ViewTweet } from '@components/view/view-tweet';
 import { isPlural } from '@lib/utils';
 import { useRouter } from 'next/router';
-import { ReactElement, ReactNode, useMemo, useRef } from 'react';
+import {
+  ReactElement,
+  ReactNode,
+  useEffect,
+  useMemo,
+  useRef,
+  useState
+} from 'react';
 import { useQuery } from 'react-query';
 import { Tweet } from '../../components/tweet/tweet';
 import { useInfiniteScroll } from '../../lib/hooks/useInfiniteScroll';
@@ -24,6 +31,11 @@ export default function TweetId(): JSX.Element {
     query: { id },
     back
   } = useRouter();
+
+  const [enabled, setEnabled] = useState(false);
+  useEffect(() => {
+    setEnabled(true);
+  }, []);
 
   const fetchCast = async () => {
     const response = await fetch(`/api/tweet/${id}`);
@@ -59,7 +71,7 @@ export default function TweetId(): JSX.Element {
       `/api/tweet/${id}/replies?limit=10${
         pageParam ? `&cursor=${pageParam}` : ''
       }`,
-    { queryKey: ['replies', id] }
+    { queryKey: ['replies', id], enabled }
   );
 
   const viewTweetRef = useRef<HTMLElement>(null);

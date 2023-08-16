@@ -6,7 +6,7 @@ import { StatsEmpty } from '@components/tweet/stats-empty';
 import { Tweet } from '@components/tweet/tweet';
 import { Loading } from '@components/ui/loading';
 import { useUser } from '@lib/context/user-context';
-import type { ReactElement, ReactNode } from 'react';
+import { useState, type ReactElement, type ReactNode, useEffect } from 'react';
 import { useInfiniteScroll } from '../../../lib/hooks/useInfiniteScroll';
 import {
   populateTweetTopic,
@@ -15,6 +15,12 @@ import {
 
 export default function UserTweets(): JSX.Element {
   const { user } = useUser();
+
+  // Debounce
+  const [enabled, setEnabled] = useState(false);
+  useEffect(() => {
+    setEnabled(true);
+  }, []);
 
   const { id, username } = user ?? {};
   const {
@@ -26,7 +32,7 @@ export default function UserTweets(): JSX.Element {
       `/api/user/${id}/tweets?limit=10${
         pageParam ? `&cursor=${pageParam}` : ''
       }`,
-    { marginBottom: 20, queryKey: ['user', id] }
+    { marginBottom: 20, queryKey: ['user', id], enabled }
   );
 
   // const { data: peopleTweets, loading: peopleLoading } = useCollection(

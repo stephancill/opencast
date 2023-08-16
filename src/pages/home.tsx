@@ -9,11 +9,17 @@ import { Error } from '@components/ui/error';
 import { Loading } from '@components/ui/loading';
 import { useWindow } from '@lib/context/window-context';
 import { useInfiniteScroll } from '@lib/hooks/useInfiniteScroll';
-import type { ReactElement, ReactNode } from 'react';
+import { useState, type ReactElement, type ReactNode, useEffect } from 'react';
 import { useAuth } from '../lib/context/auth-context';
 import { populateTweetTopic, populateTweetUsers } from '../lib/types/tweet';
 
 export default function Home(): JSX.Element {
+  // Debounce
+  const [enabled, setEnabled] = useState(false);
+  useEffect(() => {
+    setEnabled(true);
+  }, []);
+
   const { user } = useAuth();
   const { data, loading, LoadMore } = useInfiniteScroll(
     (pageParam) =>
@@ -21,7 +27,8 @@ export default function Home(): JSX.Element {
         pageParam ? `&cursor=${pageParam}` : ''
       }`,
     {
-      queryKey: ['feed', user?.id]
+      queryKey: ['feed', user?.id],
+      enabled
     }
   );
   const { isMobile } = useWindow();
