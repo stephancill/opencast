@@ -6,6 +6,8 @@ import { UserFollowing } from './user-following';
 import { UserFollowStats } from './user-follow-stats';
 import type { IconName } from '@components/ui/hero-icon';
 import type { User } from '@lib/types/user';
+import Link from 'next/link';
+import { TopicView } from '../tweet/tweet-topic';
 
 type UserDetailsProps = Pick<
   User,
@@ -19,6 +21,7 @@ type UserDetailsProps = Pick<
   | 'createdAt'
   | 'following'
   | 'followers'
+  | 'interests'
 >;
 
 type DetailIcon = [string | null, IconName];
@@ -33,7 +36,8 @@ export function UserDetails({
   verified,
   createdAt,
   following,
-  followers
+  followers,
+  interests
 }: UserDetailsProps): JSX.Element {
   const detailIcons: Readonly<DetailIcon[]> = [
     [location, 'MapPinIcon'],
@@ -89,6 +93,15 @@ export function UserDetails({
               )
           )}
         </div>
+      </div>
+      <div className='flex flex-wrap'>
+        {interests.map((topic) => (
+          <Link href={`/topic?url=${topic.url}`} key={topic.url}>
+            <span className='pr-2 text-light-secondary hover:underline dark:text-dark-secondary'>
+              <TopicView topic={topic} />
+            </span>
+          </Link>
+        ))}
       </div>
       <UserFollowStats following={following} followers={followers} />
     </>
