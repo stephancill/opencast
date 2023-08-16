@@ -132,6 +132,7 @@ export function ImagePreview({
             layout='fill'
             src={src}
             alt={alt}
+            useSkeleton={true}
           />
           {removeImage && (
             <Button
