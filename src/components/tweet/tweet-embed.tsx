@@ -1,17 +1,65 @@
+import useSWR from 'swr';
 import { ExternalEmbed } from '../../lib/types/tweet';
 import { preventBubbling } from '../../lib/utils';
+import { useEffect, useMemo } from 'react';
+import { NextImage } from '../ui/next-image';
 
 const hoverModifier =
   'hover:brightness-75 dark:hover:brightness-125 hover:duration-200 transition';
 
-export function TweetEmbed({
+export function TweetEmbeds({ embeds }: { embeds: ExternalEmbed[] }) {
+  const fetchEmbeds = async (url: string | null) => {
+    if (!url) return null;
+
+    const res = await fetch(url);
+    if (!res.ok) {
+      return null;
+    }
+
+    const data = (await res.json()) as (ExternalEmbed | null)[];
+    return data;
+  };
+
+  const url = useMemo(() => {
+    return embeds.map((embed) => embed.url).join(',');
+  }, embeds);
+
+  const { data: embedsData } = useSWR(`/api/embeds?urls=${url}`, fetchEmbeds);
+
+  const embedsCount = useMemo(() => {
+    return embedsData?.filter((embed) => embed !== null).length || 0;
+  }, [embedsData]);
+
+  return embedsData !== undefined ? (
+    embedsData && embedsCount > 0 && (
+      <div className={embedsCount > 1 ? `mt-2 grid gap-2` : 'mt-2'}>
+        {embedsData?.map((embed) =>
+          embed ? <TweetEmbed {...embed} key={embed.url}></TweetEmbed> : <></>
+        )}
+      </div>
+    )
+  ) : (
+    <div className={embeds.length > 1 ? `mt-2 grid gap-2` : 'mt-2'}>
+      {embeds?.map((embed) =>
+        embed ? (
+          <TweetEmbed {...embed} key={embed.url} isLoading={true}></TweetEmbed>
+        ) : (
+          <></>
+        )
+      )}
+    </div>
+  );
+}
+
+function TweetEmbed({
   title,
   text,
   image,
   provider,
   url,
-  icon
-}: ExternalEmbed): JSX.Element {
+  icon,
+  isLoading
+}: ExternalEmbed & { isLoading?: boolean }): JSX.Element {
   return (
     <button
       className='w-full rounded-md border border-black border-light-border 
@@ -24,12 +72,12 @@ export function TweetEmbed({
             <div className='flex items-center'>
               {icon && (
                 <span className='mx-1'>
-                  <img
+                  <NextImage
                     src={icon}
                     alt={provider || ''}
                     width={16}
                     height={16}
-                  ></img>
+                  ></NextImage>
                 </span>
               )}
               {title && (
@@ -40,7 +88,7 @@ export function TweetEmbed({
                 </span>
               )}
             </div>
-            {text && (
+            {text ? (
               <span
                 className={`mx-1 line-clamp-4 text-gray-400 ${hoverModifier}`}
               >
@@ -51,16 +99,27 @@ export function TweetEmbed({
                   )
                   .join(' ')}
               </span>
+            ) : isLoading ? (
+              <div className='h-12 w-full animate-pulse rounded-md bg-light-secondary dark:bg-dark-secondary'></div>
+            ) : (
+              <></>
             )}
           </div>
-          {image && (
+          {image ? (
             <div className='ml-2 mr-1 block hidden h-28 w-28 flex-shrink-0 flex-grow-0 overflow-hidden rounded-md sm:block'>
-              <img
+              <NextImage
                 src={image}
+                alt={title || ''}
                 title={title || 'Unknown'}
                 className='h-full w-full object-cover'
+                width={112}
+                height={112}
               />
             </div>
+          ) : isLoading ? (
+            <div className='ml-2 mr-1 block hidden h-28 w-28 flex-shrink-0 flex-grow-0 animate-pulse overflow-hidden rounded-md rounded-md bg-light-secondary dark:bg-dark-secondary sm:block'></div>
+          ) : (
+            <></>
           )}
         </div>
       </a>

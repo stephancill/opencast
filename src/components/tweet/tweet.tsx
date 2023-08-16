@@ -16,7 +16,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { TweetActions } from './tweet-actions';
 import { TweetDate } from './tweet-date';
-import { TweetEmbed } from './tweet-embed';
+import { TweetEmbeds } from './tweet-embed';
 import { TweetStats } from './tweet-stats';
 import { TweetStatus } from './tweet-status';
 import { TweetText } from './tweet-text';
@@ -212,13 +212,7 @@ export function Tweet(tweet: TweetProps): JSX.Element {
                   previewCount={images.length}
                 />
               )}
-              {embeds && (
-                <div className='grid gap-y-1'>
-                  {embeds.map((embed) =>
-                    embed ? <TweetEmbed key={embed.url} {...embed} /> : <></>
-                  )}
-                </div>
-              )}
+              {embeds && embeds.length > 0 && <TweetEmbeds embeds={embeds} />}
               {topic && <TweetTopic topic={topic} />}
               {!modal && (
                 <TweetStats

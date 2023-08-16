@@ -82,13 +82,8 @@ export default async function tweetIdEndpoint(
 
   let tweet: Tweet = tweetConverter.toTweet(cast);
 
-  const resolvedEmbeds = (
-    await Promise.all(tweet.embeds.map(populateEmbed))
-  ).filter((embed) => embed !== null) as ExternalEmbed[];
-
   const tweetWithUsers: TweetWithUsers = {
     ...tweet,
-    embeds: resolvedEmbeds,
     topic: topic,
     userLikes: reactions[ReactionType.LIKE] || [],
     userRetweets: reactions[ReactionType.RECAST] || [],

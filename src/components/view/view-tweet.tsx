@@ -16,7 +16,7 @@ import type { User } from '@lib/types/user';
 import cn from 'clsx';
 import Link from 'next/link';
 import { RefObject } from 'react';
-import { TweetEmbed } from '../tweet/tweet-embed';
+import { TweetEmbeds } from '../tweet/tweet-embed';
 import { TweetText } from '../tweet/tweet-text';
 import { TweetTopic } from '../tweet/tweet-topic';
 
@@ -138,15 +138,9 @@ export function ViewTweet(tweet: ViewTweetProps): JSX.Element {
             previewCount={images.length}
           />
         )}
-        {embeds && (
-          <div className='mt-4 grid gap-2'>
-            {embeds.map((embed) => (
-              <TweetEmbed key={embed.url} {...embed} />
-            ))}
-          </div>
-        )}
+        {embeds && embeds.length > 0 && <TweetEmbeds embeds={embeds} />}
         {topic && (
-          <span className='inline-block'>
+          <span className='mt-2 inline-block'>
             <TweetTopic topic={topic} />
           </span>
         )}

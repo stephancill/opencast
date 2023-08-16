@@ -25,8 +25,6 @@ export async function getTweetsPaginated(
 
   let { tweets } = await castsToTweets(casts);
 
-  const tweetPromises = tweets.map(populateTweetEmbeds);
-
   const fids: Set<bigint> = casts.reduce((acc: Set<bigint>, cur) => {
     acc.add(cur.fid);
     if (cur.parent_fid) acc.add(cur.parent_fid);
@@ -42,8 +40,6 @@ export async function getTweetsPaginated(
         .filter((url) => url !== null) as string[]
     )
   ]);
-
-  tweets = await Promise.all(tweetPromises);
 
   const nextPageCursor =
     casts.length > 0 ? casts[casts.length - 1].timestamp.toISOString() : null;

@@ -10,7 +10,7 @@ const KNOWN_HOSTS_MAP: {
     userAgent: 'bot'
   },
   'x.com': {
-    urlBuilder: (url: string) => url.replace('twitter.com', 'fxtwitter.com'),
+    urlBuilder: (url: string) => url.replace('x.com', 'fxtwitter.com'),
     userAgent: 'bot'
   },
   'arxiv.org': {
@@ -22,7 +22,14 @@ const KNOWN_HOSTS_MAP: {
 export async function populateEmbed(
   embed: ExternalEmbed
 ): Promise<ExternalEmbed | null> {
-  const host = new URL(embed.url).host;
+  let host = '';
+  try {
+    host = new URL(embed.url).host;
+  } catch (e) {
+    console.error(`Error parsing URL ${embed.url}`);
+    return null;
+  }
+
   const url = KNOWN_HOSTS_MAP[host]?.urlBuilder?.(embed.url) || embed.url;
   const cached = LRU.get(url);
   if (cached !== undefined) {
@@ -35,6 +42,7 @@ export async function populateEmbed(
     const userAgent = KNOWN_HOSTS_MAP[host]?.userAgent || undefined;
     const metadata = await getMetadata(url, {
       maxRedirects: 1,
+      timeout: 1000,
       ua:
         userAgent ||
         'Mozilla/5.0 (compatible; TelegramBot/1.0; +https://core.telegram.org/bots/webhooks)'
@@ -54,10 +62,13 @@ export async function populateEmbed(
     }
   } catch (e) {
     console.log(`Error fetching embed for ${url}`);
+    // console.error(e);
   }
 
   // If we get an error, cache the error for an hour
   LRU.set(url, result, { ttl: result === null ? 1000 * 60 * 60 : undefined });
+
+  // console.log(`Finished populating embed for ${embed.url}`, result);
 
   return result;
 }
