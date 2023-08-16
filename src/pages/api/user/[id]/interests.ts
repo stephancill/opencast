@@ -53,15 +53,10 @@ export default async function handle(
         LIMIT 5;
       `) as { parent_url: string; reaction_count: number }[];
 
-      console.log(reactionGroups);
-
       const topics = await Promise.all(
         reactionGroups.map(async (group) => {
           const url = group.parent_url!;
           const topic = await resolveTopic(url);
-          if (!topic) {
-            console.log(group.parent_url);
-          }
           return { topic, volume: Number(group.reaction_count) };
         })
       );

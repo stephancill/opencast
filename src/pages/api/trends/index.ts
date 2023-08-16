@@ -42,9 +42,6 @@ export default async function handle(
         results.map(async (result) => {
           const url = result.parent_url!;
           const topic = await resolveTopic(url);
-          if (!topic) {
-            console.log(result.parent_url);
-          }
           return { topic, volume: result._count.hash };
         })
       );

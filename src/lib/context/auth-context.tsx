@@ -37,7 +37,6 @@ export function AuthContextProvider({
 
     if (userResponse.ok) {
       const { result: user } = await userResponse.json();
-      console.log('User changed', user);
       setUser(user);
     }
 

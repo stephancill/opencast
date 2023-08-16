@@ -132,7 +132,7 @@ export async function userInterests(fid: bigint): Promise<TopicType[]> {
         const url = group.parent_url!;
         const topic = await resolveTopic(url);
         if (!topic) {
-          console.log(group.parent_url);
+          console.error(`Unresolved topic: ${group.parent_url}`);
         }
         return topic;
       })

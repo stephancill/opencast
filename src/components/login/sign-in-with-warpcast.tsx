@@ -11,7 +11,7 @@ export const useLocalStorage = (key: any, initialValue: any) => {
       const item = window.localStorage.getItem(key);
       return item ? JSON.parse(item) : initialValue;
     } catch (error) {
-      console.log(error);
+      console.error(error);
       return initialValue;
     }
   });
@@ -23,7 +23,7 @@ export const useLocalStorage = (key: any, initialValue: any) => {
       setStoredValue(valueToStore);
       window.localStorage.setItem(key, JSON.stringify(valueToStore));
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   };
 
@@ -98,7 +98,6 @@ const WarpcastAuthPopup = () => {
   };
 
   useEffect(() => {
-    console.log(process.env.NEXT_PUBLIC_FC_CLIENT_NAME);
     setInitiated(true);
   }, []);
 
