@@ -38,22 +38,22 @@ export function TweetStats({
   openModal
 }: TweetStatsProps): JSX.Element {
   const totalLikes = userLikes.length;
-  const totalTweets = userRetweets.length;
+  const totalRetweets = userRetweets.length;
 
-  const [{ currentReplies, currentTweets, currentLikes }, setCurrentStats] =
+  const [{ currentReplies, currentRetweets, currentLikes }, setCurrentStats] =
     useState({
       currentReplies: totalReplies,
       currentLikes: totalLikes,
-      currentTweets: totalTweets
+      currentRetweets: totalRetweets
     });
 
   useEffect(() => {
     setCurrentStats({
       currentReplies: totalReplies,
       currentLikes: totalLikes,
-      currentTweets: totalTweets
+      currentRetweets: totalRetweets
     });
-  }, [totalReplies, totalLikes, totalTweets]);
+  }, [totalReplies, totalLikes, totalRetweets]);
 
   const replyMove = useMemo(
     () => (totalReplies > currentReplies ? -25 : 25),
@@ -66,14 +66,16 @@ export function TweetStats({
   );
 
   const tweetMove = useMemo(
-    () => (totalTweets > currentTweets ? -25 : 25),
-    [totalTweets]
+    () => (totalRetweets > currentRetweets ? -25 : 25),
+    [totalRetweets]
   );
 
-  const tweetIsLiked = userLikes.includes(userId);
-  const tweetIsRetweeted = userRetweets.includes(userId);
+  const [tweetIsLiked, setTweetIsLiked] = useState(userLikes.includes(userId));
+  const [tweetIsRetweeted, setTweetIsRetweeted] = useState(
+    userRetweets.includes(userId)
+  );
 
-  const isStatsVisible = !!(totalReplies || totalTweets || totalLikes);
+  const isStatsVisible = !!(totalReplies || totalRetweets || totalLikes);
 
   return (
     <>
@@ -85,7 +87,7 @@ export function TweetStats({
           replyMove={replyMove}
           userRetweets={userRetweets}
           currentLikes={currentLikes}
-          currentTweets={currentTweets}
+          currentTweets={currentRetweets}
           currentReplies={currentReplies}
           isStatsVisible={isStatsVisible}
           tweetId={tweetId}
@@ -118,7 +120,7 @@ export function TweetStats({
                          group-focus-visible:bg-accent-green/10 group-focus-visible:ring-accent-green/80'
           tip={tweetIsRetweeted ? 'Undo Retweet' : 'Retweet'}
           move={tweetMove}
-          stats={currentTweets}
+          stats={currentRetweets}
           iconName='ArrowPathRoundedSquareIcon'
           viewTweet={viewTweet}
           onClick={async () => {
@@ -130,10 +132,20 @@ export function TweetStats({
               remove: tweetIsRetweeted
             });
             if (!message) {
-              console.error('Error creating like message');
+              console.error('Error creating recast message');
               return;
             }
             const result = await submitHubMessage(message);
+            if (result?.hash) {
+              setCurrentStats({
+                currentReplies,
+                currentLikes,
+                currentRetweets: tweetIsRetweeted
+                  ? totalRetweets - 1
+                  : totalRetweets + 1
+              });
+              setTweetIsRetweeted(!tweetIsRetweeted);
+            }
           }}
         />
         <TweetOption
@@ -161,6 +173,14 @@ export function TweetStats({
               return;
             }
             const result = await submitHubMessage(message);
+            if (result?.hash) {
+              setCurrentStats({
+                currentReplies,
+                currentRetweets: currentRetweets,
+                currentLikes: tweetIsLiked ? totalLikes - 1 : totalLikes + 1
+              });
+              setTweetIsLiked(!tweetIsLiked);
+            }
           }}
         />
         <TweetShare userId={userId} tweetId={tweetId} viewTweet={viewTweet} />
