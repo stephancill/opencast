@@ -5,12 +5,14 @@ import { ToolTip } from '@components/ui/tooltip';
 import { MobileSidebar } from '@components/sidebar/mobile-sidebar';
 import type { ReactNode } from 'react';
 import type { IconName } from '@components/ui/hero-icon';
+import { NextImage } from '../ui/next-image';
 
 type HomeHeaderProps = {
   tip?: string;
   title?: string;
   description?: string;
   children?: ReactNode;
+  imageUrl?: string;
   iconName?: IconName;
   className?: string;
   disableSticky?: boolean;
@@ -24,6 +26,7 @@ export function MainHeader({
   title,
   description,
   children,
+  imageUrl,
   iconName,
   className,
   disableSticky,
@@ -53,19 +56,33 @@ export function MainHeader({
         </Button>
       )}
       {title && (
-        <div className='flex flex-col'>
-          {useMobileSidebar && <MobileSidebar />}
-          <h2 className='text-xl font-bold' key={title}>
-            {title}
-          </h2>
-          {description && (
-            <p
-              className='text-light-secondary dark:text-dark-secondary'
-              key={description}
-            >
-              {description}
-            </p>
+        <div className='flex items-center'>
+          {imageUrl && (
+            <span className='mr-2 inline flex-shrink-0 flex-grow-0 overflow-hidden rounded-md'>
+              <NextImage
+                src={imageUrl}
+                alt={title || 'image'}
+                objectFit='contain'
+                width={48}
+                height={48}
+              ></NextImage>
+            </span>
           )}
+          <div className='flex flex-col'>
+            {useMobileSidebar && <MobileSidebar />}
+            <h2 className='text-xl font-bold' key={title}>
+              {title}
+            </h2>
+
+            {description && (
+              <p
+                className='text-light-secondary dark:text-dark-secondary'
+                key={description}
+              >
+                {description}
+              </p>
+            )}
+          </div>
         </div>
       )}
 

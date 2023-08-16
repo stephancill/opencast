@@ -102,10 +102,13 @@ export function Tweet(tweet: TweetProps): JSX.Element {
             : 'border-b border-light-border dark:border-dark-border'
         )}
         onClick={(event) => {
-          // Prevent click when clicking on a link or a paragraph
+          // Prevent click when clicking on a link or a paragraph or image
+          const tagName = (event.target as any).tagName;
           if (
-            (event.target as any).tagName === 'A' ||
-            (event.target as any).tagName === 'SPAN'
+            tagName === 'A' ||
+            tagName === 'SPAN' ||
+            tagName === 'P' ||
+            tagName === 'IMG'
           ) {
             event.stopPropagation();
             return;

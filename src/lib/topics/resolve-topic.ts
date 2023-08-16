@@ -4,6 +4,7 @@ import * as chains from 'viem/chains';
 import { LRU } from '../lru-cache';
 import { parseChainURL } from '../utils';
 import { TopicType } from '../types/topic';
+import { resolveChainIcon } from '../chains/resolve-chain-icon';
 
 const chainById = Object.values(chains).reduce(
   (acc: { [key: string]: chains.Chain }, cur) => {
@@ -36,6 +37,7 @@ function cleanUrl(url: string): string {
   } else if (url.startsWith('www.')) {
     return url.slice(4);
   } else {
+    // TODO: Remove tracking params (utm*) and trailing slash
     return url;
   }
 }
@@ -126,9 +128,13 @@ async function _resolveTopic(url: string): Promise<TopicType | null> {
           parsed.contractAddress.length - 4,
           parsed.contractAddress.length
         )}`;
+
+        const chainIcon = await resolveChainIcon(chainId);
+
         return {
-          name: `${chainById[chainId].name} ${truncatedAddress}`,
+          name: `${truncatedAddress}`,
           description: `NFT on ${chainById[chainId].name} at ${parsed.contractAddress}`,
+          image: chainIcon,
           url
         };
       }

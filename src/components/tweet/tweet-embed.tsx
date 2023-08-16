@@ -1,6 +1,5 @@
 import { ExternalEmbed } from '../../lib/types/tweet';
 import { preventBubbling } from '../../lib/utils';
-import { NextImage } from '../ui/next-image';
 
 const hoverModifier =
   'hover:brightness-75 dark:hover:brightness-125 hover:duration-200 transition';
@@ -21,7 +20,7 @@ export function TweetEmbed({
     >
       <a href={url} target={'_blank'}>
         <div className='flex items-center'>
-          <div className='flex-shrink'>
+          <div className='flex-grow'>
             <div className='flex items-center'>
               {icon && (
                 <span className='mx-1'>
@@ -45,7 +44,12 @@ export function TweetEmbed({
               <span
                 className={`mx-1 line-clamp-4 text-gray-400 ${hoverModifier}`}
               >
-                {text}
+                {text
+                  .split(' ')
+                  .map((word) =>
+                    word.length > 40 ? word.slice(0, 20) + '...' : word
+                  )
+                  .join(' ')}
               </span>
             )}
           </div>

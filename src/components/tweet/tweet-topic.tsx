@@ -8,35 +8,23 @@ export function TweetTopic({ topic }: { topic: TopicType }) {
   return (
     <span
       onClick={(e) => router.push(`/topic?url=${topic.url}`)}
-      className='flex w-full cursor-pointer items-center whitespace-nowrap pt-3 text-light-secondary hover:underline dark:text-dark-secondary'
+      className='flex w-full cursor-pointer items-center whitespace-nowrap text-light-secondary hover:underline dark:text-dark-secondary'
     >
-      #
-      {topic.image && (
-        <span className='mx-1 inline flex-shrink-0 flex-grow-0 overflow-hidden rounded-md'>
-          <NextImage
-            src={topic.image}
-            alt={topic.name}
-            // layout='fill'
-            width={16}
-            height={16}
-          ></NextImage>
-        </span>
-      )}
-      <span className='inline truncate'>{topic.name}</span>
+      <TopicView topic={topic}></TopicView>
     </span>
   );
 }
 
 export function TopicView({ topic }: { topic: TopicType }) {
   return (
-    <span className='flex items-center'>
+    <span className='flex cursor-pointer items-center'>
       #
       {topic.image && (
         <span className='mx-1 inline flex-shrink-0 flex-grow-0 overflow-hidden rounded-md'>
           <NextImage
             src={topic.image}
             alt={topic.name}
-            // layout='fill'
+            objectFit='contain'
             width={16}
             height={16}
           ></NextImage>

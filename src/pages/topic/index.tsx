@@ -68,6 +68,7 @@ export default function TopicPage({
       <MainHeader
         useMobileSidebar
         title={`${topic.name}`}
+        imageUrl={topic.image}
         description={topic.description}
         className='flex items-center justify-between'
       ></MainHeader>
