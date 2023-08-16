@@ -10,7 +10,7 @@ import { useState } from 'react';
 import { useInfiniteScrollUsers } from '../../lib/hooks/useInfiniteScrollUsers';
 import { User } from '../../lib/types/user';
 
-type viewTweetStats = Pick<Tweet, 'userRetweets' | 'userLikes'> & {
+type viewTweetStats = {
   likeMove: number;
   tweetMove: number;
   replyMove: number;
@@ -27,10 +27,8 @@ type Stats = [string, StatsType | null, number, number];
 
 export function ViewTweetStats({
   likeMove,
-  userLikes,
   tweetMove,
   replyMove,
-  userRetweets,
   currentLikes,
   currentTweets,
   currentReplies,

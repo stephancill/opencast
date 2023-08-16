@@ -50,6 +50,7 @@ type TweetActionsProps = Pick<Tweet, 'createdBy'> & {
   parentId?: string;
   hasImages: boolean;
   viewTweet?: boolean;
+  isUserFollowing: boolean;
 };
 
 type PinModalData = Record<'title' | 'description' | 'mainBtnLabel', string>;
@@ -77,7 +78,8 @@ export function TweetActions({
   username,
   hasImages,
   viewTweet,
-  createdBy
+  createdBy,
+  isUserFollowing
 }: TweetActionsProps): JSX.Element {
   const { user, isAdmin } = useAuth();
   const { push } = useRouter();
@@ -94,7 +96,7 @@ export function TweetActions({
     closeModal: pinCloseModal
   } = useModal();
 
-  const { id: userId, following, pinnedTweet } = user as User;
+  const { id: userId, pinnedTweet } = user as User;
 
   const isInAdminControl = isAdmin && !isOwner;
   const tweetIsPinned = pinnedTweet === tweetId;
@@ -149,8 +151,6 @@ export function TweetActions({
         );
       }
     };
-
-  const userIsFollowed = following.includes(createdBy);
 
   const handleOpenInWarpcast = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -262,7 +262,7 @@ export function TweetActions({
                         </>
                       )}
                     </Popover.Button>
-                  ) : userIsFollowed ? (
+                  ) : isUserFollowing ? (
                     <Popover.Button
                       className='accent-tab flex w-full gap-3 rounded-md rounded-t-none p-4 hover:bg-main-sidebar-background'
                       as={Button}

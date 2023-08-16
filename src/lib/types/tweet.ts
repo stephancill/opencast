@@ -28,12 +28,14 @@ export type Tweet = {
   images: ImagesPreview | null;
   embeds: ExternalEmbed[];
   parent: { id: string; username?: string; userId?: string } | null;
-  userLikes: string[];
   createdBy: string;
   createdAt: Date;
   updatedAt: Date | null;
-  userReplies: number;
-  userRetweets: string[];
+  totalReplies: number;
+  totalLikes: number;
+  totalRetweets: number;
+  didUserLike: boolean;
+  didUserRetweet: boolean;
   mentions: Mention[];
   client: string | null;
   topic: TopicType | null;
@@ -104,7 +106,7 @@ export const populateTweetTopic = (
 };
 
 export const tweetConverter = {
-  toTweet(cast: casts & { client?: string }): Tweet {
+  toTweet(cast: casts): Tweet {
     // Check if cast.hash is a buffer
     const isBuffer = Buffer.isBuffer(cast.hash);
 
@@ -155,14 +157,16 @@ export const tweetConverter = {
       parent,
       topic: null,
       topicUrl: cast.parent_url,
-      userLikes: [],
       createdBy: cast.fid.toString(),
       createdAt: cast.timestamp,
       updatedAt: null,
-      userReplies: 0,
-      userRetweets: [],
+      totalReplies: 0,
+      totalLikes: 0,
+      totalRetweets: 0,
+      didUserLike: false,
+      didUserRetweet: false,
       mentions,
-      client: cast.client || null,
+      client: null,
       retweet: null
     } as Tweet;
   }

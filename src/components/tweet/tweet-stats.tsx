@@ -14,7 +14,11 @@ import { ReactionType } from '@farcaster/hub-web';
 
 type TweetStatsProps = Pick<
   Tweet,
-  'userLikes' | 'userRetweets' | 'userReplies'
+  | 'totalLikes'
+  | 'totalRetweets'
+  | 'totalReplies'
+  | 'didUserLike'
+  | 'didUserRetweet'
 > & {
   reply?: boolean;
   userId: string;
@@ -30,15 +34,17 @@ export function TweetStats({
   userId,
   isOwner,
   tweetId,
-  userLikes,
   viewTweet,
-  userRetweets,
-  userReplies: totalReplies,
+  totalLikes,
+  totalRetweets,
+  totalReplies,
+  didUserLike,
+  didUserRetweet,
   tweetAuthorId,
   openModal
 }: TweetStatsProps): JSX.Element {
-  const totalLikes = userLikes.length;
-  const totalRetweets = userRetweets.length;
+  // const totalLikes = userLikes.length;
+  // const totalRetweets = userRetweets.length;
 
   const [{ currentReplies, currentRetweets, currentLikes }, setCurrentStats] =
     useState({
@@ -70,10 +76,8 @@ export function TweetStats({
     [totalRetweets]
   );
 
-  const [tweetIsLiked, setTweetIsLiked] = useState(userLikes.includes(userId));
-  const [tweetIsRetweeted, setTweetIsRetweeted] = useState(
-    userRetweets.includes(userId)
-  );
+  const [tweetIsLiked, setTweetIsLiked] = useState(didUserLike);
+  const [tweetIsRetweeted, setTweetIsRetweeted] = useState(didUserRetweet);
 
   const isStatsVisible = !!(totalReplies || totalRetweets || totalLikes);
 
@@ -82,10 +86,8 @@ export function TweetStats({
       {viewTweet && (
         <ViewTweetStats
           likeMove={likeMove}
-          userLikes={userLikes}
           tweetMove={tweetMove}
           replyMove={replyMove}
-          userRetweets={userRetweets}
           currentLikes={currentLikes}
           currentTweets={currentRetweets}
           currentReplies={currentReplies}

@@ -4,12 +4,55 @@ import { resolveTopic } from '../topics/resolve-topic';
 import { TopicType } from '../types/topic';
 import { User, userConverter, UsersMapType } from '../types/user';
 
-export async function resolveUserFromFid(fid: bigint): Promise<User | null> {
-  const userData = await prisma.user_data.findMany({
+export type GetUserContext = {
+  fid: bigint;
+};
+
+export async function resolveUserFromFid(
+  fid: bigint,
+  context: GetUserContext | null = null
+): Promise<User | null> {
+  const userDataPromise = await prisma.user_data.findMany({
     where: {
       fid: fid
     }
   });
+
+  const followersPromise = await prisma.links.findMany({
+    where: {
+      target_fid: fid,
+      type: 'follow'
+    },
+    distinct: ['target_fid', 'fid']
+  });
+
+  const followingPromise = await prisma.links.findMany({
+    where: {
+      fid: fid,
+      type: 'follow',
+      deleted_at: null
+    },
+    distinct: ['target_fid', 'fid']
+  });
+
+  const castCountPromise = await prisma.casts.aggregate({
+    where: {
+      fid: fid,
+      deleted_at: null
+    },
+    _count: true
+  });
+
+  const interestsPromise = await userInterests(fid);
+
+  const [userData, followers, following, castCount, interests] =
+    await Promise.all([
+      userDataPromise,
+      followersPromise,
+      followingPromise,
+      castCountPromise,
+      interestsPromise
+    ]);
 
   if (userData.length === 0) {
     return null;
@@ -23,39 +66,19 @@ export async function resolveUserFromFid(fid: bigint): Promise<User | null> {
     return acc;
   }, {});
 
-  const followers = await prisma.links.findMany({
-    where: {
-      target_fid: fid,
-      type: 'follow'
-    },
-    distinct: ['target_fid', 'fid']
-  });
-
-  const following = await prisma.links.findMany({
-    where: {
-      fid: fid,
-      type: 'follow',
-      deleted_at: null
-    },
-    distinct: ['target_fid', 'fid']
-  });
-
-  const castCount = await prisma.casts.aggregate({
-    where: {
-      fid: fid,
-      deleted_at: null
-    },
-    _count: true
-  });
-
-  const interests = await userInterests(fid);
-
   const user = userConverter.toUser({ ...userDataRaw, fid });
 
   return {
     ...user,
-    followers: followers.map((f) => f.fid!.toString()),
-    following: following.map((f) => f.target_fid!.toString()),
+    // followers: followers.map((f) => f.fid!.toString()),
+    totalFollowers: followers.length,
+    totalFollowing: following.length,
+    isUserFollowed: context
+      ? following.some((f) => f.target_fid === context.fid)
+      : false,
+    isUserFollowing: context
+      ? followers.some((f) => f.fid === context.fid)
+      : false,
     totalTweets: castCount._count,
     interests
   };
@@ -92,9 +115,12 @@ export async function resolveUsers(fids: bigint[]): Promise<User[]> {
 // TODO: Combine into one query
 // TODO: Cache results
 // TODO: Only pass minimal user data and fetch on-demand
-export async function resolveUsersMap(fids: bigint[]): Promise<UsersMapType> {
+export async function resolveUsersMap(
+  fids: bigint[],
+  context: GetUserContext | null = null
+): Promise<UsersMapType> {
   const userOrNulls = await Promise.all(
-    fids.map((fid) => resolveUserFromFid(fid))
+    fids.map((fid) => resolveUserFromFid(fid, context))
   );
   const users = userOrNulls.filter(
     (userOrNull) => userOrNull !== null

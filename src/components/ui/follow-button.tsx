@@ -13,18 +13,20 @@ import toast from 'react-hot-toast';
 type FollowButtonProps = {
   userTargetId: string;
   userTargetUsername: string;
+  userIsFollowed: boolean;
 };
 
 export function FollowButton({
   userTargetId,
-  userTargetUsername
+  userTargetUsername,
+  userIsFollowed
 }: FollowButtonProps): JSX.Element | null {
   const { user } = useAuth();
   const { open, openModal, closeModal } = useModal();
 
   if (user?.id === userTargetId) return null;
 
-  const { id: userId, following } = user ?? {};
+  const { id: userId } = user ?? {};
 
   const handleFollow = async (): Promise<void> => {
     if (!userId) {
@@ -63,8 +65,6 @@ export function FollowButton({
     }
     closeModal();
   };
-
-  const userIsFollowed = !!following?.includes(userTargetId ?? '');
 
   return (
     <>

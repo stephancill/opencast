@@ -35,7 +35,7 @@ export function ViewTweet(tweet: ViewTweetProps): JSX.Element {
     createdBy,
     createdAt,
     userRetweets,
-    userReplies,
+    totalReplies: userReplies,
     viewTweetRef,
     mentions,
     client,
@@ -177,7 +177,7 @@ export function ViewTweet(tweet: ViewTweetProps): JSX.Element {
             tweetId={tweetId}
             userLikes={userLikes}
             userRetweets={userRetweets}
-            userReplies={userReplies}
+            totalReplies={userReplies}
             openModal={openModal}
             tweetAuthorId={ownerId}
           />

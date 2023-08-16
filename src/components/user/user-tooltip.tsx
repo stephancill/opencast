@@ -19,8 +19,10 @@ type UserTooltipProps = Pick<
   | 'verified'
   | 'username'
   | 'photoURL'
-  | 'following'
-  | 'followers'
+  | 'totalFollowers'
+  | 'totalFollowing'
+  | 'isUserFollowed'
+  | 'isUserFollowing'
   | 'coverPhotoURL'
   | 'interests'
 > & {
@@ -41,8 +43,10 @@ export function UserTooltip({
   children,
   photoURL,
   username,
-  following,
-  followers,
+  totalFollowers,
+  totalFollowing,
+  isUserFollowed,
+  isUserFollowing,
   interests,
   coverPhotoURL
 }: UserTooltipProps): JSX.Element {
@@ -53,8 +57,8 @@ export function UserTooltip({
   const userLink = `/user/${username}`;
 
   const allStats: Readonly<Stats[]> = [
-    ['following', 'Following', following.length],
-    ['followers', 'Followers', followers.length]
+    ['following', 'Following', totalFollowing],
+    ['followers', 'Followers', totalFollowers]
   ];
 
   return (
@@ -102,7 +106,11 @@ export function UserTooltip({
                   username={username}
                 />
               </div>
-              <FollowButton userTargetId={id} userTargetUsername={username} />
+              <FollowButton
+                userTargetId={id}
+                userTargetUsername={username}
+                userIsFollowed={isUserFollowing}
+              />
             </div>
             <div>
               <UserName
@@ -113,7 +121,7 @@ export function UserTooltip({
               />
               <div className='flex items-center gap-1 text-light-secondary dark:text-dark-secondary'>
                 <UserUsername username={username} />
-                <UserFollowing userTargetId={id} />
+                {isUserFollowed && <UserFollowing />}
               </div>
             </div>
           </div>

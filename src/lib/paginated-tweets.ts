@@ -18,14 +18,32 @@ export interface PaginatedTweetsResponse
     topics: TopicsMapType;
   }> {}
 
+interface GetTweetsContext {
+  fid: bigint;
+}
+
 export async function getTweetsPaginated(
-  findManyArgs: Prisma.castsFindManyArgs
+  findManyArgs: Prisma.castsFindManyArgs,
+  context: GetTweetsContext | null = null
 ) {
+  let startTime = Date.now();
+
   const casts = await prisma.casts.findMany(findManyArgs);
+
+  console.log(`getTweetsPaginated: ${Date.now() - startTime}ms`);
+  startTime = Date.now();
 
   let { tweets } = await castsToTweets(casts);
 
+  console.log(`castsToTweets: ${Date.now() - startTime}ms`);
+  startTime = Date.now();
+
   const tweetPromises = tweets.map(populateTweetEmbeds);
+
+  tweets = await Promise.all(tweetPromises);
+
+  console.log(`populateTweetEmbeds: ${Date.now() - startTime}ms`);
+  startTime = Date.now();
 
   const fids: Set<bigint> = casts.reduce((acc: Set<bigint>, cur) => {
     acc.add(cur.fid);
@@ -34,16 +52,30 @@ export async function getTweetsPaginated(
     return acc;
   }, new Set<bigint>());
 
-  const [usersMap, topicsMap] = await Promise.all([
-    resolveUsersMap([...fids]),
-    resolveTopicsMap(
-      casts
-        .map((cast) => cast.parent_url)
-        .filter((url) => url !== null) as string[]
-    )
-  ]);
+  // const [usersMap, topicsMap] = await Promise.all([
+  //   resolveUsersMap([...fids]),
+  //   resolveTopicsMap(
+  //     casts
+  //       .map((cast) => cast.parent_url)
+  //       .filter((url) => url !== null) as string[]
+  //   )
+  // ]);
+  // console.log(`resolveUsersMap+resolveTopicsMap: ${Date.now() - startTime}ms`);
+  // startTime = Date.now();
 
-  tweets = await Promise.all(tweetPromises);
+  const usersMap = await resolveUsersMap([...fids], context);
+
+  console.log(`resolveUsersMap: ${Date.now() - startTime}ms`);
+  startTime = Date.now();
+
+  const topicsMap = await resolveTopicsMap(
+    casts
+      .map((cast) => cast.parent_url)
+      .filter((url) => url !== null) as string[]
+  );
+
+  console.log(`resolveTopicsMap: ${Date.now() - startTime}ms`);
+  startTime = Date.now();
 
   const nextPageCursor =
     casts.length > 0 ? casts[casts.length - 1].timestamp.toISOString() : null;
@@ -57,7 +89,8 @@ export async function getTweetsPaginated(
 }
 
 export async function castsToTweets(
-  castsOrHashes: Buffer[] | casts[]
+  castsOrHashes: Buffer[] | casts[],
+  context: GetTweetsContext | null = null
 ): Promise<{ tweets: Tweet[]; casts: casts[]; castHashes: Buffer[] }> {
   const casts =
     castsOrHashes[0] instanceof Buffer
@@ -143,13 +176,23 @@ export async function castsToTweets(
     const id = cast.hash.toString('hex');
     return {
       ...tweetConverter.toTweet(cast),
-      userLikes: reactionsMap[id]
-        ? reactionsMap[id][ReactionType.LIKE] || []
-        : [],
-      userRetweets: reactionsMap[id]
-        ? reactionsMap[id][ReactionType.RECAST] || []
-        : [],
-      userReplies: replyCountMap[id] || 0
+      totalLikes: reactionsMap[id]
+        ? (reactionsMap[id][ReactionType.LIKE] || []).length
+        : 0,
+      totalRetweets: reactionsMap[id]
+        ? (reactionsMap[id][ReactionType.RECAST] || []).length
+        : 0,
+      totalReplies: replyCountMap[id] || 0,
+      didUserLike: context
+        ? (reactionsMap[id][ReactionType.LIKE] || []).includes(
+            context.fid.toString()
+          )
+        : false,
+      didUserRetweet: context
+        ? (reactionsMap[id][ReactionType.RECAST] || []).includes(
+            context.fid.toString()
+          )
+        : false
     };
   });
 

@@ -45,12 +45,14 @@ export function Tweet(tweet: TweetProps): JSX.Element {
     parent,
     pinned,
     profile,
-    userLikes,
     createdBy,
     createdAt,
     parentTweet,
-    userReplies,
-    userRetweets,
+    totalLikes,
+    totalRetweets,
+    totalReplies,
+    didUserLike,
+    didUserRetweet,
     mentions,
     topic,
     retweet,
@@ -178,6 +180,7 @@ export function Tweet(tweet: TweetProps): JSX.Element {
                     username={username}
                     hasImages={!!images}
                     createdBy={createdBy}
+                    isUserFollowing={tweetUserData.isUserFollowing}
                   />
                 )}
               </div>
@@ -226,9 +229,11 @@ export function Tweet(tweet: TweetProps): JSX.Element {
                   userId={userId}
                   isOwner={isOwner}
                   tweetId={tweetId}
-                  userLikes={userLikes}
-                  userReplies={userReplies}
-                  userRetweets={userRetweets}
+                  totalLikes={totalLikes}
+                  totalRetweets={totalRetweets}
+                  totalReplies={totalReplies}
+                  didUserLike={didUserLike}
+                  didUserRetweet={didUserRetweet}
                   tweetAuthorId={ownerId}
                   openModal={!parent ? openModal : undefined}
                 />

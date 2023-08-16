@@ -15,8 +15,12 @@ export type User = {
   username: string;
   photoURL: string;
   verified: boolean;
-  following: string[];
-  followers: string[];
+  // following: string[];
+  // followers: string[];
+  totalFollowing: number;
+  totalFollowers: number;
+  isUserFollowing: boolean;
+  isUserFollowed: boolean;
   createdAt: Date;
   updatedAt: Date | null;
   totalTweets: number;
@@ -51,8 +55,10 @@ export const userConverter = {
       photoURL: user[UserDataType.PFP], //user['1'],
       coverPhotoURL: null,
       verified: false,
-      following: [],
-      followers: [],
+      totalFollowers: 0,
+      totalFollowing: 0,
+      isUserFollowed: false,
+      isUserFollowing: false,
       createdAt: new Date(),
       updatedAt: null,
       totalTweets: 0,

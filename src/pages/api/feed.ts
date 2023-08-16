@@ -21,6 +21,8 @@ export default async function handle(
           ? Number(req.query.limit)
           : 10;
 
+      console.log('New request');
+
       // Get all the target_fids (people that the user follows)
       const links = await prisma.links.findMany({
         where: {
@@ -32,22 +34,25 @@ export default async function handle(
       });
       const targetFids = links.map((link) => link.target_fid) as bigint[];
 
-      const result = await getTweetsPaginated({
-        where: {
-          fid: {
-            in: targetFids
+      const result = await getTweetsPaginated(
+        {
+          where: {
+            fid: {
+              in: targetFids
+            },
+            timestamp: {
+              lt: cursor || undefined
+            },
+            parent_hash: null,
+            deleted_at: null
           },
-          timestamp: {
-            lt: cursor || undefined
-          },
-          parent_hash: null,
-          deleted_at: null
+          take: limit,
+          orderBy: {
+            timestamp: 'desc' // reverse chronological order
+          }
         },
-        take: limit,
-        orderBy: {
-          timestamp: 'desc' // reverse chronological order
-        }
-      });
+        { fid: BigInt(userFid) }
+      );
 
       res.json({
         result
