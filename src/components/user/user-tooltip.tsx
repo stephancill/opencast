@@ -9,6 +9,7 @@ import { UserFollowing } from './user-following';
 import { UserUsername } from './user-username';
 import type { ReactNode } from 'react';
 import type { User } from '@lib/types/user';
+import { TopicView, TweetTopic } from '../tweet/tweet-topic';
 
 type UserTooltipProps = Pick<
   User,
@@ -21,6 +22,7 @@ type UserTooltipProps = Pick<
   | 'following'
   | 'followers'
   | 'coverPhotoURL'
+  | 'interests'
 > & {
   modal?: boolean;
   avatar?: boolean;
@@ -41,6 +43,7 @@ export function UserTooltip({
   username,
   following,
   followers,
+  interests,
   coverPhotoURL
 }: UserTooltipProps): JSX.Element {
   const { isMobile } = useWindow();
@@ -115,6 +118,15 @@ export function UserTooltip({
             </div>
           </div>
           {bio && <p>{bio}</p>}
+          <div className='flex flex-wrap'>
+            {interests.map((topic) => (
+              <Link href={`/topic?url=${topic.url}`} key={topic.url}>
+                <span className='pr-2 text-light-secondary hover:underline dark:text-dark-secondary'>
+                  <TopicView topic={topic} />
+                </span>
+              </Link>
+            ))}
+          </div>
           <div className='text-secondary flex gap-4'>
             {allStats.map(([id, label, stat]) => (
               <Link href={`${userLink}/${id}`} key={id}>

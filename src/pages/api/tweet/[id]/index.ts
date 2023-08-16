@@ -2,7 +2,8 @@ import { ReactionType } from '@farcaster/hub-web';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { populateEmbed } from '../../../../lib/embeds';
 import { prisma } from '../../../../lib/prisma';
-import { resolveTopic, TopicType } from '../../../../lib/topics/resolve-topic';
+import { resolveTopic } from '../../../../lib/topics/resolve-topic';
+import { TopicType } from '../../../../lib/types/topic';
 import {
   ExternalEmbed,
   Tweet,

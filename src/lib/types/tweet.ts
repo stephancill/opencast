@@ -1,6 +1,7 @@
 import { Embed } from '@farcaster/hub-web';
 import { casts } from '@prisma/client';
-import { TopicsMapType, TopicType } from '../topics/resolve-topic';
+import { TopicsMapType } from '../topics/resolve-topic';
+import { TopicType } from './topic';
 import { isValidImageExtension } from '../validation';
 import type { ImagesPreview } from './file';
 import { BaseResponse } from './responses';

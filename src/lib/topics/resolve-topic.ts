@@ -3,6 +3,7 @@ import { createPublicClient, http } from 'viem';
 import * as chains from 'viem/chains';
 import { LRU } from '../lru-cache';
 import { parseChainURL } from '../utils';
+import { TopicType } from '../types/topic';
 
 const chainById = Object.values(chains).reduce(
   (acc: { [key: string]: chains.Chain }, cur) => {
@@ -11,13 +12,6 @@ const chainById = Object.values(chains).reduce(
   },
   {}
 );
-
-export type TopicType = {
-  name: string;
-  description: string;
-  image?: string;
-  url: string;
-};
 
 export type TopicsMapType = { [key: string]: TopicType };
 

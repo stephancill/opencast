@@ -145,7 +145,11 @@ export function ViewTweet(tweet: ViewTweetProps): JSX.Element {
             ))}
           </div>
         )}
-        {topic && <TweetTopic topic={topic} />}
+        {topic && (
+          <span className='inline-block'>
+            <TweetTopic topic={topic} />
+          </span>
+        )}
         <div
           className='inner:hover-animation inner:border-b inner:border-light-border
                      dark:inner:border-dark-border'

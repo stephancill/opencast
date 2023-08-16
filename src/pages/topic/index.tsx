@@ -11,7 +11,8 @@ import { useWindow } from '@lib/context/window-context';
 import { useInfiniteScroll } from '@lib/hooks/useInfiniteScroll';
 import { GetServerSideProps } from 'next';
 import type { ReactElement, ReactNode } from 'react';
-import { TopicType, resolveTopic } from '../../lib/topics/resolve-topic';
+import { resolveTopic } from '../../lib/topics/resolve-topic';
+import { TopicType } from '../../lib/types/topic';
 import { useAuth } from '../../lib/context/auth-context';
 import { populateTweetTopic, populateTweetUsers } from '../../lib/types/tweet';
 
