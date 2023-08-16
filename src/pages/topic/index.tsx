@@ -10,7 +10,7 @@ import { Loading } from '@components/ui/loading';
 import { useWindow } from '@lib/context/window-context';
 import { useInfiniteScroll } from '@lib/hooks/useInfiniteScroll';
 import { GetServerSideProps } from 'next';
-import type { ReactElement, ReactNode } from 'react';
+import { useState, type ReactElement, type ReactNode, useEffect } from 'react';
 import { resolveTopic } from '../../lib/topics/resolve-topic';
 import { TopicType } from '../../lib/types/topic';
 import { useAuth } from '../../lib/context/auth-context';
@@ -48,7 +48,12 @@ export default function TopicPage({
   topicUrl: topicUrl,
   topic: topic
 }: TopicPageProps): JSX.Element {
-  const { user } = useAuth();
+  // Debounce
+  const [enabled, setEnabled] = useState(false);
+  useEffect(() => {
+    setEnabled(true);
+  }, []);
+
   const { data, loading, LoadMore } = useInfiniteScroll(
     (pageParam) => {
       const url = `/api/topic?url=${topicUrl}&limit=10${
@@ -57,7 +62,8 @@ export default function TopicPage({
       return url;
     },
     {
-      queryKey: ['topic', topicUrl]
+      queryKey: ['topic', topicUrl],
+      enabled
     }
   );
   const { isMobile } = useWindow();
