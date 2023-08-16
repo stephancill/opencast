@@ -14,12 +14,10 @@ export function ViewParentTweet({
   viewTweetRef
 }: ViewParentTweetProps): JSX.Element | null {
   const fetchCast = async () => {
-    console.log('fetching parent', parentId);
-
     const response = await fetch(`/api/tweet/${parentId}`);
 
     if (!response.ok) {
-      console.log(await response.json());
+      console.error(await response.json());
       return;
     }
 

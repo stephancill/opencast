@@ -30,7 +30,9 @@ export function TopicView({ topic }: { topic: TopicType }) {
           ></NextImage>
         </span>
       )}
-      <span className='inline truncate'>{topic.name}</span>
+      <span className='inline overflow-hidden text-ellipsis'>
+        {topic.name.length > 40 ? topic.name.slice(0, 40) + '...' : topic.name}
+      </span>
     </span>
   );
 }
