@@ -139,7 +139,7 @@ export function ViewTweet(tweet: ViewTweetProps): JSX.Element {
           />
         )}
         {embeds && (
-          <div className='mt-4'>
+          <div className='mt-4 grid gap-2'>
             {embeds.map((embed) => (
               <TweetEmbed key={embed.url} {...embed} />
             ))}

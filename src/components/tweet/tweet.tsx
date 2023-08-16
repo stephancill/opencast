@@ -209,10 +209,13 @@ export function Tweet(tweet: TweetProps): JSX.Element {
                   previewCount={images.length}
                 />
               )}
-              {embeds &&
-                embeds.map((embed) => (
-                  <TweetEmbed key={embed.url} {...embed} />
-                ))}
+              {embeds && (
+                <div className='grid gap-y-1'>
+                  {embeds.map((embed) =>
+                    embed ? <TweetEmbed key={embed.url} {...embed} /> : <></>
+                  )}
+                </div>
+              )}
               {topic && <TweetTopic topic={topic} />}
               {!modal && (
                 <TweetStats

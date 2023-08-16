@@ -34,7 +34,9 @@ export function TweetEmbed({
                 </span>
               )}
               {title && (
-                <span className={`mx-1 line-clamp-2 ${hoverModifier}`}>
+                <span
+                  className={`mx-1 line-clamp-2 overflow-hidden text-ellipsis ${hoverModifier}`}
+                >
                   {title}
                 </span>
               )}
