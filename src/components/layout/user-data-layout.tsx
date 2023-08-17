@@ -1,12 +1,13 @@
-import { useRouter } from 'next/router';
-import { UserContextProvider } from '@lib/context/user-context';
 import { SEO } from '@components/common/seo';
 import { MainContainer } from '@components/home/main-container';
 import { MainHeader } from '@components/home/main-header';
 import { UserHeader } from '@components/user/user-header';
-import type { LayoutProps } from './common-layout';
-import { useQuery } from 'react-query';
+import { UserContextProvider } from '@lib/context/user-context';
+import { useRouter } from 'next/router';
+import useSWR from 'swr';
+import { fetchJSON } from '../../lib/fetch';
 import { UserResponse } from '../../lib/types/user';
+import type { LayoutProps } from './common-layout';
 
 export function UserDataLayout({ children }: LayoutProps): JSX.Element {
   const {
@@ -14,27 +15,16 @@ export function UserDataLayout({ children }: LayoutProps): JSX.Element {
     back
   } = useRouter();
 
-  const fetchUser = async () => {
-    const response = await fetch(`/api/user/${id}`);
-
-    if (!response.ok) {
-      console.log(await response.json());
-      return;
-    }
-
-    const responseJson = (await response.json()) as UserResponse;
-
-    if (!responseJson.result) {
-      console.error(responseJson.message);
-    }
-
-    return responseJson.result;
-  };
-
-  const { data: user, isLoading: loading } = useQuery(['user', id], fetchUser);
+  const { data: user, isValidating: loading } = useSWR(
+    id ? `/api/user/${id}` : null,
+    async (url) => (await fetchJSON<UserResponse>(url)).result,
+    {}
+  );
 
   return (
-    <UserContextProvider value={{ user: user || null, loading }}>
+    <UserContextProvider
+      value={{ user: user || null, loading: !user && loading }}
+    >
       {!user && !loading && <SEO title='User not found / Twitter' />}
       <MainContainer>
         <MainHeader useActionButton action={back}>
