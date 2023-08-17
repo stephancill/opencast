@@ -4,6 +4,7 @@ import type { Variants } from 'framer-motion';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useRouter } from 'next/router';
 import { UserName } from './user-name';
+import { formatNumber } from '../../lib/date';
 
 export const variants: Variants = {
   initial: { opacity: 0 },
@@ -61,13 +62,15 @@ export function UserHeader(): JSX.Element {
               ? `@${user.username}`
               : isInTweetPage
               ? totalTweets
-                ? `${totalTweets} ${`Tweet${isPlural(totalTweets)}`}`
+                ? `${formatNumber(totalTweets)} ${`Tweet${isPlural(
+                    totalTweets
+                  )}`}`
                 : 'No Tweet'
               : currentPage === 'media'
               ? totalPhotos
-                ? `${totalPhotos} Photo${isPlural(totalPhotos)} & GIF${isPlural(
+                ? `${formatNumber(totalPhotos)} Photo${isPlural(
                     totalPhotos
-                  )}`
+                  )} & GIF${isPlural(totalPhotos)}`
                 : 'No Photo & GIF'
               : ''}
           </p>
