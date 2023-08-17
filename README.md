@@ -39,7 +39,7 @@ This project depends on the reference Farcaster PosgreSQL indexer. Follow the in
 - [x] Engagement actions
 - [ ] Post creation
   - [x] Text only
-  - [ ] Media
+  - [x] Media
   - [ ] Mentions
   - [ ] Embeds
 - [x] Post deletion

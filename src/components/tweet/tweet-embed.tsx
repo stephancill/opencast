@@ -1,7 +1,7 @@
+import { useMemo } from 'react';
 import useSWR from 'swr';
 import { ExternalEmbed } from '../../lib/types/tweet';
 import { preventBubbling } from '../../lib/utils';
-import { useEffect, useMemo } from 'react';
 import { NextImage } from '../ui/next-image';
 
 const hoverModifier =
@@ -24,7 +24,9 @@ export function TweetEmbeds({ embeds }: { embeds: ExternalEmbed[] }) {
     return embeds.map((embed) => embed.url).join(',');
   }, embeds);
 
-  const { data: embedsData } = useSWR(`/api/embeds?urls=${url}`, fetchEmbeds);
+  const { data: embedsData } = useSWR(`/api/embeds?urls=${url}`, fetchEmbeds, {
+    revalidateOnFocus: false
+  });
 
   const embedsCount = useMemo(() => {
     return embedsData?.filter((embed) => embed !== null).length || 0;
@@ -51,7 +53,7 @@ export function TweetEmbeds({ embeds }: { embeds: ExternalEmbed[] }) {
   );
 }
 
-function TweetEmbed({
+export function TweetEmbed({
   title,
   text,
   image,
