@@ -3,20 +3,25 @@ import { Message } from '@farcaster/hub-web';
 import { useAuth } from '@lib/context/auth-context';
 import type { FilesWithId, ImageData, ImagesPreview } from '@lib/types/file';
 import type { User } from '@lib/types/user';
-import { sleep } from '@lib/utils';
+import { getHttpsUrls, sleep } from '@lib/utils';
 import { getImagesData } from '@lib/validation';
 import cn from 'clsx';
 import type { Variants } from 'framer-motion';
 import { AnimatePresence, motion } from 'framer-motion';
 import Link from 'next/link';
 import type { ChangeEvent, ClipboardEvent, FormEvent, ReactNode } from 'react';
-import { useEffect, useId, useRef, useState } from 'react';
+import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { toast } from 'react-hot-toast';
 import { createCastMessage, submitHubMessage } from '../../lib/farcaster/utils';
 import { ImagePreview } from './image-preview';
 import { fromTop, InputForm } from './input-form';
 import { InputOptions } from './input-options';
 import { uploadToImgur } from '../../lib/imgur/upload';
+import { ExternalEmbed } from '../../lib/types/tweet';
+import useSWR from 'swr';
+import { fetchJSON } from '../../lib/fetch';
+import { TweetEmbed, TweetEmbeds } from '../tweet/tweet-embed';
+import { debounce } from 'lodash';
 
 type InputProps = {
   modal?: boolean;
@@ -49,6 +54,9 @@ export function Input({
   const [inputValue, setInputValue] = useState('');
   const [loading, setLoading] = useState(false);
   const [visited, setVisited] = useState(false);
+  const [embedUrls, setEmbedUrls] = useState<string[]>([]);
+  const [embeds, setEmbeds] = useState<ExternalEmbed[]>([]);
+  const [ignoredEmbedUrls, setIgnoredEmbedUrls] = useState<string[]>([]);
 
   const { user, isAdmin } = useAuth();
   const { name, username, photoURL } = user as User;
@@ -101,7 +109,7 @@ export function Input({
     const castMessage = await createCastMessage({
       text: inputValue.trim(),
       fid: parseInt(userId),
-      embeds: uploadedLinks.map((link) => ({ url: link })),
+      embeds: [...uploadedLinks.map((link) => ({ url: link })), ...embeds],
       parentCastHash: isReplying && parent ? parent.id : undefined,
       parentCastFid: isReplying && parent ? parseInt(parent.userId) : undefined,
       parentUrl
@@ -194,9 +202,26 @@ export function Input({
     inputRef.current?.blur();
   };
 
+  const handleEmbedsChange = (value: string) => {
+    if (value) {
+      const urls = getHttpsUrls(value).filter(
+        (url) => !ignoredEmbedUrls.includes(url)
+      );
+      console.log(urls);
+      setEmbedUrls(urls.slice(0, 2));
+    }
+  };
+
+  const handleChangeDebounced = useCallback(
+    debounce((e) => handleEmbedsChange(e.target.value), 1500),
+    []
+  );
+
   const handleChange = ({
     target: { value }
-  }: ChangeEvent<HTMLTextAreaElement>): void => setInputValue(value);
+  }: ChangeEvent<HTMLTextAreaElement>): void => {
+    setInputValue(value);
+  };
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
@@ -215,6 +240,26 @@ export function Input({
 
   const isValidTweet =
     !isCharLimitExceeded && (isValidInput || isUploadingImages);
+
+  const { data: newEmbeds, isValidating } = useSWR(
+    embedUrls.length > 0 ? `/api/embeds?urls=${embedUrls.join(',')}` : null,
+    fetchJSON<(ExternalEmbed | null)[]>,
+    {}
+  );
+
+  useEffect(() => {
+    setEmbeds((prevEmbeds) => {
+      if (newEmbeds) {
+        return newEmbeds.filter((embed) => embed !== null) as ExternalEmbed[];
+      } else {
+        return prevEmbeds;
+      }
+    });
+  }, [newEmbeds]);
+
+  useEffect(() => {
+    handleEmbedsChange(inputValue);
+  }, [ignoredEmbedUrls]);
 
   return (
     <form
@@ -270,7 +315,10 @@ export function Input({
             sendTweet={sendTweet}
             handleFocus={handleFocus}
             discardTweet={discardTweet}
-            handleChange={handleChange}
+            handleChange={(e) => {
+              handleChangeDebounced(e);
+              handleChange(e);
+            }}
             handleImageUpload={handleImageUpload}
           >
             {isUploadingImages && (
@@ -280,7 +328,25 @@ export function Input({
                 removeImage={!loading ? removeImage : undefined}
               />
             )}
+            {embeds?.map(
+              (embed) =>
+                embed &&
+                !ignoredEmbedUrls.includes(embed.url) && (
+                  <div key={embed.url} className='flex items-center gap-2'>
+                    <button
+                      className='text-light-secondary dark:text-dark-secondary'
+                      onClick={() => {
+                        setIgnoredEmbedUrls([...ignoredEmbedUrls, embed.url]);
+                      }}
+                    >
+                      x
+                    </button>
+                    <TweetEmbed {...embed} key={embed.url} />
+                  </div>
+                )
+            )}
           </InputForm>
+
           <AnimatePresence initial={false}>
             {(reply ? reply && visited && !loading : !loading) && (
               <InputOptions

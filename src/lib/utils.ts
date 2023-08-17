@@ -1,5 +1,6 @@
 import type { SyntheticEvent } from 'react';
 import type { MotionProps } from 'framer-motion';
+import isURL from 'validator/lib/isURL';
 
 export function preventBubbling(
   callback?: ((...args: never[]) => unknown) | null,
@@ -81,6 +82,28 @@ export function parseChainURL(url: string): ParsedChainURL | null {
     contractType,
     contractAddress
   };
+}
+
+export function getHttpsUrls(text: string): string[] {
+  const words = text
+    .split(' ')
+    .map((word) => word.split('\n'))
+    .flat();
+  const urls = words.filter((word) =>
+    isURL(word, { require_tld: true, require_protocol: false })
+  );
+  console.log('pre', urls, words);
+  // Add https to urls that don't have a protocol
+  const httpsUrls = urls.map((url) => {
+    if (url.startsWith('http://')) {
+      return url.replace('http://', 'https://');
+    } else if (!url.startsWith('https://')) {
+      return `https://${url}`;
+    }
+    return url;
+  });
+  const uniqueUrls = [...new Set(httpsUrls)];
+  return uniqueUrls;
 }
 
 const replacer = (_: any, value: any) =>
