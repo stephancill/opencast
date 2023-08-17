@@ -1,6 +1,6 @@
 # Opencast
 
-A fully open source Twitter flavoured Farcaster client.
+A fully open source Twitter flavoured Farcaster client. Originally a fork of [ccrsxx/twitter-clone](https://github.com/ccrsxx/twitter-clone).
 
 The goal of this project is to provide a reference implementation of a Farcaster client in order to make it easier for developers to explore their ideas without having to start from scratch.
 
