@@ -10,8 +10,8 @@ type UserNavProps = {
 const allNavs = [
   [
     { name: 'Tweets', path: '' },
-    { name: 'Tweets & replies', path: 'with_replies' },
-    { name: 'Media', path: 'media' },
+    // { name: 'Tweets & replies', path: 'with_replies' },
+    // { name: 'Media', path: 'media' },
     { name: 'Likes', path: 'likes' }
   ],
   [
@@ -28,7 +28,7 @@ export function UserNav({ follow }: UserNavProps): JSX.Element {
       className={cn(
         `hover-animation flex justify-between overflow-y-auto
          border-b border-light-border dark:border-dark-border`,
-        follow && 'mt-1 mb-0.5'
+        follow && 'mb-0.5 mt-1'
       )}
       {...variants}
       exit={undefined}
