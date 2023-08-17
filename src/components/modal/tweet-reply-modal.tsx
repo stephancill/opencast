@@ -21,6 +21,7 @@ export function TweetReplyModal({
         userId: tweet.user.id
       }}
       closeModal={closeModal}
+      parentUrl={tweet.topicUrl || undefined}
     >
       <Tweet modal parentTweet {...tweet} />
     </Input>

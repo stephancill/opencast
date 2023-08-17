@@ -183,6 +183,7 @@ export function ViewTweet(tweet: ViewTweetProps): JSX.Element {
               ? { id: tweetId, username: username, userId: parent.userId! }
               : undefined
           }
+          parentUrl={topic?.url || undefined}
         />
       </div>
     </article>

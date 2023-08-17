@@ -15,7 +15,7 @@ export function UserHomeAvatar({
   const { open, openModal, closeModal } = useModal();
 
   return (
-    <div className='mb-8 xs:mb-14 sm:mb-16'>
+    <div>
       <Modal open={open} closeModal={closeModal}>
         <ImageModal
           imageData={
@@ -25,7 +25,7 @@ export function UserHomeAvatar({
         />
       </Modal>
       <Button
-        className='accent-tab absolute -mt-3 aspect-square w-24 -translate-y-1/2 overflow-hidden p-0 
+        className='accent-tab aspect-square w-24 overflow-hidden p-0 
                    disabled:cursor-auto disabled:opacity-100 xs:w-32 sm:w-36
                    [&:hover>figure>span]:brightness-75'
         onClick={openModal}

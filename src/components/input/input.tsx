@@ -16,6 +16,7 @@ import { createCastMessage, submitHubMessage } from '../../lib/farcaster/utils';
 import { ImagePreview } from './image-preview';
 import { fromTop, InputForm } from './input-form';
 import { InputOptions } from './input-options';
+import { uploadToImgur } from '../../lib/imgur/upload';
 
 type InputProps = {
   modal?: boolean;
@@ -71,7 +72,7 @@ export function Input({
 
     setLoading(true);
 
-    if (!inputValue) return;
+    if (!inputValue && selectedImages.length === 0) return;
 
     const isReplying = reply ?? replyModal;
 
@@ -79,9 +80,28 @@ export function Input({
 
     if (isReplying && !parent) return;
 
+    const uploadedLinks: string[] = [];
+
+    // Sequentially upload files
+    for (let i = 0; i < selectedImages.length; i++) {
+      const link = await uploadToImgur(selectedImages[i]);
+
+      if (!link) {
+        toast.error(
+          () => <span className='flex gap-2'>Failed to upload image</span>,
+          { duration: 6000 }
+        );
+        setLoading(false);
+        return;
+      }
+
+      uploadedLinks.push(link);
+    }
+
     const castMessage = await createCastMessage({
       text: inputValue.trim(),
       fid: parseInt(userId),
+      embeds: uploadedLinks.map((link) => ({ url: link })),
       parentCastHash: isReplying && parent ? parent.id : undefined,
       parentCastFid: isReplying && parent ? parseInt(parent.userId) : undefined,
       parentUrl

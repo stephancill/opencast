@@ -1,46 +1,22 @@
-import { NextApiRequest, NextApiResponse } from 'next';
-import {
-  getTweetsPaginated,
-  PaginatedTweetsResponse
-} from '../../../lib/paginated-tweets';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import { UserResponse } from '../../../lib/types/user';
+import { resolveTopic } from '../../../lib/topics/resolve-topic';
+import { TopicResponse } from '../../../lib/types/topic';
 
-export default async function handle(
+export default async function topicIdEndpoint(
   req: NextApiRequest,
-  res: NextApiResponse<PaginatedTweetsResponse>
-) {
-  const { method } = req;
-  switch (method) {
-    case 'GET':
-      const topicUrl = req.query.url as string;
-      const cursor = req.query.cursor
-        ? new Date(req.query.cursor as string)
-        : undefined;
-      const limit =
-        req.query.limit && req.query.limit !== 'undefined'
-          ? Number(req.query.limit)
-          : 10;
+  res: NextApiResponse<TopicResponse>
+): Promise<void> {
+  const topicUrl = req.query.url as string;
 
-      const result = await getTweetsPaginated({
-        where: {
-          timestamp: {
-            lt: cursor || undefined
-          },
-          parent_hash: null,
-          deleted_at: null,
-          parent_url: topicUrl
-        },
-        take: limit,
-        orderBy: {
-          timestamp: 'desc'
-        }
-      });
+  const topic = await resolveTopic(topicUrl);
 
-      res.json({
-        result
-      });
-      break;
-    default:
-      res.setHeader('Allow', ['GET']);
-      res.status(405).end(`Method ${method} Not Allowed`);
+  if (!topic) {
+    res.status(404).json({
+      message: 'User not found'
+    });
+    return;
   }
+
+  res.json({ result: topic });
 }
