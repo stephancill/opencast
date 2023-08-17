@@ -232,9 +232,9 @@ export function Input({
 
   const formId = useId();
 
-  const inputLimit = isAdmin ? 560 : 280;
+  const inputLimit = 320;
 
-  const inputLength = inputValue.length;
+  const inputLength = Buffer.from(inputValue).length;
   const isValidInput = !!inputValue.trim().length;
   const isCharLimitExceeded = inputLength > inputLimit;
 
