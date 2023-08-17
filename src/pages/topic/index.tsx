@@ -9,54 +9,43 @@ import { Error } from '@components/ui/error';
 import { Loading } from '@components/ui/loading';
 import { useWindow } from '@lib/context/window-context';
 import { useInfiniteScroll } from '@lib/hooks/useInfiniteScroll';
-import { GetServerSideProps } from 'next';
-import { useState, type ReactElement, type ReactNode, useEffect } from 'react';
-import { resolveTopic } from '../../lib/topics/resolve-topic';
-import { TopicType } from '../../lib/types/topic';
-import { useAuth } from '../../lib/context/auth-context';
+import { useRouter } from 'next/router';
+import { useEffect, useState, type ReactElement, type ReactNode } from 'react';
+import useSWR from 'swr';
+import { fetchJSON } from '../../lib/fetch';
+import { TopicResponse } from '../../lib/types/topic';
 import { populateTweetTopic, populateTweetUsers } from '../../lib/types/tweet';
 
-interface TopicPageProps {
-  topicUrl: string;
-  topic: TopicType;
-}
-
-export const getServerSideProps: GetServerSideProps<TopicPageProps> = async ({
-  query
-}) => {
-  if (!query?.url) {
-    return {
-      notFound: true
-    };
-  }
-
-  const topicUrl = query.url as string;
-
-  const topic = await resolveTopic(topicUrl);
-
-  if (!topic) {
-    return {
-      notFound: true
-    };
-  }
-
-  return {
-    props: { topicUrl: topicUrl, topic: topic }
-  };
-};
-export default function TopicPage({
-  topicUrl: topicUrl,
-  topic: topic
-}: TopicPageProps): JSX.Element {
+export default function TopicPage(): JSX.Element {
   // Debounce
   const [enabled, setEnabled] = useState(false);
   useEffect(() => {
     setEnabled(true);
   }, []);
 
-  const { data, loading, LoadMore } = useInfiniteScroll(
+  const {
+    query: { url: topicUrlParam }
+  } = useRouter();
+
+  const topicUrl = topicUrlParam as string;
+
+  const { data: topic, isValidating: loadingTopic } = useSWR(
+    topicUrl ? `/api/topic?url=${topicUrl}` : null,
+    async (url) => {
+      const res = await fetchJSON<TopicResponse>(url);
+      console.log(res);
+      return res.result;
+    },
+    {}
+  );
+
+  const {
+    data,
+    loading: loadingFeed,
+    LoadMore
+  } = useInfiniteScroll(
     (pageParam) => {
-      const url = `/api/topic?url=${topicUrl}&limit=10${
+      const url = `/api/topic/feed?url=${topicUrl}&limit=10${
         pageParam ? `&cursor=${pageParam}` : ''
       }`;
       return url;
@@ -70,17 +59,23 @@ export default function TopicPage({
 
   return (
     <MainContainer>
-      <SEO title={`${topic.name} / Twitter`} />
+      {
+        <SEO
+          title={`${
+            loadingTopic ? 'Loading' : topic?.name || 'Topic not found'
+          } / Twitter`}
+        />
+      }
       <MainHeader
         useMobileSidebar
-        title={`${topic.name}`}
-        imageUrl={topic.image}
-        description={topic.description}
+        title={topic?.name}
+        imageUrl={topic?.image}
+        description={topic?.description}
         className='flex items-center justify-between'
       ></MainHeader>
       {!isMobile && <Input parentUrl={topicUrl} />}
       <section className='mt-0.5 xs:mt-0'>
-        {loading ? (
+        {loadingFeed ? (
           <Loading className='mt-5' />
         ) : !data ? (
           <Error message='Something went wrong' />

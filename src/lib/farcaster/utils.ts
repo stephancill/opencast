@@ -1,4 +1,5 @@
 import {
+  Embed,
   FarcasterNetwork,
   makeCastAdd,
   makeCastRemove,
@@ -58,12 +59,14 @@ export async function createReactionMessage({
 
 export async function createCastMessage({
   text,
+  embeds,
   parentCastHash,
   parentCastFid,
   parentUrl,
   fid
 }: {
   text: string;
+  embeds?: Embed[];
   parentCastHash?: string;
   parentCastFid?: number;
   parentUrl?: string;
@@ -87,7 +90,7 @@ export async function createCastMessage({
   const message = await makeCastAdd(
     {
       text,
-      embeds: [],
+      embeds: embeds || [],
       embedsDeprecated: [],
       mentions: [],
       mentionsPositions: [],
