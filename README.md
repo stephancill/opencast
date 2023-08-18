@@ -32,7 +32,7 @@ This project depends on the reference Farcaster PosgreSQL indexer. Follow the in
   - [x] Paginated replies
 - [x] User profiles
   - [x] Casts
-  - [ ] Casts with replies
+  - [x] Casts with replies
   - [ ] Media
   - [x] Likes
 - [x] Auth

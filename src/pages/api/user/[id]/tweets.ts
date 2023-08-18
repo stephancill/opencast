@@ -20,6 +20,7 @@ export default async function handle(
         req.query.limit && req.query.limit !== 'undefined'
           ? Number(req.query.limit)
           : 10;
+      const replies = req.query.replies === 'true';
 
       // Try to convert id to number
       let id = req.query.id;
@@ -41,22 +42,12 @@ export default async function handle(
 
       const result = await getTweetsPaginated({
         where: {
-          AND: [
-            {
-              timestamp: {
-                lt: cursor || undefined
-              }
-            },
-            {
-              fid: BigInt(id as string)
-            },
-            {
-              parent_hash: null
-            },
-            {
-              deleted_at: null
-            }
-          ]
+          timestamp: {
+            lt: cursor || undefined
+          },
+          fid: BigInt(id as string),
+          parent_hash: replies ? undefined : null,
+          deleted_at: null
         },
         take: limit,
         orderBy: {

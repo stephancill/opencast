@@ -14,9 +14,17 @@ export function useInfiniteScroll(
     stepSize?: number;
     marginBottom?: number;
     queryKey?: any[];
+    refetchOnFocus?: boolean;
   }
 ) {
-  const { initialSize, stepSize, marginBottom, queryKey, enabled } = {
+  const {
+    initialSize,
+    stepSize,
+    marginBottom,
+    queryKey,
+    enabled,
+    refetchOnFocus
+  } = {
     initialSize: 10,
     stepSize: 10,
     marginBottom: 1000,
@@ -57,7 +65,8 @@ export function useInfiniteScroll(
     getNextPageParam: (lastPage) => {
       return lastPage?.nextPageCursor ?? false;
     },
-    enabled: enabled !== undefined ? enabled : true
+    enabled: enabled !== undefined ? enabled : true,
+    refetchOnWindowFocus: refetchOnFocus !== undefined ? refetchOnFocus : true
   });
 
   useEffect(() => {

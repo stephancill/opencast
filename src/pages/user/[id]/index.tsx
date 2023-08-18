@@ -57,14 +57,7 @@ export default function UserTweets(): JSX.Element {
           description='When they do, their Tweets will show up here.'
         />
       ) : (
-        // <AnimatePresence mode='popLayout'>
         <div>
-          {/* {pinnedData && (
-            <Tweet pinned {...pinnedData} key={`pinned-${pinnedData.id}`} />
-          )}
-          {mergedTweets.map((tweet) => (
-            <Tweet {...tweet} profile={user} key={tweet.id} />
-          ))} */}
           {mergedTweets.pages.map((page) => {
             if (!page) return;
             const { tweets, users, topics } = page;
@@ -86,7 +79,6 @@ export default function UserTweets(): JSX.Element {
             });
           })}
           <LoadMore />
-          {/* </AnimatePresence> */}
         </div>
       )}
     </section>

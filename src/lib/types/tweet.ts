@@ -5,7 +5,7 @@ import { TopicType } from './topic';
 import { isValidImageExtension } from '../validation';
 import type { ImagesPreview } from './file';
 import { BaseResponse } from './responses';
-import type { UsersMapType } from './user';
+import type { User, UsersMapType } from './user';
 
 export type Mention = {
   userId: string;
@@ -30,6 +30,7 @@ export type Tweet = {
   parent: { id: string; username?: string; userId?: string } | null;
   userLikes: string[];
   createdBy: string;
+  user: User | null;
   createdAt: Date;
   updatedAt: Date | null;
   userReplies: number;
@@ -79,11 +80,14 @@ export const populateTweetUsers = (
     tweet.retweet.username = users[tweet.retweet.userId]?.username;
   }
 
+  const resolvedUser = users[tweet.createdBy];
+
   return {
     ...tweet,
     mentions: resolvedMentions,
     parent: resolvedParent,
-    retweet: resolvedRetweet
+    retweet: resolvedRetweet,
+    user: resolvedUser
   };
 };
 
@@ -157,6 +161,7 @@ export const tweetConverter = {
       topicUrl: cast.parent_url,
       userLikes: [],
       createdBy: cast.fid.toString(),
+      user: null,
       createdAt: cast.timestamp,
       updatedAt: null,
       userReplies: 0,
