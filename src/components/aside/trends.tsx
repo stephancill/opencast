@@ -21,7 +21,7 @@ type AsideTrendsProps = {
 
 export function AsideTrends({ inTrendsPage }: AsideTrendsProps): JSX.Element {
   const fetchTrends = async () => {
-    const response = await fetch(`/api/trends?limit=5`);
+    const response = await fetch(`/api/trends?limit=${inTrendsPage ? 20 : 5}`);
 
     if (!response.ok) {
       console.log(await response.json());
