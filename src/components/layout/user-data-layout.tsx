@@ -18,7 +18,7 @@ export function UserDataLayout({ children }: LayoutProps): JSX.Element {
   const { data: user, isValidating: loading } = useSWR(
     id ? `/api/user/${id}` : null,
     async (url) => (await fetchJSON<UserResponse>(url)).result,
-    {}
+    { revalidateOnFocus: false, revalidateOnReconnect: false }
   );
 
   return (

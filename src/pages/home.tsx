@@ -22,13 +22,16 @@ export default function Home(): JSX.Element {
 
   const { user } = useAuth();
   const { data, loading, LoadMore } = useInfiniteScroll(
-    (pageParam) =>
-      `/api/feed?fid=${user?.id}&limit=10${
+    (pageParam) => {
+      const url = `/api/feed?fid=${user?.id}&limit=10${
         pageParam ? `&cursor=${pageParam}` : ''
-      }`,
+      }`;
+      return url;
+    },
     {
       queryKey: ['feed', user?.id],
-      enabled
+      enabled,
+      refetchOnFocus: false
     }
   );
   const { isMobile } = useWindow();

@@ -13,13 +13,15 @@ export function useInfiniteScrollUsers(
     stepSize?: number;
     marginBottom?: number;
     queryKey?: any[];
+    enabled?: boolean;
   }
 ) {
-  const { initialSize, stepSize, marginBottom, queryKey } = {
+  const { initialSize, stepSize, marginBottom, queryKey, enabled } = {
     initialSize: 10,
     stepSize: 10,
     marginBottom: 100,
     queryKey: [],
+    enabled: true,
     ...(options ?? {})
   };
 
@@ -57,7 +59,8 @@ export function useInfiniteScrollUsers(
   } = useInfiniteQuery(queryKey, fetchData, {
     getNextPageParam: (lastPage) => {
       return lastPage?.nextPageCursor ?? false;
-    }
+    },
+    enabled: enabled
   });
 
   useEffect(() => {

@@ -24,14 +24,8 @@ export function TweetParent({
     (child) => child.childId === componentId
   );
 
-  // const { data, loading } = useDocument(doc(tweetsCollection, parentId), {
-  //   includeUser: true,
-  //   allowNull: true,
-  //   disabled: isParentAlreadyLoaded
-  // });
-
   const { data, isValidating: loading } = useSWR(
-    `/api/tweet/${parentId}`,
+    isParentAlreadyLoaded ? null : `/api/tweet/${parentId}`,
     async (url) => (await fetchJSON<TweetResponse>(url)).result,
     { revalidateOnFocus: false, revalidateOnReconnect: false }
   );

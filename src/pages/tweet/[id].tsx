@@ -60,7 +60,10 @@ export default function TweetId(): JSX.Element {
     data: tweetData,
     isLoading: tweetLoading,
     isError: tweetError
-  } = useQuery(['tweet', id], fetchCast, { keepPreviousData: false });
+  } = useQuery(['tweet', id], fetchCast, {
+    keepPreviousData: false,
+    refetchOnWindowFocus: false
+  });
 
   const {
     data: repliesData,
@@ -71,7 +74,7 @@ export default function TweetId(): JSX.Element {
       `/api/tweet/${id}/replies?limit=10${
         pageParam ? `&cursor=${pageParam}` : ''
       }`,
-    { queryKey: ['replies', id], enabled }
+    { queryKey: ['replies', id], enabled, refetchOnFocus: false }
   );
 
   const viewTweetRef = useRef<HTMLElement>(null);

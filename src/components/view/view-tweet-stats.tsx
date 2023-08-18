@@ -48,7 +48,8 @@ export function ViewTweetStats({
       }&limit=10${pageParam ? `&cursor=${pageParam}` : ''}`;
     },
     {
-      queryKey: [statsType, tweetId]
+      queryKey: [statsType, tweetId],
+      enabled: open
     }
   );
 
