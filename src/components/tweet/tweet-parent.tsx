@@ -25,7 +25,7 @@ export function TweetParent({
   );
 
   const { data, isValidating: loading } = useSWR(
-    isParentAlreadyLoaded ? null : `/api/tweet/${parentId}`,
+    `/api/tweet/${parentId}`,
     async (url) => (await fetchJSON<TweetResponse>(url)).result,
     { revalidateOnFocus: false, revalidateOnReconnect: false }
   );
@@ -37,7 +37,7 @@ export function TweetParent({
 
   const skeletonClass = `animate-pulse bg-light-secondary dark:bg-dark-secondary`;
 
-  if (loading || !isParentAlreadyLoaded || !data)
+  if (loading || !data)
     return (
       <div className={`flex h-32 gap-x-3 px-4 pt-3`}>
         <div className='flex flex-col items-center'>
