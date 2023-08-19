@@ -20,32 +20,15 @@ const options: Readonly<Options> = [
     name: 'Media',
     iconName: 'PhotoIcon',
     disabled: false
-  },
-  {
-    name: 'GIF',
-    iconName: 'GifIcon',
-    disabled: true
-  },
-  {
-    name: 'Poll',
-    iconName: 'ChartBarIcon',
-    disabled: true
-  },
-  {
-    name: 'Emoji',
-    iconName: 'FaceSmileIcon',
-    disabled: true
-  },
-  {
-    name: 'Schedule',
-    iconName: 'CalendarDaysIcon',
-    disabled: true
-  },
-  {
-    name: 'Location',
-    iconName: 'MapPinIcon',
-    disabled: true
   }
+  // {
+  //   name: 'Emoji',
+  //   iconName: 'FaceSmileIcon',
+  //   disabled: false,
+  //   onClick: () => {
+  //     console.log('Emoji');
+  //   }
+  // }
 ];
 
 type InputOptionsProps = {
@@ -75,16 +58,11 @@ export function InputOptions({
 
   let filteredOptions = options;
 
-  if (reply)
-    filteredOptions = filteredOptions.filter(
-      (_, index) => ![2, 4].includes(index)
-    );
-
   return (
     <motion.div className='flex justify-between' {...variants}>
       <div
-        className='flex text-main-accent xs:[&>button:nth-child(n+6)]:hidden 
-                   md:[&>button]:!block [&>button:nth-child(n+4)]:hidden'
+        className='flex text-main-accent [&>button:nth-child(n+4)]:hidden 
+                   xs:[&>button:nth-child(n+6)]:hidden md:[&>button]:!block'
       >
         <input
           className='hidden'
