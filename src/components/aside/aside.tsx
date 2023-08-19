@@ -1,12 +1,10 @@
 import { useWindow } from '@lib/context/window-context';
-import { SearchBar } from './search-bar';
-import { AsideFooter } from './aside-footer';
+import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { User } from '../../lib/types/user';
-import { UserAvatar } from '../user/user-avatar';
-import { UserName } from '../user/user-name';
-import Link from 'next/link';
-import { UserUsername } from '../user/user-username';
+import { UserSearchResult } from '../search/user-search-result';
+import { AsideFooter } from './aside-footer';
+import { SearchBar } from './search-bar';
 
 type AsideProps = {
   children: ReactNode;
@@ -23,28 +21,16 @@ export function Aside({ children }: AsideProps): JSX.Element | null {
         urlBuilder={(input) =>
           input.length > 0 ? `/api/search?q=${input}` : null
         }
-        resultBuilder={(
-          { id, username, photoURL, name, verified },
-          callback
-        ) => {
+        resultBuilder={(user, callback) => {
           return (
-            <Link href={`/user/${username}`} passHref={true}>
-              <div
-                key={id}
-                className='flex w-full cursor-pointer p-3 hover:bg-accent-blue/10 focus-visible:bg-accent-blue/20'
-                onClick={callback}
-              >
-                <UserAvatar src={photoURL} alt={name} username={username} />
-                <div className='flex flex-col pl-2'>
-                  <UserName
-                    name={name}
-                    username={username}
-                    verified={verified}
-                    className='text-light-primary dark:text-dark-primary'
-                  />
-                  <UserUsername username={username} />
-                </div>
-              </div>
+            <Link href={`/user/${user.username}`} passHref>
+              <a>
+                <UserSearchResult
+                  user={user}
+                  key={user.id}
+                  callback={callback}
+                />
+              </a>
             </Link>
           );
         }}
