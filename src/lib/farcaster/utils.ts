@@ -63,6 +63,8 @@ export async function createCastMessage({
   parentCastHash,
   parentCastFid,
   parentUrl,
+  mentions,
+  mentionsPositions,
   fid
 }: {
   text: string;
@@ -70,6 +72,8 @@ export async function createCastMessage({
   parentCastHash?: string;
   parentCastFid?: number;
   parentUrl?: string;
+  mentions?: number[];
+  mentionsPositions?: number[];
   fid: number;
 }) {
   const signer = getSigner();
@@ -92,8 +96,8 @@ export async function createCastMessage({
       text,
       embeds: embeds || [],
       embedsDeprecated: [],
-      mentions: [],
-      mentionsPositions: [],
+      mentions: mentions || [],
+      mentionsPositions: mentionsPositions || [],
       parentCastId,
       parentUrl
     },

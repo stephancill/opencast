@@ -92,7 +92,6 @@ export function getHttpsUrls(text: string): string[] {
   const urls = words.filter((word) =>
     isURL(word, { require_tld: true, require_protocol: false })
   );
-  console.log('pre', urls, words);
   // Add https to urls that don't have a protocol
   const httpsUrls = urls.map((url) => {
     if (url.startsWith('http://')) {

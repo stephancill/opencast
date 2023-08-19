@@ -2,7 +2,7 @@ import { UserAvatar } from '@components/user/user-avatar';
 import { Message } from '@farcaster/hub-web';
 import { useAuth } from '@lib/context/auth-context';
 import type { FilesWithId, ImageData, ImagesPreview } from '@lib/types/file';
-import type { User } from '@lib/types/user';
+import type { User, UsersMapType } from '@lib/types/user';
 import { getHttpsUrls, sleep } from '@lib/utils';
 import { getImagesData } from '@lib/validation';
 import cn from 'clsx';
@@ -22,6 +22,12 @@ import useSWR from 'swr';
 import { fetchJSON } from '../../lib/fetch';
 import { TweetEmbed, TweetEmbeds } from '../tweet/tweet-embed';
 import { debounce } from 'lodash';
+import { BaseResponse } from '../../lib/types/responses';
+import { UserName } from '../user/user-name';
+import { UserUsername } from '../user/user-username';
+import { NextImage } from '../ui/next-image';
+import { Loading } from '../ui/loading';
+import { UserSearchResult } from '../search/user-search-result';
 
 type InputProps = {
   modal?: boolean;
@@ -39,6 +45,44 @@ export const variants: Variants = {
   animate: { opacity: 1 }
 };
 
+// TODO: Generalize this and move it somewhere else
+function extractAndReplaceMentions(input: string, usersMap: UsersMapType) {
+  let result = '';
+  let mentions: number[] = [];
+  let mentionsPositions: number[] = [];
+
+  // Split on newlines and spaces, preserving delimiters
+  let splits = input.split(/(\s|\n)/);
+
+  splits.forEach((split, i) => {
+    if (split.startsWith('@')) {
+      const username = split.slice(1);
+
+      // Check if user is in the usersMap
+      if (username in usersMap) {
+        // Get the starting position of each username mention
+        const position = Buffer.from(result).length;
+
+        mentions.push(parseInt(usersMap[username].id));
+        mentionsPositions.push(position);
+
+        // result += '@[...]'; // replace username mention with what you would like
+      } else {
+        result += split;
+      }
+    } else {
+      result += split;
+    }
+  });
+
+  // Return object with replaced text and user mentions array
+  return {
+    text: result,
+    mentions,
+    mentionsPositions
+  };
+}
+
 export function Input({
   modal,
   reply,
@@ -54,9 +98,12 @@ export function Input({
   const [inputValue, setInputValue] = useState('');
   const [loading, setLoading] = useState(false);
   const [visited, setVisited] = useState(false);
-  const [embedUrls, setEmbedUrls] = useState<string[]>([]);
-  const [embeds, setEmbeds] = useState<ExternalEmbed[]>([]);
-  const [ignoredEmbedUrls, setIgnoredEmbedUrls] = useState<string[]>([]);
+
+  const [embedUrls, setEmbedUrls] = useState<string[]>([]); // URLs to be fetched
+  const [embeds, setEmbeds] = useState<ExternalEmbed[]>([]); // Fetched embeds
+  const [ignoredEmbedUrls, setIgnoredEmbedUrls] = useState<string[]>([]); // URLs of embeds to be ignored in the cast message
+
+  const [mentionedUsers, setMentionedUsers] = useState<UsersMapType>({});
 
   const { user, isAdmin } = useAuth();
   const { name, username, photoURL } = user as User;
@@ -106,10 +153,20 @@ export function Input({
       uploadedLinks.push(link);
     }
 
+    const rawText = inputValue.trim();
+    const { text, mentions, mentionsPositions } = extractAndReplaceMentions(
+      rawText,
+      mentionedUsers
+    );
+
+    // Extract mentioned users: mention text must be removed and be put into the mentionedUsers object
+
     const castMessage = await createCastMessage({
-      text: inputValue.trim(),
+      text: text,
       fid: parseInt(userId),
       embeds: [...uploadedLinks.map((link) => ({ url: link })), ...embeds],
+      mentions: mentions,
+      mentionsPositions: mentionsPositions,
       parentCastHash: isReplying && parent ? parent.id : undefined,
       parentCastFid: isReplying && parent ? parseInt(parent.userId) : undefined,
       parentUrl
@@ -210,15 +267,75 @@ export function Input({
       const urls = getHttpsUrls(value).filter(
         (url) => !ignoredEmbedUrls.includes(url)
       );
-      console.log(urls);
       setEmbedUrls(urls.slice(0, 2));
     }
   };
 
   const handleChangeDebounced = useCallback(
-    debounce((e) => handleEmbedsChange(e.target.value), 1500),
+    debounce((e) => {
+      handleEmbedsChange(e.target.value);
+    }, 1500),
     []
   );
+
+  const [showUsers, setShowUsers] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const {
+    data: usersSearch,
+    error,
+    isValidating: usersSearchLoading
+  } = useSWR(
+    searchTerm.length > 0 ? `/api/search?q=${searchTerm}` : null,
+    async (url) => (await fetchJSON<BaseResponse<User[]>>(url)).result
+  );
+
+  const debouncedSetSearchTerm = useCallback(
+    debounce((value) => {
+      console.log('search', value);
+      setSearchTerm(value);
+    }, 1000),
+    []
+  );
+
+  useEffect(() => {
+    if (!inputRef.current) return;
+    const cursorPosition = inputRef.current.selectionStart;
+    const textBeforeCursor = inputValue.slice(0, cursorPosition);
+
+    // TODO: Handle edge cases like \n
+    const lastKeyword = textBeforeCursor.split(' ').pop() || '';
+
+    if (lastKeyword.startsWith('@')) {
+      setShowUsers(true);
+      debouncedSetSearchTerm(lastKeyword.slice(1));
+    } else {
+      setShowUsers(false);
+    }
+  }, [inputValue]);
+
+  const handleUserClick = (user: User) => {
+    if (!inputRef.current) return;
+    const cursorPosition = inputRef.current.selectionStart;
+    const textBeforeCursor = inputValue.slice(0, cursorPosition);
+    const textAfterCursor = inputValue.slice(cursorPosition);
+
+    const lastSpaceBeforeCursorIndex = textBeforeCursor.lastIndexOf(' ');
+
+    const newTextBeforeCursor = textBeforeCursor.slice(
+      0,
+      lastSpaceBeforeCursorIndex + 1
+    );
+    const newTextAfterCursor = '@' + user.username + ' ' + textAfterCursor;
+
+    setInputValue(newTextBeforeCursor + newTextAfterCursor);
+    setMentionedUsers((prevMentionedUsers) => ({
+      ...prevMentionedUsers,
+      [user.username]: user
+    }));
+
+    setShowUsers(false);
+  };
 
   const handleChange = ({
     target: { value }
@@ -246,8 +363,7 @@ export function Input({
 
   const { data: newEmbeds, isValidating } = useSWR(
     embedUrls.length > 0 ? `/api/embeds?urls=${embedUrls.join(',')}` : null,
-    fetchJSON<(ExternalEmbed | null)[]>,
-    {}
+    fetchJSON<(ExternalEmbed | null)[]>
   );
 
   useEffect(() => {
@@ -324,6 +440,27 @@ export function Input({
             }}
             handleImageUpload={handleImageUpload}
           >
+            {showUsers &&
+              (usersSearchLoading ? (
+                <Loading />
+              ) : (
+                usersSearch &&
+                usersSearch.length > 0 && (
+                  <ul className='menu-container hover-animation mt-1 overflow-hidden rounded-2xl bg-main-background'>
+                    {usersSearch.map((user) => {
+                      return (
+                        <li
+                          key={user.id}
+                          className='cursor-pointer p-2'
+                          onClick={() => handleUserClick(user)}
+                        >
+                          <UserSearchResult user={user} />
+                        </li>
+                      );
+                    })}
+                  </ul>
+                )
+              ))}
             {isUploadingImages && (
               <ImagePreview
                 imagesPreview={imagesPreview}
