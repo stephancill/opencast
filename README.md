@@ -41,7 +41,7 @@ This project depends on the reference Farcaster PosgreSQL indexer. Follow the in
 - [ ] Post creation
   - [x] Text only
   - [x] Media
-  - [ ] Mentions
+  - [x] Mentions
   - [x] Embeds
   - [ ] Topic
 - [x] Post deletion
