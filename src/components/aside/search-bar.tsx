@@ -127,8 +127,9 @@ export function SearchBar<T>({
 
       {resultsVisible && (data || isValidating) && (
         <div className='menu-container hover-animation absolute mt-1 w-full overflow-hidden rounded-2xl bg-main-background'>
-          <div>{isValidating && <Loading className='p-4' />}</div>
-          {data && data.length > 0 ? (
+          {isValidating ? (
+            <div>{<Loading className='p-4' />}</div>
+          ) : data && data.length > 0 ? (
             data?.map((result) =>
               resultBuilder(result, () => {
                 console.log('clicked');
