@@ -22,22 +22,6 @@ const topNavLinks: Readonly<MobileNavLink[]> = [
     href: '/trends',
     linkName: 'Topics',
     iconName: 'ChatBubbleBottomCenterTextIcon'
-  },
-  {
-    href: '/bookmarks',
-    linkName: 'Bookmarks',
-    iconName: 'BookmarkIcon'
-  },
-  {
-    href: '/lists',
-    linkName: 'Lists',
-    iconName: 'Bars3BottomLeftIcon',
-    disabled: true
-  },
-  {
-    href: '/people',
-    linkName: 'Twitter Circle',
-    iconName: 'UserGroupIcon'
   }
 ];
 
@@ -151,11 +135,11 @@ export function MobileSidebarModal({
             )}
           </a>
         </Link>
-        <div className='mb-8 ml-2 -mt-4'>
+        <div className='-mt-4 mb-8 ml-2'>
           <UserAvatar
             className='absolute -translate-y-1/2 bg-main-background p-1 hover:brightness-100
-                       [&>figure>span]:[transition:200ms]
-                       [&:hover>figure>span]:brightness-75'
+                       [&:hover>figure>span]:brightness-75
+                       [&>figure>span]:[transition:200ms]'
             username={username}
             src={photoURL}
             alt={name}
