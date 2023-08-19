@@ -198,6 +198,9 @@ export function Input({
     setInputValue('');
     setVisited(false);
     cleanImage();
+    setEmbedUrls([]);
+    setEmbeds([]);
+    setIgnoredEmbedUrls([]);
 
     inputRef.current?.blur();
   };
