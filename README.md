@@ -35,6 +35,7 @@ This project depends on the reference Farcaster PosgreSQL indexer. Follow the in
   - [x] Casts with replies
   - [ ] Media
   - [x] Likes
+  - [ ] Edit profile
 - [x] Auth
 - [x] Engagement actions
 - [ ] Post creation
@@ -45,6 +46,9 @@ This project depends on the reference Farcaster PosgreSQL indexer. Follow the in
   - [ ] Topic
 - [x] Post deletion
 - [ ] Search
+  - [x] User
+  - [ ] Topic
+  - [ ] Posts
 - [x] Channels (now called Topics)
   - [x] Channel detail
   - [x] Channel discovery
