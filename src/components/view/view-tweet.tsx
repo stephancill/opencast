@@ -149,7 +149,7 @@ export function ViewTweet(tweet: ViewTweetProps): JSX.Element {
                      dark:inner:border-dark-border'
         >
           <div className='flex '>
-            <span className='flex items-center gap-1 py-4 text-light-secondary dark:text-dark-secondary'>
+            <span className='flex flex-wrap items-center gap-1 py-4 text-light-secondary dark:text-dark-secondary'>
               <TweetDate
                 viewTweet
                 tweetLink={tweetLink}
