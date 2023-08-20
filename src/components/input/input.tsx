@@ -292,7 +292,6 @@ export function Input({
 
   const debouncedSetSearchTerm = useCallback(
     debounce((value) => {
-      console.log('search', value);
       setSearchTerm(value);
     }, 1000),
     []

@@ -132,7 +132,6 @@ export function SearchBar<T>({
           ) : data && data.length > 0 ? (
             data?.map((result) =>
               resultBuilder(result, () => {
-                console.log('clicked');
                 handleClickOnResult();
               })
             )

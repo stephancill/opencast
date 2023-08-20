@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react';
+import type { Tweet as TweetType } from '@lib/types/tweet';
+import { useState } from 'react';
 import { Tweet } from './tweet';
 import { TweetParent } from './tweet-parent';
-import type { Tweet as TweetType, TweetWithUsers } from '@lib/types/tweet';
 
 type TweetWithParentProps = {
   data: TweetType[];
@@ -22,10 +22,6 @@ export function TweetWithParent({ data }: TweetWithParentProps): JSX.Element {
   const filteredData = data.filter(
     (child) => !loadedParents.some((parent) => parent.parentId === child.id)
   );
-
-  useEffect(() => {
-    console.log(filteredData);
-  }, [filteredData]);
 
   return (
     <>

@@ -33,7 +33,6 @@ export default function TopicPage(): JSX.Element {
     topicUrl ? `/api/topic?url=${topicUrl}` : null,
     async (url) => {
       const res = await fetchJSON<TopicResponse>(url);
-      console.log(res);
       return res.result;
     },
     {}
