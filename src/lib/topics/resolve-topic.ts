@@ -1,10 +1,11 @@
-import getMetadata, { MetaData } from 'metadata-scraper';
 import { createPublicClient, http } from 'viem';
 import * as chains from 'viem/chains';
-import { LRU } from '../lru-cache';
-import { parseChainURL } from '../utils';
-import { TopicType } from '../types/topic';
 import { resolveChainIcon } from '../chains/resolve-chain-icon';
+import { populateEmbed } from '../embeds';
+import { LRU } from '../lru-cache';
+import { TopicType } from '../types/topic';
+import { ExternalEmbed } from '../types/tweet';
+import { parseChainURL } from '../utils';
 
 const chainById = Object.values(chains).reduce(
   (acc: { [key: string]: chains.Chain }, cur) => {
@@ -45,11 +46,9 @@ function cleanUrl(url: string): string {
 // CAIP-19 URL
 async function _resolveTopic(url: string): Promise<TopicType | null> {
   if (url.startsWith('https://')) {
-    let metadata: MetaData | null;
+    let metadata: ExternalEmbed | null;
     try {
-      metadata = await getMetadata(url, {
-        maxRedirects: 1
-      });
+      metadata = await populateEmbed({ url: url });
     } catch {
       return {
         name: cleanUrl(url),
@@ -58,15 +57,15 @@ async function _resolveTopic(url: string): Promise<TopicType | null> {
       };
     }
 
-    const { description, title, icon } = metadata;
+    const { text, title, icon } = metadata || {};
     const cleanedUrl = cleanUrl(url);
     let name = title || cleanedUrl;
-    if (name.length > 20) {
+    if (name.length > 30) {
       name = cleanedUrl;
     }
     return {
       name,
-      description: description || 'Link',
+      description: text || 'Link',
       image: icon,
       url
     };
