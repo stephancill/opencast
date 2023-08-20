@@ -180,7 +180,7 @@ export function ViewTweet(tweet: ViewTweetProps): JSX.Element {
           reply
           parent={
             parent
-              ? { id: tweetId, username: username, userId: parent.userId! }
+              ? { id: tweetId, username: username, userId: ownerId }
               : undefined
           }
           parentUrl={topic?.url || undefined}
