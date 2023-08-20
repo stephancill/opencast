@@ -200,12 +200,14 @@ export function Input({
       mentionedUsers
     );
 
-    // Extract mentioned users: mention text must be removed and be put into the mentionedUsers object
-
+    // TODO: Limit to only 2 embeds
     const castMessage = await createCastMessage({
       text: text,
       fid: parseInt(userId),
-      embeds: [...uploadedLinks.map((link) => ({ url: link })), ...embeds],
+      embeds: [
+        ...uploadedLinks.map((link) => ({ url: link })),
+        ...embeds.map(({ url }) => ({ url }))
+      ],
       mentions: mentions,
       mentionsPositions: mentionsPositions,
       parentCastHash: isReplying && parent ? parent.id : undefined,
@@ -240,6 +242,7 @@ export function Input({
         { duration: 6000 }
       );
     } else {
+      setLoading(false);
       toast.error(
         () => <span className='flex gap-2'>Failed to create post</span>,
         { duration: 6000 }

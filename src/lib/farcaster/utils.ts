@@ -105,6 +105,10 @@ export async function createCastMessage({
     signer
   );
 
+  if (message.isErr()) {
+    console.error(message.error);
+  }
+
   return message.unwrapOr(null);
 }
 
