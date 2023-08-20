@@ -11,7 +11,7 @@ export default async function handle(
   const { method } = req;
   switch (method) {
     case 'GET':
-      const topicUrl = req.query.url as string;
+      const topicUrl = decodeURIComponent(req.query.url as string);
       const cursor = req.query.cursor
         ? new Date(req.query.cursor as string)
         : undefined;

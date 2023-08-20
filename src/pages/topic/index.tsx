@@ -30,12 +30,12 @@ export default function TopicPage(): JSX.Element {
   const topicUrl = topicUrlParam as string;
 
   const { data: topic, isValidating: loadingTopic } = useSWR(
-    topicUrl ? `/api/topic?url=${topicUrl}` : null,
+    topicUrl ? `/api/topic?url=${encodeURIComponent(topicUrl)}` : null,
     async (url) => {
       const res = await fetchJSON<TopicResponse>(url);
       return res.result;
     },
-    {}
+    { revalidateOnFocus: false }
   );
 
   const {
@@ -44,9 +44,9 @@ export default function TopicPage(): JSX.Element {
     LoadMore
   } = useInfiniteScroll(
     (pageParam) => {
-      const url = `/api/topic/feed?url=${topicUrl}&limit=10${
-        pageParam ? `&cursor=${pageParam}` : ''
-      }`;
+      const url = `/api/topic/feed?url=${encodeURIComponent(
+        topicUrl
+      )}&limit=10${pageParam ? `&cursor=${pageParam}` : ''}`;
       return url;
     },
     {

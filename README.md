@@ -38,12 +38,12 @@ This project depends on the reference Farcaster PosgreSQL indexer. Follow the in
   - [ ] Edit profile
 - [x] Auth
 - [x] Engagement actions
-- [ ] Post creation
+- [x] Post creation
   - [x] Text only
   - [x] Media
   - [x] Mentions
   - [x] Embeds
-  - [ ] Topic
+  - [x] Topic
 - [x] Post deletion
 - [ ] Search
   - [x] User

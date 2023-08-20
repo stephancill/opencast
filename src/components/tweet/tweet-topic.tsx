@@ -1,23 +1,20 @@
-import { useRouter } from 'next/router';
+import Link from 'next/link';
 import { TopicType } from '../../lib/types/topic';
 import { NextImage } from '../ui/next-image';
 
 export function TweetTopic({ topic }: { topic: TopicType }) {
-  const router = useRouter();
-
   return (
-    <span
-      onClick={(e) => router.push(`/topic?url=${topic.url}`)}
-      className='flex w-full cursor-pointer items-center whitespace-nowrap text-light-secondary hover:underline dark:text-dark-secondary'
-    >
-      <TopicView topic={topic}></TopicView>
-    </span>
+    <Link href={`/topic?url=${encodeURIComponent(topic.url)}`} passHref>
+      <a className='flex w-full cursor-pointer items-center whitespace-nowrap text-light-secondary hover:underline dark:text-dark-secondary'>
+        <TopicView topic={topic}></TopicView>
+      </a>
+    </Link>
   );
 }
 
 export function TopicView({ topic }: { topic: TopicType }) {
   return (
-    <span className='flex cursor-pointer items-center'>
+    <span className='flex items-center'>
       #
       {topic.image && (
         <span className='mx-1 inline flex-shrink-0 flex-grow-0 overflow-hidden rounded-md'>

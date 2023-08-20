@@ -7,13 +7,13 @@ export default async function topicIdEndpoint(
   req: NextApiRequest,
   res: NextApiResponse<TopicResponse>
 ): Promise<void> {
-  const topicUrl = req.query.url as string;
+  const topicUrl = decodeURIComponent(req.query.url as string);
 
   const topic = await resolveTopic(topicUrl);
 
   if (!topic) {
     res.status(404).json({
-      message: 'User not found'
+      message: 'Topic not found'
     });
     return;
   }

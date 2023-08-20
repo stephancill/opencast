@@ -15,22 +15,6 @@ type Options = {
   onClick?: () => void;
 }[];
 
-const options: Readonly<Options> = [
-  {
-    name: 'Media',
-    iconName: 'PhotoIcon',
-    disabled: false
-  }
-  // {
-  //   name: 'Emoji',
-  //   iconName: 'FaceSmileIcon',
-  //   disabled: false,
-  //   onClick: () => {
-  //     console.log('Emoji');
-  //   }
-  // }
-];
-
 type InputOptionsProps = {
   reply?: boolean;
   modal?: boolean;
@@ -41,6 +25,7 @@ type InputOptionsProps = {
   handleImageUpload: (
     e: ChangeEvent<HTMLInputElement> | ClipboardEvent<HTMLTextAreaElement>
   ) => void;
+  options: Readonly<Options>;
 };
 
 export function InputOptions({
@@ -50,11 +35,12 @@ export function InputOptions({
   inputLength,
   isValidTweet,
   isCharLimitExceeded,
-  handleImageUpload
+  handleImageUpload,
+  options
 }: InputOptionsProps): JSX.Element {
   const inputFileRef = useRef<HTMLInputElement>(null);
 
-  const onClick = (): void => inputFileRef.current?.click();
+  const imgOnClick = (): void => inputFileRef.current?.click();
 
   let filteredOptions = options;
 
@@ -72,11 +58,11 @@ export function InputOptions({
           ref={inputFileRef}
           multiple
         />
-        {filteredOptions.map(({ name, iconName, disabled }, index) => (
+        {filteredOptions.map(({ name, iconName, disabled, onClick }, index) => (
           <Button
             className='accent-tab accent-bg-tab group relative rounded-full p-2 
                        hover:bg-main-accent/10 active:bg-main-accent/20'
-            onClick={index === 0 ? onClick : undefined}
+            onClick={onClick ? onClick : imgOnClick}
             disabled={disabled}
             key={name}
           >
