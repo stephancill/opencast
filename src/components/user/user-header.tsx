@@ -33,9 +33,10 @@ export function UserHeader(): JSX.Element {
   const isInFollowPage = ['following', 'followers'].includes(currentPage);
 
   return (
-    <AnimatePresence mode='popLayout'>
+    // <AnimatePresence mode='popLayout'>
+    <div>
       {loading ? (
-        <motion.div
+        <div
           className='-mb-1 inner:animate-pulse inner:rounded-lg 
                      inner:bg-light-secondary dark:inner:bg-dark-secondary'
           {...variants}
@@ -43,13 +44,13 @@ export function UserHeader(): JSX.Element {
         >
           <div className='-mt-1 mb-1 h-5 w-24' />
           <div className='h-4 w-12' />
-        </motion.div>
+        </div>
       ) : !user ? (
-        <motion.h2 className='text-xl font-bold' {...variants} key='not-found'>
+        <h2 className='text-xl font-bold' {...variants} key='not-found'>
           {isInFollowPage ? `@${id as string}` : 'User'}
-        </motion.h2>
+        </h2>
       ) : (
-        <motion.div className='-mb-1 truncate' {...variants} key='found'>
+        <div className='-mb-1 truncate' {...variants} key='found'>
           <UserName
             tag='h2'
             name={user.name}
@@ -74,8 +75,9 @@ export function UserHeader(): JSX.Element {
                 : 'No Photo & GIF'
               : ''}
           </p>
-        </motion.div>
+        </div>
       )}
-    </AnimatePresence>
+      {/* </AnimatePresence> */}
+    </div>
   );
 }

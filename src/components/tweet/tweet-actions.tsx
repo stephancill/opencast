@@ -223,6 +223,9 @@ export function TweetActions({
     const newMessage = Message.fromJSON(res);
     const newCastId = Buffer.from(newMessage.hash).toString('hex');
 
+    setRepostModalLoading(false);
+    repostCloseModal();
+
     toast.success(
       () => (
         <span className='flex gap-2'>
@@ -269,7 +272,7 @@ export function TweetActions({
         />
       </Modal>
       <Modal
-        modalClassName='max-w-xs bg-main-background w-full p-8 rounded-2xl'
+        modalClassName='max-w-sm bg-main-background w-full p-8 rounded-2xl'
         open={repostOpen}
         closeModal={repostCloseModal}
       >
@@ -312,14 +315,19 @@ export function TweetActions({
               </div>
             )
           )}
-          <Button
-            className='accent-tab bg-main-accent font-bold text-white enabled:hover:bg-main-accent/90 enabled:active:bg-main-accent/75'
-            onClick={() => {
-              handleRepostInChannel();
-            }}
-          >
-            {repostModalLoading ? <Loading className='h-5 w-5' /> : 'Repost'}
-          </Button>
+          {repostModalLoading ? (
+            <Loading className='w-full' />
+          ) : (
+            <Button
+              className='accent-tab flex items-center justify-center bg-main-accent font-bold text-white enabled:hover:bg-main-accent/90 enabled:active:bg-main-accent/75'
+              onClick={() => {
+                handleRepostInChannel();
+              }}
+              disabled={repostModalLoading}
+            >
+              Repost
+            </Button>
+          )}
         </div>
       </Modal>
       <Popover>
