@@ -55,6 +55,9 @@ This project depends on the reference Farcaster PosgreSQL indexer. Follow the in
   - [ ] Index channels
 - [x] Fix mobile layout
 - [ ] Rebrand
+  - [x] Renaming (casts -> tweets, etc)
+  - [x] Images
+  - [ ] Code
 - [ ] Optimize
   - [ ] DB queries
   - [ ] Bandwidth
