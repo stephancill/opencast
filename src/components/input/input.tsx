@@ -189,7 +189,9 @@ export function Input({
       fid: parseInt(userId),
       embeds: [
         ...uploadedLinks.map((link) => ({ url: link })),
-        ...embeds.map(({ url }) => ({ url }))
+        ...embeds
+          .filter((embed) => !ignoredEmbedUrls.includes(embed.url))
+          .map(({ url }) => ({ url }))
       ],
       mentions: mentions,
       mentionsPositions: mentionsPositions,
