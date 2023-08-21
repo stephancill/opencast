@@ -18,14 +18,15 @@ const chainById = Object.values(chains).reduce(
 export type TopicsMapType = { [key: string]: TopicType };
 
 export async function resolveTopic(url: string): Promise<TopicType | null> {
-  const cached = LRU.get(url);
+  const key = `topic:${url}`;
+  const cached = LRU.get(key);
   if (cached !== undefined) {
     return cached as TopicType;
   }
 
   const resolved = await _resolveTopic(url);
   // If we can't resolve the topic, cache it for 5 minutes
-  LRU.set(url, resolved, {
+  LRU.set(key, resolved, {
     ttl: resolved === null ? 5 * 60 * 1000 : undefined
   });
 
