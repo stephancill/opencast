@@ -14,19 +14,16 @@ import type { ChangeEvent, ClipboardEvent, FormEvent, ReactNode } from 'react';
 import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { toast } from 'react-hot-toast';
 import useSWR from 'swr';
-import isURL from 'validator/lib/isURL';
 import { createCastMessage, submitHubMessage } from '../../lib/farcaster/utils';
 import { fetchJSON } from '../../lib/fetch';
 import { uploadToImgur } from '../../lib/imgur/upload';
 import { BaseResponse } from '../../lib/types/responses';
 import { TopicResponse, TopicType } from '../../lib/types/topic';
-import { TrendsResponse } from '../../lib/types/trends';
 import { ExternalEmbed } from '../../lib/types/tweet';
+import { SearchTopics } from '../search/search-topics';
 import { UserSearchResult } from '../search/user-search-result';
 import { TweetEmbed } from '../tweet/tweet-embed';
 import { TopicView } from '../tweet/tweet-topic';
-import { Button } from '../ui/button';
-import { HeroIcon } from '../ui/hero-icon';
 import { Loading } from '../ui/loading';
 import { ImagePreview } from './image-preview';
 import { InputForm, fromTop } from './input-form';
@@ -106,10 +103,9 @@ export function Input({
   const [embeds, setEmbeds] = useState<ExternalEmbed[]>([]); // Fetched embeds
   const [ignoredEmbedUrls, setIgnoredEmbedUrls] = useState<string[]>([]); // URLs of embeds to be ignored in the cast message
 
-  const [topicQuery, setTopicQuery] = useState('');
   const [topicUrl, setTopicUrl] = useState(parentUrl);
   const [showingTopicSelector, setShowingTopicSelector] = useState(false);
-  const [topic, setTopic] = useState<TopicType | null>(null);
+  const [topic, setTopic] = useState<TopicType | null>();
 
   const { data: topicResult, isValidating: loadingTopic } = useSWR(
     topicUrl ? `/api/topic?url=${encodeURIComponent(topicUrl)}` : null,
@@ -120,21 +116,8 @@ export function Input({
     { revalidateOnFocus: false }
   );
 
-  const { data: allTopics, isValidating: loadingAllTopics } = useSWR(
-    showingTopicSelector ? `/api/trends?limit=50` : null,
-    async (url) => {
-      const res = await fetchJSON<TrendsResponse>(url);
-      return res.result;
-    },
-    { revalidateOnFocus: false }
-  );
-
-  // useEffect(() => {
-  //   debouncedSetTopicUrl(topicUrlOrQuery);
-  // }, [topicUrlOrQuery]);
-
   useEffect(() => {
-    if (topicUrl === topic?.url) return;
+    if (topicUrl === topic?.url || topic === undefined) return;
     setTopicUrl(topic?.url);
   }, [topic]);
 
@@ -535,87 +518,12 @@ export function Input({
               <Loading />
             </div>
           ) : showingTopicSelector ? (
-            <div className=''>
-              <div>
-                <label
-                  className='group flex items-center justify-between gap-4 rounded-full
-                   bg-main-search-background px-4 py-2 transition focus-within:bg-main-background
-                   focus-within:ring-2 focus-within:ring-main-accent'
-                >
-                  <i>
-                    <HeroIcon
-                      className='h-5 w-5 text-light-secondary transition-colors 
-                       group-focus-within:text-main-accent dark:text-dark-secondary'
-                      iconName='MagnifyingGlassIcon'
-                    />
-                  </i>
-                  <input
-                    className='peer flex-1 bg-transparent outline-none 
-                    placeholder:text-light-secondary dark:placeholder:text-dark-secondary'
-                    placeholder='Search topics or paste a link'
-                    value={topicQuery}
-                    type='text'
-                    onChange={(e) => setTopicQuery(e.target.value)}
-                  />
-                  <Button
-                    className={cn(
-                      'accent-tab scale-50 bg-main-accent p-1 opacity-0 transition hover:brightness-90 disabled:opacity-0',
-                      inputValue &&
-                        'focus:scale-100 focus:opacity-100 peer-focus:scale-100 peer-focus:opacity-100'
-                    )}
-                    // onClick={clearInputValue(true)}
-                    disabled={!inputValue}
-                  >
-                    <HeroIcon
-                      className='h-3 w-3 stroke-white'
-                      iconName='XMarkIcon'
-                    />
-                  </Button>
-                </label>
-              </div>
-
-              <div>
-                {isURL(topicQuery) && (
-                  <div
-                    onClick={() => {
-                      setTopicUrl(topicQuery);
-                      setTopicQuery('');
-                      setShowingTopicSelector(false);
-                    }}
-                    className='mt-2 cursor-pointer rounded-lg p-2 text-light-secondary hover:bg-main-accent/10 dark:text-dark-secondary'
-                  >
-                    Choose "{topicQuery}"
-                  </div>
-                )}
-                <div className='mt-2 flex flex-wrap gap-2'>
-                  {allTopics
-                    ?.filter(
-                      ({ topic }) =>
-                        topicQuery.length === 0 ||
-                        topic?.name
-                          .toLowerCase()
-                          .includes(topicQuery.toLowerCase()) ||
-                        topic?.url
-                          .toLowerCase()
-                          .includes(topicQuery.toLowerCase())
-                    )
-                    .slice(0, 5)
-                    .map(({ topic }, i) => (
-                      <div
-                        onClick={() => {
-                          setTopic(topic);
-                          setTopicQuery('');
-                          setShowingTopicSelector(false);
-                        }}
-                        key={i}
-                        className='cursor-pointer rounded-lg p-2 text-light-secondary hover:bg-main-accent/10 dark:text-dark-secondary'
-                      >
-                        <TopicView topic={topic!} key={i} />
-                      </div>
-                    ))}
-                </div>
-              </div>
-            </div>
+            <SearchTopics
+              enabled={showingTopicSelector}
+              onSelectRawUrl={setTopicUrl}
+              onSelectTopic={setTopic}
+              setShowing={setShowingTopicSelector}
+            />
           ) : (
             topic && (
               <div
