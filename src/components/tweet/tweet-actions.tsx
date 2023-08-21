@@ -1,36 +1,37 @@
-import { useMemo } from 'react';
-import { useRouter } from 'next/router';
-import { doc, getDoc } from 'firebase/firestore';
-import { Popover } from '@headlessui/react';
-import { AnimatePresence, motion } from 'framer-motion';
-import cn from 'clsx';
-import { toast } from 'react-hot-toast';
+import { ActionModal } from '@components/modal/action-modal';
+import { Modal } from '@components/modal/modal';
+import { Button } from '@components/ui/button';
+import { HeroIcon } from '@components/ui/hero-icon';
+import { ToolTip } from '@components/ui/tooltip';
+import { Dialog, Popover } from '@headlessui/react';
 import { useAuth } from '@lib/context/auth-context';
 import { useModal } from '@lib/hooks/useModal';
-// import { tweetsCollection } from '@lib/firebase/collections';
-// import {
-//   removeTweet,
-//   manageReply,
-//   manageFollow,
-//   managePinnedTweet,
-//   manageTotalTweets,
-//   manageTotalPhotos
-// } from '@lib/firebase/utils';
-import { delayScroll, preventBubbling, sleep } from '@lib/utils';
-import { Modal } from '@components/modal/modal';
-import { ActionModal } from '@components/modal/action-modal';
-import { Button } from '@components/ui/button';
-import { ToolTip } from '@components/ui/tooltip';
-import { HeroIcon } from '@components/ui/hero-icon';
-import { CustomIcon } from '@components/ui/custom-icon';
-import type { Variants } from 'framer-motion';
 import type { Tweet } from '@lib/types/tweet';
 import type { User } from '@lib/types/user';
+import { preventBubbling } from '@lib/utils';
+import cn from 'clsx';
+import type { Variants } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
+import { useRouter } from 'next/router';
+import { toast } from 'react-hot-toast';
 import {
+  createCastMessage,
   createFollowMessage,
   createRemoveCastMessage,
   submitHubMessage
 } from '../../lib/farcaster/utils';
+import { SearchBar } from '../aside/search-bar';
+import { SearchTopics } from '../search/search-topics';
+import { useEffect, useState } from 'react';
+import { fetchJSON } from '../../lib/fetch';
+import useSWR from 'swr';
+import { TopicResponse, TopicType } from '../../lib/types/topic';
+import { Loading } from '../ui/loading';
+import { TopicView } from './tweet-topic';
+import { BaseResponse } from '../../lib/types/responses';
+import { CastAddBody, Message } from '@farcaster/hub-web';
+import { result } from 'lodash';
+import Link from 'next/link';
 
 export const variants: Variants = {
   initial: { opacity: 0, y: -25 },
@@ -50,6 +51,7 @@ type TweetActionsProps = Pick<Tweet, 'createdBy'> & {
   parentId?: string;
   hasImages: boolean;
   viewTweet?: boolean;
+  topic?: TopicType;
 };
 
 type PinModalData = Record<'title' | 'description' | 'mainBtnLabel', string>;
@@ -71,13 +73,10 @@ const pinModalData: Readonly<PinModalData[]> = [
 
 export function TweetActions({
   isOwner,
-  ownerId,
   tweetId,
-  parentId,
   username,
-  hasImages,
-  viewTweet,
-  createdBy
+  createdBy,
+  topic
 }: TweetActionsProps): JSX.Element {
   const { user, isAdmin } = useAuth();
   const { push } = useRouter();
@@ -89,10 +88,40 @@ export function TweetActions({
   } = useModal();
 
   const {
-    open: pinOpen,
-    openModal: pinOpenModal,
-    closeModal: pinCloseModal
+    open: repostOpen,
+    openModal: repostOpenModal,
+    closeModal: repostCloseModal
   } = useModal();
+
+  const [repostTopicUrl, setRepostTopicUrl] = useState<string>();
+  const [showingTopicSelector, setShowingTopicSelector] = useState(false);
+  const [repostTopic, setRepostTopic] = useState<TopicType | null>(
+    topic || null
+  );
+  const [repostModalLoading, setRepostModalLoading] = useState(false);
+
+  const { data: topicResult, isValidating: loadingTopic } = useSWR(
+    repostTopicUrl
+      ? `/api/topic?url=${encodeURIComponent(repostTopicUrl)}`
+      : null,
+    async (url) => {
+      const res = await fetchJSON<TopicResponse>(url);
+      return res.result;
+    },
+    { revalidateOnFocus: false }
+  );
+
+  useEffect(() => {
+    if (repostTopicUrl === repostTopic?.url || repostTopic === undefined)
+      return;
+    setRepostTopicUrl(repostTopic?.url);
+  }, [repostTopic]);
+
+  useEffect(() => {
+    if (topicResult && repostTopic?.url !== topicResult.url) {
+      setRepostTopic(topicResult);
+    }
+  }, [topicResult]);
 
   const { id: userId, following, pinnedTweet } = user as User;
 
@@ -118,14 +147,6 @@ export function TweetActions({
     }
   };
 
-  // const handlePin = async (): Promise<void> => {
-  //   await managePinnedTweet(tweetIsPinned ? 'unpin' : 'pin', userId, tweetId);
-  //   toast.success(
-  //     `Your tweet was ${tweetIsPinned ? 'unpinned' : 'pinned'} to your profile`
-  //   );
-  //   pinCloseModal();
-  // };
-
   const handleFollow =
     (closeMenu: () => void, type: 'follow' | 'unfollow') =>
     async (): Promise<void> => {
@@ -150,6 +171,71 @@ export function TweetActions({
       }
     };
 
+  const handleRepostInChannel = async (): Promise<void> => {
+    // Set loading
+    setRepostModalLoading(true);
+    // Get original message
+    const messageJson = (
+      await fetchJSON<BaseResponse<any>>(
+        `/api/hub?hash=${tweetId}&fid=${createdBy}`
+      )
+    ).result;
+    const message = Message.fromJSON(messageJson);
+    if (!message) {
+      toast.error('Failed to get original message');
+      setRepostModalLoading(false);
+      return;
+    }
+    const castAddBody = CastAddBody.fromJSON(message.data?.castAddBody);
+    if (!castAddBody) {
+      toast.error('Failed to get original message');
+      setRepostModalLoading(false);
+      return;
+    }
+
+    // Replace topic with new topic
+    const newCastAddBody = await createCastMessage({
+      text: castAddBody.text,
+      embeds: castAddBody.embeds,
+      parentCastHash: castAddBody.parentCastId?.hash
+        ? Buffer.from(castAddBody.parentCastId?.hash).toString('hex')
+        : undefined,
+      parentCastFid: castAddBody.parentCastId?.fid,
+      parentUrl: repostTopic?.url,
+      mentions: castAddBody.mentions,
+      mentionsPositions: castAddBody.mentionsPositions,
+      fid: parseInt(createdBy)
+    });
+    if (!newCastAddBody) {
+      toast.error('Failed to create new message');
+      setRepostModalLoading(false);
+      return;
+    }
+
+    // Submit new message
+    const res = await submitHubMessage(newCastAddBody);
+    if (!res) {
+      toast.error('Failed to repost message');
+      setRepostModalLoading(false);
+      return;
+    }
+
+    const newMessage = Message.fromJSON(res);
+    const newCastId = Buffer.from(newMessage.hash).toString('hex');
+
+    toast.success(
+      () => (
+        <span className='flex gap-2'>
+          Your cast was reposted
+          <Link href={`/tweet/${newCastId}`}>
+            <a className='custom-underline font-bold'>View</a>
+          </Link>
+        </span>
+      ),
+      { duration: 6000 }
+    );
+  };
+
   const userIsFollowed = following.includes(createdBy);
 
   const handleOpenInWarpcast = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -159,12 +245,6 @@ export function TweetActions({
       '_blank'
     );
   };
-
-  const currentPinModalData = useMemo(
-    () => pinModalData[+tweetIsPinned],
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [pinOpen]
-  );
 
   return (
     <>
@@ -190,18 +270,57 @@ export function TweetActions({
       </Modal>
       <Modal
         modalClassName='max-w-xs bg-main-background w-full p-8 rounded-2xl'
-        open={pinOpen}
-        closeModal={pinCloseModal}
+        open={repostOpen}
+        closeModal={repostCloseModal}
       >
-        <ActionModal
-          {...currentPinModalData}
-          mainBtnClassName='bg-light-primary hover:bg-light-primary/90 active:bg-light-primary/80 dark:text-light-primary
-                            dark:bg-light-border dark:hover:bg-light-border/90 dark:active:bg-light-border/75'
-          focusOnMainBtn
-          // action={handlePin}
-          action={() => {}}
-          closeModal={pinCloseModal}
-        />
+        <div className='flex flex-col gap-6'>
+          <div className='flex flex-col gap-4'>
+            <div className='flex flex-col gap-2'>
+              <div className='flex items-center'>
+                <i className='inline pr-2'>
+                  <HeroIcon iconName='ArrowPathRoundedSquareIcon' />
+                </i>
+                <Dialog.Title className='inline text-xl font-bold'>
+                  Repost to topic
+                </Dialog.Title>
+              </div>
+              <Dialog.Description className='text-light-secondary dark:text-dark-secondary'>
+                Repost this Cast to another topic
+              </Dialog.Description>
+            </div>
+          </div>
+          {loadingTopic ? (
+            <div className='w-10'>
+              <Loading />
+            </div>
+          ) : showingTopicSelector ? (
+            <SearchTopics
+              enabled={repostOpen}
+              onSelectRawUrl={(url) => setRepostTopicUrl(url)}
+              onSelectTopic={(topic) => setRepostTopic(topic)}
+              setShowing={setShowingTopicSelector}
+            />
+          ) : (
+            repostTopic && (
+              <div
+                className='cursor-pointer text-light-secondary dark:text-dark-secondary'
+                onClick={() => setShowingTopicSelector(true)}
+              >
+                <span className='inline'>
+                  <TopicView topic={repostTopic} />
+                </span>
+              </div>
+            )
+          )}
+          <Button
+            className='accent-tab bg-main-accent font-bold text-white enabled:hover:bg-main-accent/90 enabled:active:bg-main-accent/75'
+            onClick={() => {
+              handleRepostInChannel();
+            }}
+          >
+            {repostModalLoading ? <Loading className='h-5 w-5' /> : 'Repost'}
+          </Button>
+        </div>
       </Modal>
       <Popover>
         {({ open, close }): JSX.Element => (
@@ -248,19 +367,14 @@ export function TweetActions({
                     <Popover.Button
                       className='accent-tab flex w-full gap-3 rounded-md rounded-t-none p-4 hover:bg-main-sidebar-background'
                       as={Button}
-                      onClick={preventBubbling(pinOpenModal)}
+                      onClick={preventBubbling(async (): Promise<void> => {
+                        close();
+                        setShowingTopicSelector(true);
+                        repostOpenModal();
+                      })}
                     >
-                      {tweetIsPinned ? (
-                        <>
-                          <CustomIcon iconName='PinOffIcon' />
-                          Unpin from profile
-                        </>
-                      ) : (
-                        <>
-                          <CustomIcon iconName='PinIcon' />
-                          Pin to your profile
-                        </>
-                      )}
+                      <HeroIcon iconName='ArrowPathRoundedSquareIcon' />
+                      Repost to topic
                     </Popover.Button>
                   ) : userIsFollowed ? (
                     <Popover.Button

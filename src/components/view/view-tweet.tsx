@@ -114,6 +114,7 @@ export function ViewTweet(tweet: ViewTweetProps): JSX.Element {
                 username={username}
                 hasImages={!!images}
                 createdBy={createdBy}
+                topic={topic || undefined}
               />
             </div>
           </div>

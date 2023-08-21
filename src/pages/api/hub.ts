@@ -19,6 +19,22 @@ export default async function handle(
       }
       res.json({ result: Message.toJSON(unwrapped) as Message });
       break;
+    case 'GET':
+      // Get cast
+      const hash = req.query.hash as string;
+      const fid = parseInt(req.query.fid as string);
+      const castResult = await hubClient.getCast({
+        fid,
+        hash: Buffer.from(hash, 'hex')
+      });
+      const cast = castResult.unwrapOr(null);
+      if (!cast) {
+        res.status(400).json({ message: 'Could not get cast' });
+        return;
+      }
+      res.json({ result: Message.toJSON(cast) as Message });
+      break;
+
     default:
       res.setHeader('Allow', ['POST']);
       res.status(405).end(`Method ${method} Not Allowed`);
