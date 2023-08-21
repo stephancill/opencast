@@ -53,7 +53,7 @@ export default function UserWithReplies(): JSX.Element {
       <SEO
         title={`Tweets with replies by ${name as string} (@${
           username as string
-        }) / Twitter`}
+        }) / Opencast`}
       />
       {loading ? (
         <Loading className='mt-5' />

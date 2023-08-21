@@ -100,7 +100,7 @@ export function SearchBar<T>({
             className='peer flex-1 bg-transparent outline-none 
                      placeholder:text-light-secondary dark:placeholder:text-dark-secondary'
             type='text'
-            placeholder='Search Twitter'
+            placeholder='Search Farcaster'
             ref={inputRef}
             value={inputValue}
             onChange={(e) => {

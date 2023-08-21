@@ -62,7 +62,7 @@ export default function TopicPage(): JSX.Element {
         <SEO
           title={`${
             loadingTopic ? 'Loading' : topic?.name || 'Topic not found'
-          } / Twitter`}
+          } / Opencast`}
         />
       }
       <MainHeader

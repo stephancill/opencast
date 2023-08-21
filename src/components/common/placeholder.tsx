@@ -5,8 +5,8 @@ export function Placeholder(): JSX.Element {
   return (
     <main className='flex min-h-screen items-center justify-center'>
       <SEO
-        title='Twitter'
-        description='From breaking news and entertainment to sports and politics, get the full story with all the live commentary.'
+        title='Opencast'
+        description='Fully open source Twitter flavoured Farcaster client.'
         image='/home.png'
       />
       <i>

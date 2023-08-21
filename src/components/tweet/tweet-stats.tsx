@@ -118,7 +118,7 @@ export function TweetStats({
           )}
           iconClassName='group-hover:bg-accent-green/10 group-active:bg-accent-green/20
                          group-focus-visible:bg-accent-green/10 group-focus-visible:ring-accent-green/80'
-          tip={tweetIsRetweeted ? 'Undo Retweet' : 'Retweet'}
+          tip={tweetIsRetweeted ? 'Undo Recast' : 'Recast'}
           move={tweetMove}
           stats={currentRetweets}
           iconName='ArrowPathRoundedSquareIcon'

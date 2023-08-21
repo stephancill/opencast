@@ -34,7 +34,7 @@ export default async function tweetIdEndpoint(
 
   if (!cast) {
     res.status(404).json({
-      message: 'Tweet not found'
+      message: 'Cast not found'
     });
     return;
   }

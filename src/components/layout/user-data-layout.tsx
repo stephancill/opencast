@@ -25,7 +25,7 @@ export function UserDataLayout({ children }: LayoutProps): JSX.Element {
     <UserContextProvider
       value={{ user: user || null, loading: !user && loading }}
     >
-      {!user && !loading && <SEO title='User not found / Twitter' />}
+      {!user && !loading && <SEO title='User not found / Opencast' />}
       <MainContainer>
         <MainHeader useActionButton action={back}>
           <UserHeader />

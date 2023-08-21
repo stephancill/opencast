@@ -85,11 +85,11 @@ export default function TweetId(): JSX.Element {
   const parentId = tweetData?.parent?.id;
 
   const pageTitle = tweetData
-    ? `${tweetData.users[tweetData.createdBy]?.name} on Twitter: "${
+    ? `${tweetData.users[tweetData.createdBy]?.name} on Opencast: "${
         text ?? ''
       }${
         images ? ` (${imagesLength} image${isPlural(imagesLength)})` : ''
-      }" / Twitter`
+      }" / Opencast`
     : null;
 
   const resolvedMentions = useMemo(() => {
@@ -105,7 +105,7 @@ export default function TweetId(): JSX.Element {
     <MainContainer className='!pb-[1280px]'>
       <MainHeader
         useActionButton
-        title={parentId ? 'Thread' : 'Tweet'}
+        title={parentId ? 'Thread' : 'Cast'}
         action={back}
       />
       <section>
@@ -113,8 +113,8 @@ export default function TweetId(): JSX.Element {
           <Loading className='mt-5' />
         ) : !tweetData ? (
           <>
-            <SEO title='Tweet not found / Twitter' />
-            <Error message='Tweet not found' />
+            <SEO title='Cast not found / Opencast' />
+            <Error message='Cast not found' />
           </>
         ) : (
           <>

@@ -62,10 +62,10 @@ export function UserHeader(): JSX.Element {
               ? `@${user.username}`
               : isInTweetPage
               ? totalTweets
-                ? `${formatNumber(totalTweets)} ${`Tweet${isPlural(
+                ? `${formatNumber(totalTweets)} ${`Cast${isPlural(
                     totalTweets
                   )}`}`
-                : 'No Tweet'
+                : 'No Casts'
               : currentPage === 'media'
               ? totalPhotos
                 ? `${formatNumber(totalPhotos)} Photo${isPlural(

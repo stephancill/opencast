@@ -128,7 +128,7 @@ export function Tweet(tweet: TweetProps): JSX.Element {
           <AnimatePresence initial={false}>
             {modal ? null : pinned ? (
               <TweetStatus type='pin'>
-                <p className='text-sm font-bold'>Pinned Tweet</p>
+                <p className='text-sm font-bold'>Pinned Cast</p>
               </TweetStatus>
             ) : (
               tweetIsRetweeted &&

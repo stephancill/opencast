@@ -38,7 +38,7 @@ export default function Home(): JSX.Element {
 
   return (
     <MainContainer>
-      <SEO title='Home / Twitter' />
+      <SEO title='Home / Opencast' />
       <MainHeader
         useMobileSidebar
         title='Home'

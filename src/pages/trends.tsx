@@ -18,7 +18,7 @@ export default function Trends(): JSX.Element {
 
   return (
     <MainContainer>
-      <SEO title='Trends / Twitter' />
+      <SEO title='Trends / Opencast' />
       <MainHeader useActionButton title='Trending topics' action={back}>
         <Button
           className='dark-bg-tab group relative ml-auto cursor-not-allowed p-2 hover:bg-light-primary/10

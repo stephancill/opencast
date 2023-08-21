@@ -92,7 +92,7 @@ export function TweetShare({
                   onClick={preventBubbling(handleCopy(close))}
                 >
                   <HeroIcon iconName='LinkIcon' />
-                  Copy link to Tweet
+                  Copy link to Cast
                 </Popover.Button>
                 {/* {!tweetIsBookmarked ? (
                   <Popover.Button
