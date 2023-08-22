@@ -2,7 +2,7 @@ import { UserDataType } from '@farcaster/hub-web';
 import { Timestamp } from 'firebase/firestore';
 import { BaseResponse } from './responses';
 import type { Accent, Theme } from './theme';
-import { TopicType } from './topic';
+import { InterestType, TopicType as InterestsType } from './topic';
 
 export type User = {
   id: string;
@@ -23,7 +23,7 @@ export type User = {
   totalPhotos: number;
   pinnedTweet: string | null;
   coverPhotoURL: string | null;
-  interests: TopicType[];
+  interests: InterestType[];
 };
 
 export type EditableData = Extract<

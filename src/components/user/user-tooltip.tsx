@@ -120,11 +120,11 @@ export function UserTooltip({
           </div>
           {bio && <p>{bio}</p>}
           <div className='flex flex-wrap'>
-            {interests.map((topic) => (
-              <Link href={`/topic?url=${topic.url}`} key={topic.url}>
-                <span className='pr-2 text-light-secondary hover:underline dark:text-dark-secondary'>
+            {interests.map(({ topic }) => (
+              <Link href={`/topic?url=${topic.url}`} key={topic.url} passHref>
+                <a className='flex-grow-0 cursor-pointer pr-2 text-light-secondary hover:underline dark:text-dark-secondary'>
                   <TopicView topic={topic} />
-                </span>
+                </a>
               </Link>
             ))}
           </div>

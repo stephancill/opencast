@@ -14,6 +14,8 @@ import type { Variants } from 'framer-motion';
 import { AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
+import { useMemo } from 'react';
+import { calculateMatchFactor } from '../../lib/interests/interest-match';
 import { TweetActions } from './tweet-actions';
 import { TweetDate } from './tweet-date';
 import { TweetEmbeds } from './tweet-embed';
@@ -60,13 +62,13 @@ export function Tweet(tweet: TweetProps): JSX.Element {
 
   const { id: ownerId, name, username, verified, photoURL } = tweetUserData;
 
-  const { user } = useAuth();
+  const { user: currentUser } = useAuth();
 
   const { open, openModal, closeModal } = useModal();
 
   const tweetLink = `/tweet/${tweetId}`;
 
-  const userId = user?.id as string;
+  const userId = currentUser?.id as string;
 
   const isOwner = userId === createdBy;
 
@@ -82,6 +84,14 @@ export function Tweet(tweet: TweetProps): JSX.Element {
 
   const reply = !!parent;
   const tweetIsRetweeted = retweet !== null;
+
+  const userMatchFactor = useMemo(
+    () =>
+      currentUser
+        ? calculateMatchFactor(currentUser?.interests, tweetUserData.interests)
+        : 0,
+    [currentUser, tweetUserData]
+  );
 
   return (
     <article>
@@ -153,16 +163,32 @@ export function Tweet(tweet: TweetProps): JSX.Element {
             )}
           </div>
           <div className='flex min-w-0 flex-col'>
+            {currentUser && userMatchFactor > 0 && (
+              <div
+                style={{
+                  width: `${userMatchFactor * 100}%`,
+                  height: `3px`,
+                  backgroundColor: `hsla(204, 88%, 53%, ${
+                    userMatchFactor + 10
+                  })`
+                }}
+                className='mr-1 inline rounded-full'
+                title={userMatchFactor.toFixed(2)}
+              ></div>
+            )}
             <div className='flex justify-between gap-2 text-light-secondary dark:text-dark-secondary'>
               <div className='flex gap-1 truncate xs:overflow-visible xs:whitespace-normal'>
                 <UserTooltip modal={modal} {...tweetUserData}>
-                  <UserName
-                    name={name}
-                    username={username}
-                    verified={verified}
-                    className='text-light-primary dark:text-dark-primary'
-                  />
+                  <span className='flex items-center'>
+                    <UserName
+                      name={name}
+                      username={username}
+                      verified={verified}
+                      className='text-light-primary dark:text-dark-primary'
+                    />
+                  </span>
                 </UserTooltip>
+
                 <UserTooltip modal={modal} {...tweetUserData}>
                   <UserUsername username={username} />
                 </UserTooltip>

@@ -28,7 +28,9 @@ export default async function signerUserEndpoint(
     return;
   }
 
-  const user = await resolveUserFromFid(signerRow.fid);
+  const user = await resolveUserFromFid(signerRow.fid, {
+    interestsType: 'reactions'
+  });
 
   if (!user) {
     res.status(404).json({

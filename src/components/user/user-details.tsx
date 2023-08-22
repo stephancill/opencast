@@ -95,7 +95,7 @@ export function UserDetails({
         </div>
       </div>
       <div className='flex flex-wrap'>
-        {interests.map((topic) => (
+        {interests.map(({ topic }) => (
           <Link href={`/topic?url=${topic.url}`} key={topic.url}>
             <span className='pr-2 text-light-secondary hover:underline dark:text-dark-secondary'>
               <TopicView topic={topic} />

@@ -1,10 +1,15 @@
 import { UserDataType } from '@farcaster/hub-web';
 import { prisma } from '../prisma';
 import { resolveTopic } from '../topics/resolve-topic';
-import { TopicType } from '../types/topic';
+import { InterestType, TopicType } from '../types/topic';
 import { User, userConverter, UsersMapType } from '../types/user';
 
-export async function resolveUserFromFid(fid: bigint): Promise<User | null> {
+export async function resolveUserFromFid(
+  fid: bigint,
+  {
+    interestsType = 'casts'
+  }: { interestsType?: 'casts' | 'reactions' } | undefined = {}
+): Promise<User | null> {
   const userData = await prisma.user_data.findMany({
     where: {
       fid: fid
@@ -48,7 +53,7 @@ export async function resolveUserFromFid(fid: bigint): Promise<User | null> {
     _count: true
   });
 
-  const interests = await userInterests(fid);
+  const interests = await userInterests(fid, interestsType);
 
   const user = userConverter.toUser({ ...userDataRaw, fid });
 
@@ -108,11 +113,32 @@ export async function resolveUsersMap(fids: bigint[]): Promise<UsersMapType> {
   return usersMap;
 }
 
-export async function userInterests(fid: bigint): Promise<TopicType[]> {
-  const reactionGroups = (await prisma.$queryRaw`
+export async function userInterests(
+  fid: bigint,
+  type: 'casts' | 'reactions'
+): Promise<InterestType[]> {
+  let groups: { parent_url: string; volume: number }[] = [];
+
+  if (type === 'casts') {
+    groups = (await prisma.$queryRaw`
+        SELECT 
+            parent_url, 
+            COUNT(*) as volume 
+        FROM 
+            casts 
+        WHERE 
+            fid = ${fid}  
+            AND deleted_at IS NULL 
+            AND parent_url IS NOT NULL 
+        GROUP BY parent_url
+        ORDER BY volume DESC
+        LIMIT 5;
+      `) as { parent_url: string; volume: number }[];
+  } else if (type === 'reactions') {
+    groups = (await prisma.$queryRaw`
         SELECT 
             c.parent_url, 
-            COUNT(*) as reaction_count 
+            COUNT(*) as volume 
         FROM 
             reactions r
         INNER JOIN 
@@ -122,22 +148,25 @@ export async function userInterests(fid: bigint): Promise<TopicType[]> {
             AND c.deleted_at IS NULL 
             AND c.parent_url IS NOT NULL 
         GROUP BY c.parent_url
-        ORDER BY reaction_count DESC
+        ORDER BY volume DESC
         LIMIT 5;
-      `) as { parent_url: string; reaction_count: number }[];
+      `) as { parent_url: string; volume: number }[];
+  }
 
-  const topics = (
+  const interests = (
     await Promise.all(
-      reactionGroups.map(async (group) => {
+      groups.map(async (group) => {
         const url = group.parent_url!;
         const topic = await resolveTopic(url);
         if (!topic) {
           console.error(`Unresolved topic: ${group.parent_url}`);
         }
-        return topic;
+        return { topic, volume: Number(group.volume) };
       })
     )
-  ).filter((topic) => topic !== null) as TopicType[];
+  ).filter(
+    ({ topic, volume }) => topic !== null && volume > 5
+  ) as InterestType[];
 
-  return topics;
+  return interests;
 }

@@ -8,3 +8,8 @@ export type TopicType = {
   image?: string;
   url: string;
 };
+
+export type InterestType = {
+  topic: TopicType;
+  volume: number;
+};
