@@ -151,13 +151,19 @@ export function Input({
 
     setLoading(true);
 
-    if (!inputValue && selectedImages.length === 0) return;
+    if (!inputValue && selectedImages.length === 0) {
+      setLoading(false);
+      return;
+    }
 
     const isReplying = reply ?? replyModal;
 
     const userId = user?.id as string;
 
-    if (isReplying && !parent) return;
+    if (isReplying && !parent) {
+      setLoading(false);
+      return;
+    }
 
     const uploadedLinks: string[] = [];
 
@@ -197,7 +203,7 @@ export function Input({
       mentionsPositions: mentionsPositions,
       parentCastHash: isReplying && parent ? parent.id : undefined,
       parentCastFid: isReplying && parent ? parseInt(parent.userId) : undefined,
-      parentUrl: topicUrl
+      parentUrl: !parent ? topicUrl : undefined
     });
 
     if (castMessage) {
@@ -519,7 +525,7 @@ export function Input({
             <div className='w-10'>
               <Loading />
             </div>
-          ) : showingTopicSelector ? (
+          ) : showingTopicSelector && !parent ? (
             <SearchTopics
               enabled={showingTopicSelector}
               onSelectRawUrl={setTopicUrl}

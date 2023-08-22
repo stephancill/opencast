@@ -179,11 +179,7 @@ export function ViewTweet(tweet: ViewTweetProps): JSX.Element {
         </div>
         <Input
           reply
-          parent={
-            parent
-              ? { id: tweetId, username: username, userId: ownerId }
-              : undefined
-          }
+          parent={{ id: tweetId, username: username, userId: ownerId }}
           parentUrl={topic?.url || undefined}
         />
       </div>
