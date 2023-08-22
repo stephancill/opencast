@@ -46,7 +46,10 @@ export const variants: Variants = {
 };
 
 // TODO: Generalize this and move it somewhere else
-function extractAndReplaceMentions(input: string, usersMap: UsersMapType) {
+function extractAndReplaceMentions(
+  input: string,
+  usersMap: { [key: string]: number }
+) {
   let result = '';
   let mentions: number[] = [];
   let mentionsPositions: number[] = [];
@@ -63,7 +66,7 @@ function extractAndReplaceMentions(input: string, usersMap: UsersMapType) {
         // Get the starting position of each username mention
         const position = Buffer.from(result).length;
 
-        mentions.push(parseInt(usersMap[username].id));
+        mentions.push(usersMap[username]);
         mentionsPositions.push(position);
 
         // result += '@[...]'; // replace username mention with what you would like
@@ -127,8 +130,6 @@ export function Input({
     }
   }, [topicResult]);
 
-  const [mentionedUsers, setMentionedUsers] = useState<UsersMapType>({});
-
   const { user, isAdmin } = useAuth();
   const { name, username, photoURL } = user as User;
 
@@ -184,10 +185,45 @@ export function Input({
     }
 
     const rawText = inputValue.trim();
+
+    // Get fids of mentioned users
+    const mentionedUsers = ((input: string) => {
+      let splits = input.split(/(\s|\n)/);
+
+      const usernames: string[] = [];
+
+      splits.forEach((split, i) => {
+        if (split.startsWith('@')) {
+          const username = split.slice(1);
+          usernames.push(username);
+        }
+      });
+
+      return usernames;
+    })(rawText);
+
+    const usersMapResponse = await fetchJSON<
+      BaseResponse<{ [key: string]: number }>
+    >(`/api/user/resolve-usernames?usernames=${mentionedUsers.join(',')}`);
+    const usersMap = usersMapResponse.result;
+
+    if (!usersMap) {
+      toast.error(
+        () => <span className='flex gap-2'>Failed to resolve usernames</span>,
+        { duration: 6000 }
+      );
+      setLoading(false);
+      return;
+    }
+
+    // Extract mentions for cast message
     const { text, mentions, mentionsPositions } = extractAndReplaceMentions(
       rawText,
-      mentionedUsers
+      usersMap
     );
+
+    // setLoading(false);
+    // return;
 
     // TODO: Limit to only 2 embeds
     const castMessage = await createCastMessage({
@@ -363,10 +399,6 @@ export function Input({
     const newTextAfterCursor = '@' + user.username + ' ' + textAfterCursor;
 
     setInputValue(newTextBeforeCursor + newTextAfterCursor);
-    setMentionedUsers((prevMentionedUsers) => ({
-      ...prevMentionedUsers,
-      [user.username]: user
-    }));
 
     setShowUsers(false);
   };
