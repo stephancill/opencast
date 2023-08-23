@@ -37,6 +37,9 @@ export function AuthContextProvider({
   const [error, setError] = useState<Error | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const [lastCheckedNotifications, setLastCheckedNotifications] =
+    useState<Date | null>(null);
+
   const manageUser = async (keyPair: KeyPair): Promise<void> => {
     const userResponse = await fetch(`/api/signer/${keyPair.publicKey}/user`);
 
@@ -64,6 +67,9 @@ export function AuthContextProvider({
 
   useEffect(() => {
     handleUserAuth();
+    setLastCheckedNotifications(
+      new Date(localStorage.getItem('lastChecked') || new Date().toISOString())
+    );
   }, []);
 
   const signOut = async (): Promise<void> => {
@@ -78,17 +84,13 @@ export function AuthContextProvider({
   const isAdmin = user ? user.username === 'ccrsxx' : false;
   const randomSeed = useMemo(getRandomId, [user?.id]);
 
-  const swrKey = useMemo(() => {
-    return user?.id
-      ? `/api/user/${user.id}/notifications?last_time=${
-          localStorage.getItem('lastChecked') || new Date().toISOString()
-        }`
-      : null;
-  }, [user?.id]);
-
   const { data: userNotifications, isValidating: loadingNotifications } =
     useSWR(
-      swrKey,
+      user?.id && lastCheckedNotifications
+        ? `/api/user/${
+            user.id
+          }/notifications?last_time=${lastCheckedNotifications.toISOString()}`
+        : null,
       async (url) => (await fetchJSON<NotificationsResponse>(url)).result,
       {
         revalidateOnFocus: false,
@@ -98,14 +100,16 @@ export function AuthContextProvider({
     );
 
   const resetNotifications = (): void => {
-    localStorage.setItem('lastChecked', new Date().toISOString());
+    setLastCheckedNotifications(new Date());
   };
 
-  // useEffect(() => {
-  //   if (userNotifications?.lastChecked) {
-  //     localStorage.setItem('lastChecked', userNotifications.lastChecked);
-  //   }
-  // }, [userNotifications]);
+  useEffect(() => {
+    if (lastCheckedNotifications)
+      localStorage.setItem(
+        'lastChecked',
+        lastCheckedNotifications.toISOString()
+      );
+  }, [lastCheckedNotifications]);
 
   const value: AuthContext = {
     user,

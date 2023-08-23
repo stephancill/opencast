@@ -76,7 +76,11 @@ export function Sidebar(): JSX.Element {
             {navLinks.map(({ ...linkData }) => (
               <SidebarLink {...linkData} key={linkData.href} />
             ))}
-            <div onClick={resetNotifications}>
+            <div
+              onClick={() => {
+                resetNotifications();
+              }}
+            >
               {userNotifications && (
                 <div className='absolute ml-6 mt-2 flex h-4 min-w-[16px] items-center rounded-full bg-main-accent'>
                   <div className='mx-auto px-1 text-xs'>

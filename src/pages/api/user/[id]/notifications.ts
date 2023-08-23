@@ -73,6 +73,8 @@ export default async function handle(
         userPostsReplies.length +
         userMentions.length;
 
+      // console.log(`User ${fid} has ${badgeCount} new notifications`);
+
       res.json({
         result: {
           // followers: userNewFollowers.length,

@@ -65,7 +65,7 @@ export function MobileSidebarModal({
   coverPhotoURL,
   closeModal
 }: MobileSidebarModalProps): JSX.Element {
-  const { signOut } = useAuth();
+  const { signOut, userNotifications, resetNotifications } = useAuth();
 
   const {
     open: displayOpen,
@@ -179,6 +179,25 @@ export function MobileSidebarModal({
               iconName='UserIcon'
               linkName='Profile'
             />
+            <div
+              onClick={() => {
+                resetNotifications();
+              }}
+            >
+              {userNotifications && (
+                <div className='absolute ml-6 mt-2 flex h-4 min-w-[16px] items-center rounded-full bg-main-accent'>
+                  <div className='mx-auto px-1 text-xs'>
+                    {userNotifications < 100 ? userNotifications : '99+'}
+                  </div>
+                </div>
+              )}
+              <MobileSidebarLink
+                href='https://warpcast.com/~/notifications'
+                iconName='BellIcon'
+                linkName={`Notifications`}
+                newTab
+              />
+            </div>
             {topNavLinks.map((linkData) => (
               <MobileSidebarLink {...linkData} key={linkData.href} />
             ))}

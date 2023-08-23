@@ -13,7 +13,8 @@ export function MobileSidebarLink({
   bottom,
   linkName,
   iconName,
-  disabled
+  disabled,
+  newTab
 }: MobileSidebarLinkProps): JSX.Element {
   return (
     <Link href={href} key={href}>
@@ -26,6 +27,7 @@ export function MobileSidebarLink({
           disabled && 'cursor-not-allowed'
         )}
         onClick={disabled ? preventBubbling() : undefined}
+        target={newTab ? '_blank' : undefined}
       >
         <HeroIcon
           className={bottom ? 'h-5 w-5' : 'h-7 w-7'}
