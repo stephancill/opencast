@@ -241,8 +241,8 @@ export function TweetActions({
 
   const userIsFollowed = following.includes(createdBy);
 
-  const handleOpenInWarpcast = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
+  const handleOpenInWarpcast = (closeMenu: () => void) => {
+    closeMenu();
     window.open(
       `https://warpcast.com/${username}/0x${tweetId.slice(0, 5)}`,
       '_blank'
@@ -406,7 +406,7 @@ export function TweetActions({
                   <Popover.Button
                     className='accent-tab flex w-full gap-3 rounded-md rounded-t-none p-4 hover:bg-main-sidebar-background'
                     as={Button}
-                    onClick={(e) => handleOpenInWarpcast(e)}
+                    onClick={preventBubbling(() => handleOpenInWarpcast(close))}
                   >
                     <HeroIcon iconName='ArrowTopRightOnSquareIcon' />
                     Open in Warpcast
