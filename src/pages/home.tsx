@@ -20,7 +20,7 @@ export default function Home(): JSX.Element {
     setEnabled(true);
   }, []);
 
-  const { user } = useAuth();
+  const { user, userNotifications } = useAuth();
   const { data, loading, LoadMore } = useInfiniteScroll(
     (pageParam) => {
       const url = `/api/feed?fid=${user?.id}&limit=10${
@@ -38,7 +38,11 @@ export default function Home(): JSX.Element {
 
   return (
     <MainContainer>
-      <SEO title='Home / Opencast' />
+      <SEO
+        title={`${
+          userNotifications ? `(${userNotifications}) ` : ''
+        }Home / Opencast`}
+      />
       <MainHeader
         useMobileSidebar
         title='Home'

@@ -17,6 +17,7 @@ export type NavLink = {
   iconName: IconName;
   disabled?: boolean;
   canBeHidden?: boolean;
+  newTab?: boolean;
 };
 
 const navLinks: Readonly<NavLink[]> = [
@@ -33,7 +34,7 @@ const navLinks: Readonly<NavLink[]> = [
 ];
 
 export function Sidebar(): JSX.Element {
-  const { user } = useAuth();
+  const { user, userNotifications, resetNotifications } = useAuth();
   const { isMobile } = useWindow();
 
   const { open, openModal, closeModal } = useModal();
@@ -75,6 +76,21 @@ export function Sidebar(): JSX.Element {
             {navLinks.map(({ ...linkData }) => (
               <SidebarLink {...linkData} key={linkData.href} />
             ))}
+            <div onClick={resetNotifications}>
+              {userNotifications && (
+                <div className='absolute ml-6 mt-2 flex h-4 min-w-[16px] items-center rounded-full bg-main-accent'>
+                  <div className='mx-auto px-1 text-xs'>
+                    {userNotifications < 100 ? userNotifications : '99+'}
+                  </div>
+                </div>
+              )}
+              <SidebarLink
+                href='https://warpcast.com/~/notifications'
+                iconName='BellIcon'
+                linkName={`Notifications`}
+                newTab
+              />
+            </div>
             <SidebarLink
               href={`/user/${username}`}
               username={username}

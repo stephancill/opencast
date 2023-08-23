@@ -15,7 +15,8 @@ export function SidebarLink({
   iconName,
   linkName,
   disabled,
-  canBeHidden
+  canBeHidden,
+  newTab
 }: SidebarLinkProps): JSX.Element {
   const { asPath } = useRouter();
   const isActive = username ? asPath.includes(username) : asPath === href;
@@ -29,6 +30,7 @@ export function SidebarLink({
           disabled && 'cursor-not-allowed'
         )}
         onClick={disabled ? preventBubbling() : undefined}
+        target={newTab ? '_blank' : undefined}
       >
         <div
           className={cn(

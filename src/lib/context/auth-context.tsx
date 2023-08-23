@@ -4,6 +4,9 @@ import type { User } from '@lib/types/user';
 import type { ReactNode } from 'react';
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { KeyPair } from '../types/keypair';
+import useSWR from 'swr';
+import { NotificationsResponse } from '../types/notifications';
+import { fetchJSON } from '../fetch';
 
 type AuthContext = {
   user: User | null;
@@ -12,8 +15,10 @@ type AuthContext = {
   isAdmin: boolean;
   randomSeed: string;
   userBookmarks: Bookmark[] | null;
+  userNotifications: number | null;
   signOut: () => Promise<void>;
   handleUserAuth: () => void;
+  resetNotifications: () => void;
 };
 
 export const AuthContext = createContext<AuthContext | null>(null);
@@ -73,6 +78,35 @@ export function AuthContextProvider({
   const isAdmin = user ? user.username === 'ccrsxx' : false;
   const randomSeed = useMemo(getRandomId, [user?.id]);
 
+  const swrKey = useMemo(() => {
+    return user?.id
+      ? `/api/user/${user.id}/notifications?last_time=${
+          localStorage.getItem('lastChecked') || new Date().toISOString()
+        }`
+      : null;
+  }, [user?.id]);
+
+  const { data: userNotifications, isValidating: loadingNotifications } =
+    useSWR(
+      swrKey,
+      async (url) => (await fetchJSON<NotificationsResponse>(url)).result,
+      {
+        revalidateOnFocus: false,
+        revalidateOnReconnect: false,
+        refreshInterval: 10000 // Poll every 10 seconds
+      }
+    );
+
+  const resetNotifications = (): void => {
+    localStorage.setItem('lastChecked', new Date().toISOString());
+  };
+
+  // useEffect(() => {
+  //   if (userNotifications?.lastChecked) {
+  //     localStorage.setItem('lastChecked', userNotifications.lastChecked);
+  //   }
+  // }, [userNotifications]);
+
   const value: AuthContext = {
     user,
     error,
@@ -80,8 +114,10 @@ export function AuthContextProvider({
     isAdmin,
     randomSeed,
     userBookmarks,
+    userNotifications: userNotifications?.badgeCount || null,
     signOut,
-    handleUserAuth
+    handleUserAuth,
+    resetNotifications
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

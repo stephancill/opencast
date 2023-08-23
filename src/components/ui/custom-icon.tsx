@@ -33,7 +33,7 @@ export function CustomIcon({
 function TwitterIcon({ className }: IconProps): JSX.Element {
   return (
     <svg className={cn('fill-current', className)} viewBox='-1 -1 24 24'>
-      <g clip-path='url(#clip0_9_137)'>
+      <g>
         <path d='M20.3 18.75C20.6868 18.75 21 19.0576 21 19.4375V20.125H14V19.4375C14 19.0576 14.3132 18.75 14.7 18.75H20.3Z' />
         <path d='M20.3001 18.7499V18.0625C20.3001 17.6825 19.9868 17.3749 19.6001 17.3749H15.4001C15.0133 17.3749 14.7001 17.6825 14.7001 18.0625V18.7499H20.3001Z' />
         <path d='M17.5 0.875H3.5V3.625H17.5V0.875Z' />
