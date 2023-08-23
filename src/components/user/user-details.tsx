@@ -8,6 +8,7 @@ import type { IconName } from '@components/ui/hero-icon';
 import type { User } from '@lib/types/user';
 import Link from 'next/link';
 import { TopicView } from '../tweet/tweet-topic';
+import { TweetText } from '../tweet/tweet-text';
 
 type UserDetailsProps = Pick<
   User,
@@ -60,7 +61,8 @@ export function UserDetails({
         </div>
       </div>
       <div className='flex flex-col gap-2'>
-        {bio && <p className='whitespace-pre-line break-words'>{bio}</p>}
+        {/* {bio && <p className='whitespace-pre-line break-words'>{bio}</p>} */}
+        {bio && <TweetText text={bio} images={[]} mentions={[]} />}
         <div className='flex flex-wrap gap-x-3 gap-y-1 text-light-secondary dark:text-dark-secondary'>
           {detailIcons.map(
             ([detail, icon], index) =>

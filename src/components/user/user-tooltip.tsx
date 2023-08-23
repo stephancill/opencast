@@ -11,6 +11,7 @@ import type { ReactNode } from 'react';
 import type { User } from '@lib/types/user';
 import { TopicView, TweetTopic } from '../tweet/tweet-topic';
 import { formatNumber } from '../../lib/date';
+import { TweetText } from '../tweet/tweet-text';
 
 type UserTooltipProps = Pick<
   User,
@@ -118,7 +119,7 @@ export function UserTooltip({
               </div>
             </div>
           </div>
-          {bio && <p>{bio}</p>}
+          {bio && <TweetText text={bio} mentions={[]} images={[]} />}
           <div className='flex flex-wrap'>
             {interests.map((topic) => (
               <Link href={`/topic?url=${topic.url}`} key={topic.url}>

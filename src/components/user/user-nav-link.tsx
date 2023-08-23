@@ -16,7 +16,7 @@ export function UserNavLink({ name, path }: UserNavLinkProps): JSX.Element {
   const userPath = `/user/${id as string}${path ? `/${path}` : ''}`;
 
   return (
-    <Link href={userPath} scroll={false}>
+    <Link href={userPath} scroll={false} passHref>
       <a
         className='hover-animation main-tab dark-bg-tab flex flex-1 justify-center
                    hover:bg-light-primary/10 dark:hover:bg-dark-primary/10'

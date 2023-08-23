@@ -4,6 +4,7 @@ import { ImagesPreview } from '../../lib/types/file';
 import { Mention } from '../../lib/types/tweet';
 import { replaceOccurrencesMultiple } from '../../lib/utils';
 import { UserTooltip } from '../user/user-tooltip';
+import isURL from 'validator/lib/isURL';
 
 export interface TweetTextProps {
   text: string;
@@ -65,15 +66,30 @@ export function TweetText({
       }),
       (s) => {
         return (
-          <p className='inline' key={s}>
-            {s.split(urlRegex).map((part, index) => {
-              if (part.match(urlRegex)) {
+          <span className='inline' key={s}>
+            {s.split(/(\s|\n)/).map((part, index) => {
+              if (isURL(part, { require_protocol: false })) {
                 return (
-                  <a target={'_blank'} key={part} href={part}>
-                    <span className='inline text-main-accent hover:cursor-pointer hover:underline'>
+                  <Link
+                    href={
+                      !(
+                        part.toLowerCase().startsWith('https://') ||
+                        part.toLowerCase().startsWith('http://')
+                      )
+                        ? `https://${part}`
+                        : part
+                    }
+                    key={part}
+                    passHref
+                  >
+                    <a
+                      target={'_blank'}
+                      key={part}
+                      className='inline text-main-accent hover:cursor-pointer hover:underline'
+                    >
                       {part}
-                    </span>
-                  </a>
+                    </a>
+                  </Link>
                 );
               } else {
                 return replaceOccurrencesMultiple(
@@ -83,7 +99,7 @@ export function TweetText({
                 );
               }
             })}
-          </p>
+          </span>
         );
       }
     );

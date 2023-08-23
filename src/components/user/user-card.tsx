@@ -6,6 +6,7 @@ import { UserName } from './user-name';
 import { UserFollowing } from './user-following';
 import { UserUsername } from './user-username';
 import type { User } from '@lib/types/user';
+import { TweetText } from '../tweet/tweet-text';
 
 type UserCardProps = User & {
   modal?: boolean;
@@ -44,7 +45,7 @@ export function UserCard(user: UserCardProps): JSX.Element {
             </div>
             <FollowButton userTargetId={id} userTargetUsername={username} />
           </div>
-          {follow && bio && <p className='whitespace-normal'>{bio}</p>}
+          {follow && bio && <TweetText text={bio} mentions={[]} images={[]} />}
         </div>
       </a>
     </Link>
