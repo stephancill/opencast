@@ -11,6 +11,7 @@ export type Mention = {
   userId: string;
   position: number;
   username?: string;
+  user?: User;
 };
 
 export type ExternalEmbed = {
@@ -66,7 +67,8 @@ export const populateTweetUsers = (
   // Look up mentions in users object
   const resolvedMentions = tweet.mentions.map((mention) => ({
     ...mention,
-    username: users[mention.userId]?.username
+    username: users[mention.userId]?.username,
+    user: users[mention.userId]
   }));
 
   // Look up recast username in users object

@@ -92,13 +92,9 @@ export default function TweetId(): JSX.Element {
       }" / Opencast`
     : null;
 
-  const resolvedMentions = useMemo(() => {
-    const resolvedMentions =
-      tweetData?.mentions.map((mention) => ({
-        ...mention,
-        username: tweetData?.users[mention.userId]?.username
-      })) || [];
-    return resolvedMentions;
+  const tweetWithPopulatedUsers = useMemo(() => {
+    if (!tweetData) return;
+    return populateTweetUsers(tweetData, tweetData.users);
   }, [tweetData]);
 
   return (
@@ -111,7 +107,7 @@ export default function TweetId(): JSX.Element {
       <section>
         {tweetLoading ? (
           <Loading className='mt-5' />
-        ) : !tweetData ? (
+        ) : !(tweetWithPopulatedUsers && tweetData) ? (
           <>
             <SEO title='Cast not found / Opencast' />
             <Error message='Cast not found' />
@@ -127,8 +123,7 @@ export default function TweetId(): JSX.Element {
             )}
             <ViewTweet
               viewTweetRef={viewTweetRef}
-              {...tweetData}
-              mentions={resolvedMentions}
+              {...tweetWithPopulatedUsers}
               user={tweetData.users[tweetData.createdBy]}
             />
             {tweetData &&

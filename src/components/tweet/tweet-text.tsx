@@ -3,6 +3,7 @@ import { useMemo } from 'react';
 import { ImagesPreview } from '../../lib/types/file';
 import { Mention } from '../../lib/types/tweet';
 import { replaceOccurrencesMultiple } from '../../lib/utils';
+import { UserTooltip } from '../user/user-tooltip';
 
 export interface TweetTextProps {
   text: string;
@@ -49,10 +50,17 @@ export function TweetText({
       text,
       indices,
       mentions.map((mention, index) => {
-        return (
+        const link = (
           <Link href={`/user/${mention.username}`} key={index}>
             <span className='inline text-main-accent hover:cursor-pointer hover:underline'>{`@${mention.username}`}</span>
           </Link>
+        );
+        return mention.user ? (
+          <span className='inline-block'>
+            <UserTooltip {...mention.user}>{link}</UserTooltip>
+          </span>
+        ) : (
+          link
         );
       }),
       (s) => {
