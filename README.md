@@ -58,6 +58,9 @@ This project depends on the reference Farcaster PosgreSQL indexer. Follow the in
   - [x] Renaming (casts -> tweets, etc)
   - [x] Images
   - [ ] Code
+- [ ] Notifications
+  - [x] Badge counter
+  - [ ] Notifications page
 - [ ] Optimize
   - [ ] DB queries
   - [ ] Bandwidth
