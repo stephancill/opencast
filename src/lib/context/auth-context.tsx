@@ -95,6 +95,7 @@ export function AuthContextProvider({
       {
         revalidateOnFocus: false,
         revalidateOnReconnect: false,
+        refreshWhenHidden: true,
         refreshInterval: 10000 // Poll every 10 seconds
       }
     );
