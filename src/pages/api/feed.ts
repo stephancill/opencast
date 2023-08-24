@@ -30,7 +30,10 @@ export default async function handle(
           target_fid: true
         }
       });
-      const targetFids = links.map((link) => link.target_fid) as bigint[];
+      const targetFids = [
+        ...(links.map((link) => link.target_fid) as bigint[]),
+        BigInt(userFid)
+      ];
 
       const result = await getTweetsPaginated({
         where: {
@@ -41,7 +44,10 @@ export default async function handle(
             lt: cursor || undefined
           },
           parent_hash: null,
-          deleted_at: null
+          deleted_at: null,
+          messages: {
+            deleted_at: null
+          }
         },
         take: limit,
         orderBy: {
