@@ -12,6 +12,7 @@ import type { User } from '@lib/types/user';
 import { TopicView, TweetTopic } from '../tweet/tweet-topic';
 import { formatNumber } from '../../lib/date';
 import { TweetText } from '../tweet/tweet-text';
+import { UserFid } from './user-fid';
 
 type UserTooltipProps = Pick<
   User,
@@ -115,6 +116,7 @@ export function UserTooltip({
               />
               <div className='flex items-center gap-1 text-light-secondary dark:text-dark-secondary'>
                 <UserUsername username={username} />
+                <UserFid userId={id} />
                 <UserFollowing userTargetId={id} />
               </div>
             </div>

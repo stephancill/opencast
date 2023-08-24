@@ -7,6 +7,7 @@ import { UserFollowing } from './user-following';
 import { UserUsername } from './user-username';
 import type { User } from '@lib/types/user';
 import { TweetText } from '../tweet/tweet-text';
+import { UserFid } from './user-fid';
 
 type UserCardProps = User & {
   modal?: boolean;
@@ -40,6 +41,7 @@ export function UserCard(user: UserCardProps): JSX.Element {
                 <UserTooltip {...user} modal={modal}>
                   <UserUsername username={username} />
                 </UserTooltip>
+                <UserFid userId={id} />
                 {follow && <UserFollowing userTargetId={id} />}
               </div>
             </div>

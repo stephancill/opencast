@@ -9,6 +9,7 @@ import type { User } from '@lib/types/user';
 import Link from 'next/link';
 import { TopicView } from '../tweet/tweet-topic';
 import { TweetText } from '../tweet/tweet-text';
+import { UserFid } from './user-fid';
 
 type UserDetailsProps = Pick<
   User,
@@ -57,6 +58,7 @@ export function UserDetails({
         />
         <div className='flex items-center gap-1 text-light-secondary dark:text-dark-secondary'>
           <p>@{username}</p>
+          <UserFid userId={id} />
           <UserFollowing userTargetId={id} />
         </div>
       </div>
