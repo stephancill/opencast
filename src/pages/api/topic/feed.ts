@@ -27,7 +27,10 @@ export default async function handle(
           },
           parent_hash: null,
           deleted_at: null,
-          parent_url: topicUrl
+          parent_url: topicUrl,
+          messages: {
+            deleted_at: null
+          }
         },
         take: limit,
         orderBy: {

@@ -90,7 +90,10 @@ export async function castsToTweets(
       parent_hash: {
         in: castHashes
       },
-      deleted_at: null
+      deleted_at: null,
+      messages: {
+        deleted_at: null
+      }
     },
     _count: {
       parent_hash: true

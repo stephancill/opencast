@@ -25,7 +25,11 @@ export default async function tweetIdEndpoint(
 
   const cast = await prisma.casts.findUnique({
     where: {
-      hash: Buffer.from(id, 'hex')
+      hash: Buffer.from(id, 'hex'),
+      deleted_at: null,
+      messages: {
+        deleted_at: null
+      }
     },
     include: {
       messages: true
