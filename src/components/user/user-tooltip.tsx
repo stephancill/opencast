@@ -114,7 +114,7 @@ export function UserTooltip({
                 username={username}
                 verified={verified}
               />
-              <div className='flex items-center gap-1 text-light-secondary dark:text-dark-secondary'>
+              <div className='flex flex-wrap items-center gap-1 text-light-secondary dark:text-dark-secondary'>
                 <UserUsername username={username} />
                 <UserFid userId={id} />
                 <UserFollowing userTargetId={id} />
