@@ -11,14 +11,12 @@ import type { Tweet } from '@lib/types/tweet';
 import type { User } from '@lib/types/user';
 import cn from 'clsx';
 import type { Variants } from 'framer-motion';
-import { AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { TweetActions } from './tweet-actions';
 import { TweetDate } from './tweet-date';
 import { TweetEmbeds } from './tweet-embed';
 import { TweetStats } from './tweet-stats';
-import { TweetStatus } from './tweet-status';
 import { TweetText } from './tweet-text';
 import { TweetTopic } from './tweet-topic';
 
@@ -59,27 +57,13 @@ export function Tweet(tweet: TweetProps): JSX.Element {
   } = tweet;
 
   const { id: ownerId, name, username, verified, photoURL } = tweetUserData;
-
   const { user } = useAuth();
-
   const { open, openModal, closeModal } = useModal();
-
   const tweetLink = `/tweet/${tweetId}`;
-
   const userId = user?.id as string;
-
   const isOwner = userId === createdBy;
-
   const { id: parentId, username: parentUsername = username } = parent ?? {};
-
   const { push } = useRouter();
-
-  const {
-    id: profileId,
-    name: profileName,
-    username: profileUsername
-  } = profile ?? {};
-
   const reply = !!parent;
   const tweetIsRetweeted = retweet !== null;
 
@@ -125,25 +109,6 @@ export function Tweet(tweet: TweetProps): JSX.Element {
         }}
       >
         <div className='grid grid-cols-[auto,1fr] gap-x-3 gap-y-1'>
-          <AnimatePresence initial={false}>
-            {modal ? null : pinned ? (
-              <TweetStatus type='pin'>
-                <p className='text-sm font-bold'>Pinned Cast</p>
-              </TweetStatus>
-            ) : (
-              tweetIsRetweeted &&
-              retweet.username && (
-                <TweetStatus type='tweet'>
-                  <Link href={retweet.username as string}>
-                    <a className='custom-underline truncate text-sm font-bold'>
-                      {retweet.userId === profileId ? 'You' : retweet.username}{' '}
-                      Retweeted
-                    </a>
-                  </Link>
-                </TweetStatus>
-              )
-            )}
-          </AnimatePresence>
           <div className='flex flex-col items-center gap-2'>
             <UserTooltip avatar modal={modal} {...tweetUserData}>
               <UserAvatar src={photoURL} alt={name} username={username} />

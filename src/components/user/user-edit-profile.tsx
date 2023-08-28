@@ -11,7 +11,12 @@ import { Button } from '@components/ui/button';
 import { InputField } from '@components/input/input-field';
 import type { ChangeEvent, KeyboardEvent } from 'react';
 import type { FilesWithId } from '@lib/types/file';
-import type { User, EditableData, EditableUserData } from '@lib/types/user';
+import type {
+  User,
+  EditableData,
+  EditableUserData,
+  UserFull
+} from '@lib/types/user';
 import type { InputFieldProps } from '@components/input/input-field';
 
 type RequiredInputFieldProps = Omit<InputFieldProps, 'handleChange'> & {
@@ -39,7 +44,7 @@ export function UserEditProfile({ hide }: UserEditProfileProps): JSX.Element {
   const [loading, setLoading] = useState(false);
 
   const { bio, name, website, location, photoURL, coverPhotoURL } =
-    user as User;
+    user as UserFull;
 
   const [editUserData, setEditUserData] = useState<EditableUserData>({
     bio,

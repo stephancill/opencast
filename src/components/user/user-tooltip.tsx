@@ -1,31 +1,24 @@
-import Link from 'next/link';
-import cn from 'clsx';
-import { useWindow } from '@lib/context/window-context';
 import { FollowButton } from '@components/ui/follow-button';
-import { NextImage } from '@components/ui/next-image';
-import { UserAvatar } from './user-avatar';
-import { UserName } from './user-name';
-import { UserFollowing } from './user-following';
-import { UserUsername } from './user-username';
-import type { ReactNode } from 'react';
-import type { User } from '@lib/types/user';
-import { TopicView, TweetTopic } from '../tweet/tweet-topic';
+import { useWindow } from '@lib/context/window-context';
+import type { User, UserResponse } from '@lib/types/user';
+import cn from 'clsx';
+import Link from 'next/link';
+import { useState, type ReactNode } from 'react';
+import useSWR from 'swr';
 import { formatNumber } from '../../lib/date';
+import { fetchJSON } from '../../lib/fetch';
 import { TweetText } from '../tweet/tweet-text';
+import { TopicView } from '../tweet/tweet-topic';
+import { Loading } from '../ui/loading';
+import { UserAvatar } from './user-avatar';
 import { UserFid } from './user-fid';
+import { UserFollowing } from './user-following';
+import { UserName } from './user-name';
+import { UserUsername } from './user-username';
 
 type UserTooltipProps = Pick<
   User,
-  | 'id'
-  | 'bio'
-  | 'name'
-  | 'verified'
-  | 'username'
-  | 'photoURL'
-  | 'following'
-  | 'followers'
-  | 'coverPhotoURL'
-  | 'interests'
+  'id' | 'bio' | 'name' | 'verified' | 'username' | 'photoURL'
 > & {
   modal?: boolean;
   avatar?: boolean;
@@ -43,21 +36,38 @@ export function UserTooltip({
   verified,
   children,
   photoURL,
-  username,
-  following,
-  followers,
-  interests,
-  coverPhotoURL
+  username
 }: UserTooltipProps): JSX.Element {
   const { isMobile } = useWindow();
+
+  const [shouldFetch, setShouldFetch] = useState(false);
+  let hoverTimer: NodeJS.Timeout | null = null;
+
+  const handleMouseEnter = () => {
+    hoverTimer = setTimeout(() => {
+      setShouldFetch(true);
+    }, 500);
+  };
+
+  const handleMouseLeave = () => {
+    hoverTimer && clearTimeout(hoverTimer);
+    // setShouldFetch(false); // You can choose to keep it true if you want to keep the data
+  };
+
+  const { data: user, isValidating } = useSWR(
+    shouldFetch ? `/api/user/${id}` : null,
+    async (url) => (await fetchJSON<UserResponse>(url)).result
+  );
+
+  const { following, followers, interests } = user || {};
 
   if (isMobile || modal) return <>{children}</>;
 
   const userLink = `/user/${username}`;
 
   const allStats: Readonly<Stats[]> = [
-    ['following', 'Following', following.length],
-    ['followers', 'Followers', followers.length]
+    ['following', 'Following', following?.length || 0],
+    ['followers', 'Followers', followers?.length || 0]
   ];
 
   return (
@@ -67,87 +77,86 @@ export function UserTooltip({
         avatar ? '[&>div]:translate-y-2' : 'grid [&>div]:translate-y-7'
       )}
     >
-      {children}
+      <span
+        className='inline'
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+      >
+        {children}
+      </span>
       <div
         className='menu-container invisible absolute left-1/2 w-72 -translate-x-1/2 rounded-2xl 
                    opacity-0 [transition:visibility_0ms_ease_400ms,opacity_200ms_ease_200ms] group-hover:visible 
                    group-hover:opacity-100 group-hover:delay-500'
       >
-        <div className='flex flex-col gap-3 p-4'>
-          <div className='flex flex-col gap-2'>
-            <div className='-mx-4 -mt-4'>
-              {coverPhotoURL ? (
-                <Link href={userLink}>
-                  <a className='blur-picture'>
-                    <NextImage
-                      useSkeleton
-                      className='relative h-24'
-                      imgClassName='rounded-t-2xl'
-                      src={coverPhotoURL}
-                      alt={name}
-                      layout='fill'
-                    />
-                  </a>
-                </Link>
-              ) : (
+        {user ? (
+          <div className='flex flex-col gap-3 p-4'>
+            <div className='flex flex-col gap-2'>
+              <div className='-mx-4 -mt-4'>
                 <div className='h-16 rounded-t-2xl bg-light-line-reply dark:bg-dark-line-reply' />
-              )}
-            </div>
-            <div className='flex justify-between'>
-              <div className='mb-10'>
-                <UserAvatar
-                  className='absolute -translate-y-1/2 bg-main-background p-1 
+              </div>
+              <div className='flex justify-between'>
+                <div className='mb-10'>
+                  <UserAvatar
+                    className='absolute -translate-y-1/2 bg-main-background p-1 
                              hover:brightness-100 [&:hover>figure>span]:brightness-75
                              [&>figure>span]:[transition:200ms]'
-                  src={photoURL}
-                  alt={name}
-                  size={64}
+                    src={photoURL}
+                    alt={name}
+                    size={64}
+                    username={username}
+                  />
+                </div>
+                <FollowButton userTargetId={id} userTargetUsername={username} />
+              </div>
+              <div>
+                <UserName
+                  className='-mb-1 text-lg'
+                  name={name}
                   username={username}
+                  verified={verified}
                 />
-              </div>
-              <FollowButton userTargetId={id} userTargetUsername={username} />
-            </div>
-            <div>
-              <UserName
-                className='-mb-1 text-lg'
-                name={name}
-                username={username}
-                verified={verified}
-              />
-              <div className='flex flex-wrap items-center gap-1 text-light-secondary dark:text-dark-secondary'>
-                <UserUsername username={username} />
-                <UserFid userId={id} />
-                <UserFollowing userTargetId={id} />
+                <div className='flex flex-wrap items-center gap-1 text-light-secondary dark:text-dark-secondary'>
+                  <UserUsername username={username} />
+                  <UserFid userId={id} />
+                  <UserFollowing userTargetId={id} />
+                </div>
               </div>
             </div>
-          </div>
-          {bio && <TweetText text={bio} mentions={[]} images={[]} />}
-          <div className='flex flex-wrap'>
-            {interests.map((topic) => (
-              <Link href={`/topic?url=${topic.url}`} key={topic.url}>
-                <span className='pr-2 text-light-secondary hover:underline dark:text-dark-secondary'>
-                  <TopicView topic={topic} />
-                </span>
-              </Link>
-            ))}
-          </div>
-          <div className='text-secondary flex gap-4'>
-            {allStats.map(([id, label, stat]) => (
-              <Link href={`${userLink}/${id}`} key={id}>
-                <a
-                  className='hover-animation flex h-4 items-center gap-1 border-b border-b-transparent 
+            {bio && <TweetText text={bio} mentions={[]} images={[]} />}
+            {interests && (
+              <div className='flex flex-wrap'>
+                {interests.map((topic) => (
+                  <Link href={`/topic?url=${topic.url}`} key={topic.url}>
+                    <span className='pr-2 text-light-secondary hover:underline dark:text-dark-secondary'>
+                      <TopicView topic={topic} />
+                    </span>
+                  </Link>
+                ))}
+              </div>
+            )}
+            <div className='text-secondary flex gap-4'>
+              {allStats.map(([id, label, stat]) => (
+                <Link href={`${userLink}/${id}`} key={id}>
+                  <a
+                    className='hover-animation flex h-4 items-center gap-1 border-b border-b-transparent 
                              outline-none hover:border-b-light-primary focus-visible:border-b-light-primary
                              dark:hover:border-b-dark-primary dark:focus-visible:border-b-dark-primary'
-                >
-                  <p className='font-bold'>{formatNumber(stat)}</p>
-                  <p className='text-light-secondary dark:text-dark-secondary'>
-                    {label}
-                  </p>
-                </a>
-              </Link>
-            ))}
+                  >
+                    <p className='font-bold'>{formatNumber(stat)}</p>
+                    <p className='text-light-secondary dark:text-dark-secondary'>
+                      {label}
+                    </p>
+                  </a>
+                </Link>
+              ))}
+            </div>
           </div>
-        </div>
+        ) : isValidating ? (
+          <Loading className='p-4' />
+        ) : (
+          <div>Could not load user</div>
+        )}
       </div>
     </div>
   );

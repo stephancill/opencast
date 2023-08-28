@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { UserResponse } from '../../../../lib/types/user';
+import { UserFull, UserResponse } from '../../../../lib/types/user';
 import { resolveUserAmbiguous } from '../../../../lib/user/resolve-user';
 
 type UserEndpointQuery = {
@@ -12,7 +12,7 @@ export default async function userIdEndpoint(
 ): Promise<void> {
   const { id } = req.query as UserEndpointQuery;
 
-  const user = await resolveUserAmbiguous(id);
+  const user = (await resolveUserAmbiguous(id, true)) as UserFull;
 
   if (!user) {
     res.status(404).json({

@@ -123,10 +123,9 @@ export function TweetActions({
     }
   }, [topicResult]);
 
-  const { id: userId, following, pinnedTweet } = user as User;
+  const { id: userId } = user as User;
 
   const isInAdminControl = isAdmin && !isOwner;
-  const tweetIsPinned = pinnedTweet === tweetId;
 
   const handleRemove = async (): Promise<void> => {
     const message = await createRemoveCastMessage({
@@ -239,7 +238,7 @@ export function TweetActions({
     );
   };
 
-  const userIsFollowed = following.includes(createdBy);
+  // const userIsFollowed = following.includes(createdBy);
 
   const handleOpenInWarpcast = (closeMenu: () => void) => {
     closeMenu();
@@ -371,20 +370,7 @@ export function TweetActions({
                       Delete
                     </Popover.Button>
                   )}
-                  {isOwner ? (
-                    <Popover.Button
-                      className='accent-tab flex w-full gap-3 rounded-md rounded-t-none p-4 hover:bg-main-sidebar-background'
-                      as={Button}
-                      onClick={preventBubbling(async (): Promise<void> => {
-                        close();
-                        setShowingTopicSelector(true);
-                        repostOpenModal();
-                      })}
-                    >
-                      <HeroIcon iconName='ArrowPathRoundedSquareIcon' />
-                      Repost to topic
-                    </Popover.Button>
-                  ) : userIsFollowed ? (
+                  {/* {userIsFollowed ? (
                     <Popover.Button
                       className='accent-tab flex w-full gap-3 rounded-md rounded-t-none p-4 hover:bg-main-sidebar-background'
                       as={Button}
@@ -402,7 +388,7 @@ export function TweetActions({
                       <HeroIcon iconName='UserPlusIcon' />
                       Follow @{username}
                     </Popover.Button>
-                  )}
+                  )} */}
                   <Popover.Button
                     className='accent-tab flex w-full gap-3 rounded-md rounded-t-none p-4 hover:bg-main-sidebar-background'
                     as={Button}

@@ -1,5 +1,3 @@
-import { useAuth } from '@lib/context/auth-context';
-
 type UserFollowingProps = {
   userId: string;
 };

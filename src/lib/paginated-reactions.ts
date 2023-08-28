@@ -11,13 +11,14 @@ export interface PaginatedUsersResponse
   }> {}
 
 export async function getUsersPaginated(
-  findManyArgs: Prisma.reactionsFindManyArgs
+  findManyArgs: Prisma.reactionsFindManyArgs,
+  full: boolean = false
 ) {
   const reactions = await prisma.reactions.findMany(findManyArgs);
 
   const fids = reactions.map((reaction) => reaction.fid);
 
-  const users = await resolveUsers([...fids]);
+  const users = await resolveUsers([...fids], full);
 
   const nextPageCursor =
     reactions.length > 0

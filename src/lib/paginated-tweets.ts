@@ -1,11 +1,10 @@
 import { ReactionType } from '@farcaster/hub-web';
 import { casts, Prisma } from '@prisma/client';
-import { populateTweetEmbeds } from './embeds';
 import { prisma } from './prisma';
 import { resolveTopicsMap, TopicsMapType } from './topics/resolve-topic';
 import { BaseResponse } from './types/responses';
 import { Tweet, tweetConverter } from './types/tweet';
-import { UsersMapType } from './types/user';
+import { User, UserFull, UsersMapType } from './types/user';
 import { resolveUsersMap } from './user/resolve-user';
 
 export interface PaginatedTweetsResponse
@@ -13,7 +12,7 @@ export interface PaginatedTweetsResponse
     tweets: Tweet[];
     nextPageCursor: string | null;
     // fid -> User
-    users: UsersMapType;
+    users: UsersMapType<User | UserFull>;
     // url -> Topic
     topics: TopicsMapType;
   }> {}

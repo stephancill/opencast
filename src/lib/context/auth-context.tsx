@@ -1,6 +1,6 @@
 import { getRandomId } from '@lib/random';
 import type { Bookmark } from '@lib/types/bookmark';
-import type { User } from '@lib/types/user';
+import type { User, UserFull } from '@lib/types/user';
 import type { ReactNode } from 'react';
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { KeyPair } from '../types/keypair';
@@ -9,7 +9,7 @@ import { NotificationsResponse } from '../types/notifications';
 import { fetchJSON } from '../fetch';
 
 type AuthContext = {
-  user: User | null;
+  user: UserFull | null;
   error: Error | null;
   loading: boolean;
   isAdmin: boolean;
@@ -32,7 +32,7 @@ export function AuthContextProvider({
 }: AuthContextProviderProps): JSX.Element {
   const [userId, setUserId] = useState<string | null>(null); // '1689'
 
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<UserFull | null>(null);
   const [userBookmarks, setUserBookmarks] = useState<Bookmark[] | null>(null);
   const [error, setError] = useState<Error | null>(null);
   const [loading, setLoading] = useState(true);

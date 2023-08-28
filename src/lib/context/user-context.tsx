@@ -1,9 +1,9 @@
 import { createContext, useContext } from 'react';
 import type { ReactNode } from 'react';
-import type { User } from '@lib/types/user';
+import type { User, UserFull } from '@lib/types/user';
 
 type UserContext = {
-  user: User | null;
+  user: UserFull | null;
   loading: boolean;
 };
 

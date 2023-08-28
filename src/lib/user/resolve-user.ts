@@ -1,10 +1,36 @@
 import { UserDataType } from '@farcaster/hub-web';
 import { prisma } from '../prisma';
-import { resolveTopic } from '../topics/resolve-topic';
+import { User, userConverter, UserFull, UsersMapType } from '../types/user';
 import { TopicType } from '../types/topic';
-import { User, userConverter, UsersMapType } from '../types/user';
+import { resolveTopic } from '../topics/resolve-topic';
 
 export async function resolveUserFromFid(fid: bigint): Promise<User | null> {
+  const userData = await prisma.user_data.findMany({
+    where: {
+      fid: fid
+    }
+  });
+
+  if (userData.length === 0) {
+    return null;
+  }
+
+  const userDataRaw = userData.reduce((acc: any, cur) => {
+    acc = {
+      ...acc,
+      [cur.type]: cur.value
+    };
+    return acc;
+  }, {});
+
+  const user = userConverter.toUser({ ...userDataRaw, fid });
+
+  return user;
+}
+
+export async function resolveUserFullFromFid(
+  fid: bigint
+): Promise<UserFull | null> {
   const userData = await prisma.user_data.findMany({
     where: {
       fid: fid
@@ -50,7 +76,7 @@ export async function resolveUserFromFid(fid: bigint): Promise<User | null> {
 
   const interests = await userInterests(fid);
 
-  const user = userConverter.toUser({ ...userDataRaw, fid });
+  const user = userConverter.toUserFull({ ...userDataRaw, fid });
 
   return {
     ...user,
@@ -62,8 +88,9 @@ export async function resolveUserFromFid(fid: bigint): Promise<User | null> {
 }
 
 export async function resolveUserAmbiguous(
-  idOrUsername: string
-): Promise<User | null> {
+  idOrUsername: string,
+  full: boolean = false
+): Promise<User | UserFull | null> {
   let fid = Number(idOrUsername);
   if (isNaN(fid)) {
     const username = (idOrUsername as string).toLowerCase();
@@ -80,26 +107,40 @@ export async function resolveUserAmbiguous(
     }
   }
 
-  return await resolveUserFromFid(BigInt(fid));
+  if (full) {
+    return await resolveUserFullFromFid(BigInt(fid));
+  } else {
+    return await resolveUserFromFid(BigInt(fid));
+  }
 }
 
 // TODO: Combine into one query
-export async function resolveUsers(fids: bigint[]): Promise<User[]> {
-  const users = await Promise.all(fids.map((fid) => resolveUserFromFid(fid)));
-  return users.filter((user) => user !== null) as User[];
+export async function resolveUsers(
+  fids: bigint[],
+  full: boolean = false
+): Promise<(User | UserFull)[]> {
+  const users = await Promise.all(
+    full
+      ? fids.map((fid) => resolveUserFromFid(fid))
+      : fids.map((fid) => resolveUserFullFromFid(fid))
+  );
+  return users.filter((user) => user !== null) as (User | UserFull)[];
 }
 
 // TODO: Combine into one query
 // TODO: Cache results
 // TODO: Only pass minimal user data and fetch on-demand
-export async function resolveUsersMap(fids: bigint[]): Promise<UsersMapType> {
+export async function resolveUsersMap(
+  fids: bigint[],
+  full: boolean = false
+): Promise<UsersMapType<User | UserFull>> {
   const userOrNulls = await Promise.all(
     fids.map((fid) => resolveUserFromFid(fid))
   );
   const users = userOrNulls.filter(
     (userOrNull) => userOrNull !== null
   ) as User[];
-  const usersMap = users.reduce((acc: UsersMapType, cur) => {
+  const usersMap = users.reduce((acc: UsersMapType<User | UserFull>, cur) => {
     if (cur) {
       acc[cur.id] = cur;
     }

@@ -1,7 +1,10 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { prisma } from '../../../../lib/prisma';
 import { UserResponse } from '../../../../lib/types/user';
-import { resolveUserFromFid } from '../../../../lib/user/resolve-user';
+import {
+  resolveUserFromFid,
+  resolveUserFullFromFid
+} from '../../../../lib/user/resolve-user';
 
 type SignerEndpointQuery = {
   pubKey: string;
@@ -28,7 +31,7 @@ export default async function signerUserEndpoint(
     return;
   }
 
-  const user = await resolveUserFromFid(signerRow.fid);
+  const user = await resolveUserFullFromFid(signerRow.fid);
 
   if (!user) {
     res.status(404).json({

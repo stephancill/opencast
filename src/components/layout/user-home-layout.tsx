@@ -25,10 +25,6 @@ export function UserHomeLayout({ children }: LayoutProps): JSX.Element {
     query: { id }
   } = useRouter();
 
-  const coverData = userData?.coverPhotoURL
-    ? { src: userData.coverPhotoURL, alt: userData.name }
-    : null;
-
   const profileData = userData
     ? { src: userData.photoURL, alt: userData.name }
     : null;

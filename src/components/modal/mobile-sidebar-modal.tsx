@@ -13,7 +13,7 @@ import { Modal } from './modal';
 import { ActionModal } from './action-modal';
 import { DisplayModal } from './display-modal';
 import type { NavLink } from '@components/sidebar/sidebar';
-import type { User } from '@lib/types/user';
+import type { User, UserFull } from '@lib/types/user';
 
 export type MobileNavLink = Omit<NavLink, 'canBeHidden'>;
 
@@ -43,7 +43,7 @@ const bottomNavLinks: Readonly<MobileNavLink[]> = [
 type Stats = [string, string, number];
 
 type MobileSidebarModalProps = Pick<
-  User,
+  UserFull,
   | 'name'
   | 'username'
   | 'verified'

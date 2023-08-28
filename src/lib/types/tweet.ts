@@ -43,7 +43,7 @@ export type Tweet = {
   retweet: { username?: string; userId?: string } | null;
 };
 
-export type TweetWithUsers = Tweet & { users: UsersMapType };
+export type TweetWithUsers = Tweet & { users: UsersMapType<User> };
 
 export type TweetResponse = BaseResponse<TweetWithUsers>;
 export interface TweetRepliesResponse
@@ -51,12 +51,12 @@ export interface TweetRepliesResponse
     tweets: Tweet[];
     nextPageCursor: string | null;
     // fid -> User
-    users: UsersMapType;
+    users: UsersMapType<User>;
   }> {}
 
 export const populateTweetUsers = (
   tweet: Tweet,
-  users: UsersMapType
+  users: UsersMapType<User>
 ): Tweet => {
   // Look up parent tweet username in users object
   const resolvedParent = tweet.parent;

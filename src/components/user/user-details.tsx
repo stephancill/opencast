@@ -5,14 +5,14 @@ import { UserName } from './user-name';
 import { UserFollowing } from './user-following';
 import { UserFollowStats } from './user-follow-stats';
 import type { IconName } from '@components/ui/hero-icon';
-import type { User } from '@lib/types/user';
+import type { User, UserFull } from '@lib/types/user';
 import Link from 'next/link';
 import { TopicView } from '../tweet/tweet-topic';
 import { TweetText } from '../tweet/tweet-text';
 import { UserFid } from './user-fid';
 
 type UserDetailsProps = Pick<
-  User,
+  UserFull,
   | 'id'
   | 'bio'
   | 'name'

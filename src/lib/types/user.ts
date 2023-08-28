@@ -8,13 +8,16 @@ export type User = {
   id: string;
   bio: string | null;
   name: string;
+  username: string;
+  photoURL: string;
+  verified: boolean;
+};
+
+export type UserFull = User & {
   theme: Theme | null;
   accent: Accent | null;
   website: string | null;
   location: string | null;
-  username: string;
-  photoURL: string;
-  verified: boolean;
   following: string[];
   followers: string[];
   createdAt: Date;
@@ -27,18 +30,29 @@ export type User = {
 };
 
 export type EditableData = Extract<
-  keyof User,
+  keyof UserFull,
   'bio' | 'name' | 'website' | 'photoURL' | 'location' | 'coverPhotoURL'
 >;
 
-export type EditableUserData = Pick<User, EditableData>;
+export type EditableUserData = Pick<UserFull, EditableData>;
 
-export type UserResponse = BaseResponse<User>;
+export type UserResponse = BaseResponse<UserFull>;
 
-export type UsersMapType = { [key: string]: User };
+export type UsersMapType<T> = { [key: string]: T };
 
 export const userConverter = {
   toUser(user: any): User {
+    return {
+      id: user.fid.toString(),
+      bio: user[UserDataType.BIO] ?? null,
+      name: user[UserDataType.DISPLAY],
+      username: user[UserDataType.USERNAME],
+      photoURL: user[UserDataType.PFP], //user['1'],
+      verified: false
+    } as User;
+  },
+
+  toUserFull(user: any): UserFull {
     return {
       id: user.fid.toString(),
       bio: user[UserDataType.BIO] ?? null,
@@ -59,6 +73,6 @@ export const userConverter = {
       totalPhotos: 0,
       pinnedTweet: null,
       interests: []
-    } as User;
+    } as UserFull;
   }
 };

@@ -6,10 +6,10 @@ import { HeroIcon } from '@components/ui/hero-icon';
 import { NextImage } from '@components/ui/next-image';
 import { ToolTip } from '@components/ui/tooltip';
 import type { ReactNode, ChangeEvent } from 'react';
-import type { User } from '@lib/types/user';
+import type { User, UserFull } from '@lib/types/user';
 
 type EditProfileModalProps = Pick<
-  User,
+  UserFull,
   'name' | 'photoURL' | 'coverPhotoURL'
 > & {
   loading: boolean;
@@ -29,12 +29,10 @@ export function EditProfileModal({
   loading,
   photoURL,
   children,
-  coverPhotoURL,
   inputNameError,
   editImage,
   closeModal,
   updateData,
-  removeCoverImage,
   resetUserEditData
 }: EditProfileModalProps): JSX.Element {
   const coverInputFileRef = useRef<HTMLInputElement>(null);
@@ -68,7 +66,7 @@ export function EditProfileModal({
             <ToolTip tip='Reset' />
           </Button>
           <Button
-            className='bg-light-primary py-1 px-4 font-bold text-white focus-visible:bg-light-primary/90 
+            className='bg-light-primary px-4 py-1 font-bold text-white focus-visible:bg-light-primary/90 
                        enabled:hover:bg-light-primary/90 enabled:active:bg-light-primary/80 disabled:brightness-75
                        dark:bg-light-border dark:text-light-primary dark:focus-visible:bg-light-border/90
                        dark:enabled:hover:bg-light-border/90 dark:enabled:active:bg-light-border/75'
@@ -94,20 +92,8 @@ export function EditProfileModal({
             ref={coverInputFileRef}
             onChange={editImage('cover')}
           />
-          {coverPhotoURL ? (
-            <NextImage
-              useSkeleton
-              className='relative h-full'
-              imgClassName='object-cover transition group-hover:brightness-75 duration-200
-                            group-focus-within:brightness-75'
-              src={coverPhotoURL}
-              alt={name}
-              layout='fill'
-            />
-          ) : (
-            <div className='h-full bg-light-line-reply dark:bg-dark-line-reply' />
-          )}
-          <div className='absolute left-1/2 top-1/2 flex -translate-y-1/2 -translate-x-1/2 gap-4'>
+          <div className='h-full bg-light-line-reply dark:bg-dark-line-reply' />
+          <div className='absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 gap-4'>
             <Button
               className='group/inner relative bg-light-primary/60 p-2 hover:bg-image-preview-hover/50
                          focus-visible:bg-image-preview-hover/50'
@@ -119,19 +105,6 @@ export function EditProfileModal({
               />
               <ToolTip groupInner tip='Add photo' />
             </Button>
-            {coverPhotoURL && (
-              <Button
-                className='group/inner relative bg-light-primary/60 p-2 hover:bg-image-preview-hover/50
-                           focus-visible:bg-image-preview-hover/50'
-                onClick={removeCoverImage}
-              >
-                <HeroIcon
-                  className='hover-animation h-6 w-6 text-dark-primary group-hover:text-white'
-                  iconName='XMarkIcon'
-                />
-                <ToolTip groupInner tip='Remove photo' />
-              </Button>
-            )}
           </div>
         </div>
         <div className='relative flex flex-col gap-6 px-4 py-3'>
