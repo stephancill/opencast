@@ -9,8 +9,7 @@ import { useAuth } from '@lib/context/auth-context';
 import { useModal } from '@lib/hooks/useModal';
 import type { Tweet } from '@lib/types/tweet';
 import type { User, UserResponse } from '@lib/types/user';
-import { preventBubbling, truncateAddress } from '@lib/utils';
-import { ConnectButton } from '@rainbow-me/rainbowkit';
+import { preventBubbling } from '@lib/utils';
 import cn from 'clsx';
 import type { Variants } from 'framer-motion';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -18,9 +17,7 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
 import useSWR from 'swr';
-import { parseEther } from 'viem';
-import { useAccount, useChainId, useSendTransaction } from 'wagmi';
-import * as chains from 'wagmi/chains';
+import { useChainId } from 'wagmi';
 import {
   createCastMessage,
   createFollowMessage,
@@ -30,6 +27,7 @@ import {
 import { fetchJSON } from '../../lib/fetch';
 import { BaseResponse } from '../../lib/types/responses';
 import { TopicResponse, TopicType } from '../../lib/types/topic';
+import { TipModal } from '../modal/tip-modal';
 import { SearchTopics } from '../search/search-topics';
 import { Loading } from '../ui/loading';
 import { TopicView } from './tweet-topic';
@@ -64,8 +62,6 @@ export function TweetActions({
 }: TweetActionsProps): JSX.Element {
   const { user: currentUser, isAdmin } = useAuth();
 
-  const { address: currentUserAddress } = useAccount();
-
   const chainId = useChainId();
 
   const [shouldFetchUser, setShouldFetchUser] = useState(false);
@@ -74,16 +70,6 @@ export function TweetActions({
     async (url) => (await fetchJSON<UserResponse>(url)).result,
     { revalidateOnFocus: false }
   );
-  const [tipAmount, setTipAmount] = useState<number>(0.001);
-  const {
-    data: tipTxResult,
-    isLoading: tipTxResultLoading,
-    isSuccess: tipTxSuccess,
-    sendTransaction: sendTipTx
-  } = useSendTransaction({
-    to: user?.address || undefined,
-    value: parseEther(tipAmount.toString())
-  });
 
   const {
     open: removeOpen,
@@ -262,39 +248,6 @@ export function TweetActions({
     setShouldFetchUser(true);
   }, [tipUserOpen]);
 
-  useEffect(() => {
-    if (!tipTxSuccess) return;
-    tipCloseModal();
-
-    const chainById = Object.values(chains).reduce(
-      (acc: { [key: string]: chains.Chain }, cur) => {
-        if (cur.id) acc[cur.id] = cur;
-        return acc;
-      },
-      {}
-    );
-
-    const chain = chainById[chainId];
-    const explorerUrl = chain?.blockExplorers?.default;
-    const url = `${explorerUrl?.url}/tx/${tipTxResult?.hash}`;
-
-    if (!url) return;
-
-    toast.success(
-      () => (
-        <span className='flex gap-2'>
-          Your tip was sent
-          <Link href={`${explorerUrl?.url}/tx/${tipTxResult?.hash}`}>
-            <a className='custom-underline font-bold' target='_blank'>
-              View
-            </a>
-          </Link>
-        </span>
-      ),
-      { duration: 6000 }
-    );
-  }, [tipTxSuccess]);
-
   return (
     <>
       <Modal
@@ -376,91 +329,13 @@ export function TweetActions({
           )}
         </div>
       </Modal>
-      <Modal
-        modalClassName='max-w-sm bg-main-background w-full p-8 rounded-2xl'
-        open={tipUserOpen}
-        closeModal={tipCloseModal}
-      >
-        <div className='flex flex-col gap-6'>
-          <div className='flex flex-col gap-4'>
-            <div className='flex flex-col gap-2'>
-              <div className='flex items-center'>
-                <i className='inline pr-2'>
-                  <HeroIcon iconName='BanknotesIcon' />
-                </i>
-                <Dialog.Title className='inline text-xl font-bold'>
-                  Tip user
-                </Dialog.Title>
-              </div>
-              <Dialog.Description className='text-light-secondary dark:text-dark-secondary'>
-                Send @{username} some ETH
-              </Dialog.Description>
-            </div>
-            {isUserLoading ? (
-              <Loading />
-            ) : (
-              <div className='flex flex-col'>
-                <div
-                  className={` p-2 ${
-                    !currentUserAddress ? `rounded-full border` : ''
-                  }`}
-                >
-                  <div data-rk='data-rk'>
-                    <ConnectButton showBalance={false}></ConnectButton>
-                  </div>
-                </div>
-                {user?.address ? (
-                  currentUserAddress && (
-                    <div className='mt-4 flex flex-col gap-4'>
-                      <div className='flex justify-center gap-2'>
-                        {[0.0005, 0.001, 0.002].map((amount) => (
-                          <button
-                            key={amount}
-                            onClick={() => setTipAmount(amount)}
-                            className={`rounded-full p-2 
-                             ${
-                               tipAmount === amount
-                                 ? 'ring-2 ring-main-accent'
-                                 : 'border border-gray-500 text-gray-500'
-                             }`}
-                          >
-                            {amount}
-                          </button>
-                        ))}
-                      </div>
-                      {!tipTxResultLoading ? (
-                        <Button
-                          className='accent-tab mt-2 flex items-center justify-center bg-main-accent font-bold text-white enabled:hover:bg-main-accent/90 enabled:active:bg-main-accent/75'
-                          onClick={() => {
-                            sendTipTx();
-                          }}
-                          disabled={tipTxResultLoading || tipAmount === 0}
-                        >
-                          Send{' '}
-                          {tipAmount.toLocaleString(undefined, {
-                            maximumFractionDigits: 6
-                          })}{' '}
-                          ETH
-                        </Button>
-                      ) : (
-                        <Loading></Loading>
-                      )}
-                      <div className='w-full text-center text-gray-500'>
-                        to @{username}{' '}
-                        <span title={user.address}>
-                          ({truncateAddress(user.address)})
-                        </span>
-                      </div>
-                    </div>
-                  )
-                ) : (
-                  <div>User doesn't have an address connected</div>
-                )}
-              </div>
-            )}
-          </div>
-        </div>
-      </Modal>
+      <TipModal
+        isUserLoading={isUserLoading}
+        tipCloseModal={tipCloseModal}
+        tipUserOpen={tipUserOpen}
+        user={user}
+        username={username}
+      />
       <Popover>
         {({ open, close }): JSX.Element => (
           <>
