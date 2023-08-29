@@ -101,7 +101,7 @@ export function TipModal({
           ) : (
             <div className='flex flex-col'>
               <div className={`p-2 pl-0`} data-rk='data-rk'>
-                <ConnectButton showBalance={false}></ConnectButton>
+                <ConnectButton></ConnectButton>
               </div>
               {user?.address ? (
                 currentUserAddress && (
