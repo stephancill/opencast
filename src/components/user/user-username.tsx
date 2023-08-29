@@ -14,16 +14,16 @@ export function UserUsername({
 }: UserUsernameProps): JSX.Element {
   return (
     <Link href={`/user/${username}`}>
-      <div
+      <span
         className={cn(
-          'inline truncate text-light-secondary dark:text-dark-secondary',
+          'override-nav inline truncate text-light-secondary dark:text-dark-secondary',
           className,
           disableLink && 'pointer-events-none'
         )}
         tabIndex={-1}
       >
         @{username}
-      </div>
+      </span>
     </Link>
   );
 }

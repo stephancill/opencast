@@ -86,27 +86,25 @@ export function Tweet(tweet: TweetProps): JSX.Element {
             : 'border-b border-light-border dark:border-dark-border'
         )}
         onClick={(event) => {
+          const clickedElement = event.target as any;
           // Prevent click when clicking on a link or a paragraph or image
           const tagName = (event.target as any).tagName;
           // DIV clicks do not propagate to parent, span used for body text
-          if (
-            tagName === 'A' ||
-            tagName === 'P' ||
-            tagName === 'IMG' ||
-            tagName === 'DIV'
-          ) {
-            event.stopPropagation();
-            return;
-          }
+          const isSpecialElement =
+            clickedElement.tagName === 'A' || // For links
+            clickedElement.tagName === 'IMG' || // For images
+            clickedElement.classList.contains('override-nav');
 
           // Prevent click when selecting text
           const text = window.getSelection()?.toString();
           if (text) {
-            event.stopPropagation();
+            // event.stopPropagation();
             return;
           }
 
-          push(tweetLink);
+          if (!isSpecialElement) {
+            push(tweetLink);
+          }
         }}
       >
         <div className='grid grid-cols-[auto,1fr] gap-x-3 gap-y-1'>

@@ -21,9 +21,9 @@ export function UserAvatar({
 
   return (
     <Link href={username ? `/user/${username}` : '#'}>
-      <div
+      <span
         className={cn(
-          'blur-picture inline flex self-start',
+          'blur-picture override-nav flex self-start',
           !username && 'pointer-events-none',
           className
         )}
@@ -38,7 +38,7 @@ export function UserAvatar({
           alt={alt}
           key={src}
         />
-      </div>
+      </span>
     </Link>
   );
 }

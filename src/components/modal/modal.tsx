@@ -52,13 +52,13 @@ export function Modal({
           static
         >
           <motion.div
-            className='hover-animation fixed inset-0 bg-black/40 dark:bg-[#5B7083]/40'
+            className='hover-animation override-nav fixed inset-0 bg-black/40 dark:bg-[#5B7083]/40'
             aria-hidden='true'
             {...backdrop}
           />
           <div
             className={cn(
-              'fixed inset-0 overflow-y-auto p-4',
+              'override-nav fixed inset-0 overflow-y-auto p-4',
               className ?? 'flex items-center justify-center'
             )}
           >

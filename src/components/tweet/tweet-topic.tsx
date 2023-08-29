@@ -14,10 +14,10 @@ export function TweetTopic({ topic }: { topic: TopicType }) {
 
 export function TopicView({ topic }: { topic: TopicType }) {
   return (
-    <div className='inline flex items-center'>
+    <div className='override-nav inline flex items-center'>
       #
       {topic.image && (
-        <span className='mx-1 inline flex-shrink-0 flex-grow-0 overflow-hidden rounded-md'>
+        <span className='override-nav mx-1 inline flex-shrink-0 flex-grow-0 overflow-hidden rounded-md'>
           <NextImage
             src={topic.image}
             alt={topic.name}
@@ -27,7 +27,7 @@ export function TopicView({ topic }: { topic: TopicType }) {
           ></NextImage>
         </span>
       )}
-      <div className='inline inline overflow-hidden text-ellipsis'>
+      <div className='override-nav inline inline overflow-hidden text-ellipsis'>
         {/* TODO: Fix CSS truncation */}
         {topic.name.length > 30 ? topic.name.slice(0, 30) + '...' : topic.name}
       </div>
