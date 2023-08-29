@@ -1,0 +1,12 @@
+diff --git a/node_modules/@rainbow-me/rainbowkit/dist/index.css b/node_modules/@rainbow-me/rainbowkit/dist/index.css
+index ce7f8e3..acf5386 100644
+--- a/node_modules/@rainbow-me/rainbowkit/dist/index.css
++++ b/node_modules/@rainbow-me/rainbowkit/dist/index.css
+@@ -229,6 +229,7 @@
+   gap: 10px;
+ }
+ [data-rk] .ju367v1n {
++  flex-wrap: wrap;
+   gap: 12px;
+ }
+ [data-rk] .ju367v1o {

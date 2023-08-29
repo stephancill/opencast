@@ -50,6 +50,7 @@ export default function App({
     <>
       <AppHead />
       <WagmiConfig config={wagmiConfig}>
+        {/* TODO: Theme */}
         <RainbowKitProvider chains={chains}>
           <QueryClientProvider client={queryClient}>
             <AuthContextProvider>

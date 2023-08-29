@@ -405,7 +405,9 @@ export function TweetActions({
                     !currentUserAddress ? `rounded-full border` : ''
                   }`}
                 >
-                  <ConnectButton></ConnectButton>
+                  <div data-rk='data-rk'>
+                    <ConnectButton showBalance={false}></ConnectButton>
+                  </div>
                 </div>
                 {user?.address ? (
                   currentUserAddress && (
@@ -419,8 +421,8 @@ export function TweetActions({
                              ${
                                tipAmount === amount
                                  ? 'ring-2 ring-main-accent'
-                                 : 'border border-gray-500'
-                             }}`}
+                                 : 'border border-gray-500 text-gray-500'
+                             }`}
                           >
                             {amount}
                           </button>
