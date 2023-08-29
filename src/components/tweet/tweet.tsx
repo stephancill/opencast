@@ -88,11 +88,12 @@ export function Tweet(tweet: TweetProps): JSX.Element {
         onClick={(event) => {
           // Prevent click when clicking on a link or a paragraph or image
           const tagName = (event.target as any).tagName;
+          // DIV clicks do not propagate to parent, span used for body text
           if (
             tagName === 'A' ||
-            tagName === 'SPAN' ||
             tagName === 'P' ||
-            tagName === 'IMG'
+            tagName === 'IMG' ||
+            tagName === 'DIV'
           ) {
             event.stopPropagation();
             return;

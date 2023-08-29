@@ -19,7 +19,7 @@ export function UserName({
   className,
   iconClassName
 }: UserNameProps): JSX.Element {
-  const CustomTag = tag ? tag : 'p';
+  const CustomTag = tag ? tag : 'div';
 
   return (
     <Link href={username ? `/user/${username}` : '#'}>
@@ -31,7 +31,7 @@ export function UserName({
         )}
         tabIndex={username ? 0 : -1}
       >
-        <CustomTag className='truncate'>{name}</CustomTag>
+        <CustomTag className='inline truncate'>{name}</CustomTag>
         {verified && (
           <i>
             <HeroIcon
