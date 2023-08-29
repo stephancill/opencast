@@ -185,7 +185,7 @@ export function MobileSidebarModal({
               }}
             >
               {userNotifications && (
-                <div className='absolute ml-6 mt-2 flex h-4 min-w-[16px] items-center rounded-full bg-main-accent'>
+                <div className='absolute ml-6 mt-2 flex h-4 min-w-[16px] items-center rounded-full bg-main-accent text-white'>
                   <div className='mx-auto px-1 text-xs'>
                     {userNotifications < 100 ? userNotifications : '99+'}
                   </div>
