@@ -5,7 +5,7 @@ import { populateEmbed } from '../embeds';
 import { LRU } from '../lru-cache';
 import { TopicType } from '../types/topic';
 import { ExternalEmbed } from '../types/tweet';
-import { parseChainURL } from '../utils';
+import { parseChainURL, truncateAddress } from '../utils';
 
 const chainById = Object.values(chains).reduce(
   (acc: { [key: string]: chains.Chain }, cur) => {
@@ -121,13 +121,7 @@ async function _resolveTopic(url: string): Promise<TopicType | null> {
           args: [BigInt(1)]
         })) as string;
       } catch {
-        const truncatedAddress = `${parsed.contractAddress.slice(
-          0,
-          6
-        )}...${parsed.contractAddress.slice(
-          parsed.contractAddress.length - 4,
-          parsed.contractAddress.length
-        )}`;
+        const truncatedAddress = truncateAddress(parsed.contractAddress);
 
         const chainIcon = await resolveChainIcon(chainId);
 

@@ -3,35 +3,36 @@ import { Modal } from '@components/modal/modal';
 import { Button } from '@components/ui/button';
 import { HeroIcon } from '@components/ui/hero-icon';
 import { ToolTip } from '@components/ui/tooltip';
+import { CastAddBody, Message } from '@farcaster/hub-web';
 import { Dialog, Popover } from '@headlessui/react';
 import { useAuth } from '@lib/context/auth-context';
 import { useModal } from '@lib/hooks/useModal';
 import type { Tweet } from '@lib/types/tweet';
-import type { User } from '@lib/types/user';
-import { preventBubbling } from '@lib/utils';
+import type { User, UserResponse } from '@lib/types/user';
+import { preventBubbling, truncateAddress } from '@lib/utils';
+import { ConnectButton } from '@rainbow-me/rainbowkit';
 import cn from 'clsx';
 import type { Variants } from 'framer-motion';
 import { AnimatePresence, motion } from 'framer-motion';
-import { useRouter } from 'next/router';
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
+import useSWR from 'swr';
+import { parseEther } from 'viem';
+import { useAccount, useChainId, useSendTransaction } from 'wagmi';
+import * as chains from 'wagmi/chains';
 import {
   createCastMessage,
   createFollowMessage,
   createRemoveCastMessage,
   submitHubMessage
 } from '../../lib/farcaster/utils';
-import { SearchBar } from '../aside/search-bar';
-import { SearchTopics } from '../search/search-topics';
-import { useEffect, useState } from 'react';
 import { fetchJSON } from '../../lib/fetch';
-import useSWR from 'swr';
+import { BaseResponse } from '../../lib/types/responses';
 import { TopicResponse, TopicType } from '../../lib/types/topic';
+import { SearchTopics } from '../search/search-topics';
 import { Loading } from '../ui/loading';
 import { TopicView } from './tweet-topic';
-import { BaseResponse } from '../../lib/types/responses';
-import { CastAddBody, Message } from '@farcaster/hub-web';
-import { result } from 'lodash';
-import Link from 'next/link';
 
 export const variants: Variants = {
   initial: { opacity: 0, y: -25 },
@@ -54,23 +55,6 @@ type TweetActionsProps = Pick<Tweet, 'createdBy'> & {
   topic?: TopicType;
 };
 
-type PinModalData = Record<'title' | 'description' | 'mainBtnLabel', string>;
-
-const pinModalData: Readonly<PinModalData[]> = [
-  {
-    title: 'Pin Cast to from profile?',
-    description:
-      'This will appear at the top of your profile and replace any previously pinned Cast.',
-    mainBtnLabel: 'Pin'
-  },
-  {
-    title: 'Unpin Cast from profile?',
-    description:
-      'This will no longer appear automatically at the top of your profile.',
-    mainBtnLabel: 'Unpin'
-  }
-];
-
 export function TweetActions({
   isOwner,
   tweetId,
@@ -78,8 +62,28 @@ export function TweetActions({
   createdBy,
   topic
 }: TweetActionsProps): JSX.Element {
-  const { user, isAdmin } = useAuth();
-  const { push } = useRouter();
+  const { user: currentUser, isAdmin } = useAuth();
+
+  const { address: currentUserAddress } = useAccount();
+
+  const chainId = useChainId();
+
+  const [shouldFetchUser, setShouldFetchUser] = useState(false);
+  const { data: user, isValidating: isUserLoading } = useSWR(
+    shouldFetchUser ? `/api/user/${createdBy}` : null,
+    async (url) => (await fetchJSON<UserResponse>(url)).result,
+    { revalidateOnFocus: false }
+  );
+  const [tipAmount, setTipAmount] = useState<number>(0.001);
+  const {
+    data: tipTxResult,
+    isLoading: tipTxResultLoading,
+    isSuccess: tipTxSuccess,
+    sendTransaction: sendTipTx
+  } = useSendTransaction({
+    to: user?.address || undefined,
+    value: parseEther(tipAmount.toString())
+  });
 
   const {
     open: removeOpen,
@@ -91,6 +95,12 @@ export function TweetActions({
     open: repostOpen,
     openModal: repostOpenModal,
     closeModal: repostCloseModal
+  } = useModal();
+
+  const {
+    open: tipUserOpen,
+    openModal: tipOpenModal,
+    closeModal: tipCloseModal
   } = useModal();
 
   const [repostTopicUrl, setRepostTopicUrl] = useState<string>();
@@ -111,20 +121,7 @@ export function TweetActions({
     { revalidateOnFocus: false }
   );
 
-  useEffect(() => {
-    if (repostTopicUrl === repostTopic?.url || repostTopic === undefined)
-      return;
-    setRepostTopicUrl(repostTopic?.url);
-  }, [repostTopic]);
-
-  useEffect(() => {
-    if (topicResult && repostTopic?.url !== topicResult.url) {
-      setRepostTopic(topicResult);
-    }
-  }, [topicResult]);
-
-  const { id: userId } = user as User;
-
+  const { id: userId } = currentUser as User;
   const isInAdminControl = isAdmin && !isOwner;
 
   const handleRemove = async (): Promise<void> => {
@@ -248,6 +245,56 @@ export function TweetActions({
     );
   };
 
+  useEffect(() => {
+    if (repostTopicUrl === repostTopic?.url || repostTopic === undefined)
+      return;
+    setRepostTopicUrl(repostTopic?.url);
+  }, [repostTopic]);
+
+  useEffect(() => {
+    if (topicResult && repostTopic?.url !== topicResult.url) {
+      setRepostTopic(topicResult);
+    }
+  }, [topicResult]);
+
+  useEffect(() => {
+    if (!tipUserOpen) return;
+    setShouldFetchUser(true);
+  }, [tipUserOpen]);
+
+  useEffect(() => {
+    if (!tipTxSuccess) return;
+    tipCloseModal();
+
+    const chainById = Object.values(chains).reduce(
+      (acc: { [key: string]: chains.Chain }, cur) => {
+        if (cur.id) acc[cur.id] = cur;
+        return acc;
+      },
+      {}
+    );
+
+    const chain = chainById[chainId];
+    const explorerUrl = chain?.blockExplorers?.default;
+    const url = `${explorerUrl?.url}/tx/${tipTxResult?.hash}`;
+
+    if (!url) return;
+
+    toast.success(
+      () => (
+        <span className='flex gap-2'>
+          Your tip was sent
+          <Link href={`${explorerUrl?.url}/tx/${tipTxResult?.hash}`}>
+            <a className='custom-underline font-bold' target='_blank'>
+              View
+            </a>
+          </Link>
+        </span>
+      ),
+      { duration: 6000 }
+    );
+  }, [tipTxSuccess]);
+
   return (
     <>
       <Modal
@@ -329,6 +376,89 @@ export function TweetActions({
           )}
         </div>
       </Modal>
+      <Modal
+        modalClassName='max-w-sm bg-main-background w-full p-8 rounded-2xl'
+        open={tipUserOpen}
+        closeModal={tipCloseModal}
+      >
+        <div className='flex flex-col gap-6'>
+          <div className='flex flex-col gap-4'>
+            <div className='flex flex-col gap-2'>
+              <div className='flex items-center'>
+                <i className='inline pr-2'>
+                  <HeroIcon iconName='BanknotesIcon' />
+                </i>
+                <Dialog.Title className='inline text-xl font-bold'>
+                  Tip user
+                </Dialog.Title>
+              </div>
+              <Dialog.Description className='text-light-secondary dark:text-dark-secondary'>
+                Send @{username} some ETH
+              </Dialog.Description>
+            </div>
+            {isUserLoading ? (
+              <Loading />
+            ) : (
+              <div className='flex flex-col'>
+                <div
+                  className={` p-2 ${
+                    !currentUserAddress ? `rounded-full border` : ''
+                  }`}
+                >
+                  <ConnectButton></ConnectButton>
+                </div>
+                {user?.address ? (
+                  currentUserAddress && (
+                    <div className='mt-4 flex flex-col gap-4'>
+                      <div className='flex justify-center gap-2'>
+                        {[0.0005, 0.001, 0.002].map((amount) => (
+                          <button
+                            key={amount}
+                            onClick={() => setTipAmount(amount)}
+                            className={`rounded-full p-2 
+                             ${
+                               tipAmount === amount
+                                 ? 'ring-2 ring-main-accent'
+                                 : 'border border-gray-500'
+                             }}`}
+                          >
+                            {amount}
+                          </button>
+                        ))}
+                      </div>
+                      {!tipTxResultLoading ? (
+                        <Button
+                          className='accent-tab mt-2 flex items-center justify-center bg-main-accent font-bold text-white enabled:hover:bg-main-accent/90 enabled:active:bg-main-accent/75'
+                          onClick={() => {
+                            sendTipTx();
+                          }}
+                          disabled={tipTxResultLoading || tipAmount === 0}
+                        >
+                          Send{' '}
+                          {tipAmount.toLocaleString(undefined, {
+                            maximumFractionDigits: 6
+                          })}{' '}
+                          ETH
+                        </Button>
+                      ) : (
+                        <Loading></Loading>
+                      )}
+                      <div className='w-full text-center text-gray-500'>
+                        to @{username}{' '}
+                        <span title={user.address}>
+                          ({truncateAddress(user.address)})
+                        </span>
+                      </div>
+                    </div>
+                  )
+                ) : (
+                  <div>User doesn't have an address connected</div>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      </Modal>
       <Popover>
         {({ open, close }): JSX.Element => (
           <>
@@ -370,6 +500,7 @@ export function TweetActions({
                       Delete
                     </Popover.Button>
                   )}
+
                   {/* {userIsFollowed ? (
                     <Popover.Button
                       className='accent-tab flex w-full gap-3 rounded-md rounded-t-none p-4 hover:bg-main-sidebar-background'
@@ -389,6 +520,34 @@ export function TweetActions({
                       Follow @{username}
                     </Popover.Button>
                   )} */}
+                  {isOwner && (
+                    <Popover.Button
+                      className='accent-tab flex w-full gap-3 rounded-md rounded-t-none p-4 hover:bg-main-sidebar-background'
+                      as={Button}
+                      onClick={preventBubbling(async (): Promise<void> => {
+                        close();
+                        setShowingTopicSelector(true);
+                        repostOpenModal();
+                      })}
+                    >
+                      <HeroIcon iconName='ArrowPathRoundedSquareIcon' />
+                      Repost to topic
+                    </Popover.Button>
+                  )}
+                  {
+                    <Popover.Button
+                      className='accent-tab flex w-full gap-3 rounded-md rounded-t-none p-4 hover:bg-main-sidebar-background'
+                      as={Button}
+                      onClick={preventBubbling(() => {
+                        close();
+                        tipOpenModal();
+                      })}
+                    >
+                      <HeroIcon iconName='BanknotesIcon' />
+                      Tip user
+                    </Popover.Button>
+                  }
+
                   <Popover.Button
                     className='accent-tab flex w-full gap-3 rounded-md rounded-t-none p-4 hover:bg-main-sidebar-background'
                     as={Button}

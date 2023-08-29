@@ -109,7 +109,6 @@ export function TweetStats({
           iconName='ChatBubbleOvalLeftIcon'
           viewTweet={viewTweet}
           onClick={openModal}
-          disabled={reply}
         />
         <TweetOption
           className={cn(

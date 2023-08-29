@@ -1,15 +1,15 @@
-import Link from 'next/link';
+import { Input } from '@components/input/input';
+import { Modal } from '@components/modal/modal';
+import { Button } from '@components/ui/button';
+import { CustomIcon } from '@components/ui/custom-icon';
+import type { IconName } from '@components/ui/hero-icon';
 import { useAuth } from '@lib/context/auth-context';
 import { useWindow } from '@lib/context/window-context';
 import { useModal } from '@lib/hooks/useModal';
-import { Modal } from '@components/modal/modal';
-import { Input } from '@components/input/input';
-import { CustomIcon } from '@components/ui/custom-icon';
-import { Button } from '@components/ui/button';
-import { SidebarLink } from './sidebar-link';
+import Link from 'next/link';
 import { MoreSettings } from './more-settings';
+import { SidebarLink } from './sidebar-link';
 import { SidebarProfile } from './sidebar-profile';
-import type { IconName } from '@components/ui/hero-icon';
 
 export type NavLink = {
   href: string;

@@ -1,10 +1,9 @@
 import { useUser } from '@lib/context/user-context';
 import { isPlural } from '@lib/utils';
 import type { Variants } from 'framer-motion';
-import { AnimatePresence, motion } from 'framer-motion';
 import { useRouter } from 'next/router';
-import { UserName } from './user-name';
 import { formatNumber } from '../../lib/date';
+import { UserName } from './user-name';
 
 export const variants: Variants = {
   initial: { opacity: 0 },
@@ -19,8 +18,6 @@ export function UserHeader(): JSX.Element {
   } = useRouter();
 
   const { user, loading } = useUser();
-
-  const userId = user ? user.id : null;
 
   const [totalTweets, totalPhotos] = [
     user?.totalTweets ?? 0,

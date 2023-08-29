@@ -105,6 +105,10 @@ export function getHttpsUrls(text: string): string[] {
   return uniqueUrls;
 }
 
+export const truncateAddress = (address: string): string => {
+  return `${address.slice(0, 6)}...${address.slice(-4)}`;
+};
+
 const replacer = (_: any, value: any) =>
   typeof value === 'bigint' ? value.toString() : value;
 

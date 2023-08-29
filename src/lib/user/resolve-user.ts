@@ -76,6 +76,17 @@ export async function resolveUserFullFromFid(
 
   const interests = await userInterests(fid);
 
+  const verification = await prisma.verifications.findFirst({
+    where: {
+      fid: fid,
+      deleted_at: null
+    }
+  });
+  const verificationClaim = verification?.claim as
+    | { address: string }
+    | undefined;
+  const userAddress = verificationClaim?.address;
+
   const user = userConverter.toUserFull({ ...userDataRaw, fid });
 
   return {
@@ -83,6 +94,7 @@ export async function resolveUserFullFromFid(
     followers: followers.map((f) => f.fid!.toString()),
     following: following.map((f) => f.target_fid!.toString()),
     totalTweets: castCount._count,
+    address: userAddress || null,
     interests
   };
 }
@@ -129,7 +141,6 @@ export async function resolveUsers(
 
 // TODO: Combine into one query
 // TODO: Cache results
-// TODO: Only pass minimal user data and fetch on-demand
 export async function resolveUsersMap(
   fids: bigint[],
   full: boolean = false

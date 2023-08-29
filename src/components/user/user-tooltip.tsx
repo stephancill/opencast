@@ -56,7 +56,8 @@ export function UserTooltip({
 
   const { data: user, isValidating } = useSWR(
     shouldFetch ? `/api/user/${id}` : null,
-    async (url) => (await fetchJSON<UserResponse>(url)).result
+    async (url) => (await fetchJSON<UserResponse>(url)).result,
+    { revalidateOnFocus: false }
   );
 
   const { following, followers, interests } = user || {};

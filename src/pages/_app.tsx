@@ -1,11 +1,19 @@
 import '@styles/globals.scss';
+import '@rainbow-me/rainbowkit/styles.css';
 
+import { AppHead } from '@components/common/app-head';
 import { AuthContextProvider } from '@lib/context/auth-context';
 import { ThemeContextProvider } from '@lib/context/theme-context';
-import { AppHead } from '@components/common/app-head';
-import type { ReactElement, ReactNode } from 'react';
+import { RainbowKitProvider, getDefaultWallets } from '@rainbow-me/rainbowkit';
 import type { NextPage } from 'next';
 import type { AppProps } from 'next/app';
+import type { ReactElement, ReactNode } from 'react';
+import { QueryClient, QueryClientProvider } from 'react-query';
+import { WagmiConfig, configureChains, createConfig } from 'wagmi';
+import { arbitrum, base, mainnet, optimism, polygon, zora } from 'wagmi/chains';
+import { publicProvider } from 'wagmi/providers/public';
+
+const queryClient = new QueryClient();
 
 type NextPageWithLayout = NextPage & {
   getLayout?: (page: ReactElement) => ReactNode;
@@ -15,8 +23,22 @@ type AppPropsWithLayout = AppProps & {
   Component: NextPageWithLayout;
 };
 
-import { QueryClient, QueryClientProvider } from 'react-query';
-const queryClient = new QueryClient();
+const { chains, publicClient } = configureChains(
+  [mainnet, polygon, optimism, arbitrum, base, zora],
+  [publicProvider()]
+);
+
+const { connectors } = getDefaultWallets({
+  appName: process.env.NEXT_PUBLIC_FC_CLIENT_NAME!,
+  projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_ID!,
+  chains
+});
+
+const wagmiConfig = createConfig({
+  autoConnect: true,
+  connectors,
+  publicClient
+});
 
 export default function App({
   Component,
@@ -27,13 +49,17 @@ export default function App({
   return (
     <>
       <AppHead />
-      <QueryClientProvider client={queryClient}>
-        <AuthContextProvider>
-          <ThemeContextProvider>
-            {getLayout(<Component {...pageProps} />)}
-          </ThemeContextProvider>
-        </AuthContextProvider>
-      </QueryClientProvider>
+      <WagmiConfig config={wagmiConfig}>
+        <RainbowKitProvider chains={chains}>
+          <QueryClientProvider client={queryClient}>
+            <AuthContextProvider>
+              <ThemeContextProvider>
+                {getLayout(<Component {...pageProps} />)}
+              </ThemeContextProvider>
+            </AuthContextProvider>
+          </QueryClientProvider>
+        </RainbowKitProvider>
+      </WagmiConfig>
     </>
   );
 }

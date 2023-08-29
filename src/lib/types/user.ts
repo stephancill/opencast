@@ -1,5 +1,4 @@
 import { UserDataType } from '@farcaster/hub-web';
-import { Timestamp } from 'firebase/firestore';
 import { BaseResponse } from './responses';
 import type { Accent, Theme } from './theme';
 import { TopicType } from './topic';
@@ -27,6 +26,7 @@ export type UserFull = User & {
   pinnedTweet: string | null;
   coverPhotoURL: string | null;
   interests: TopicType[];
+  address: string | null;
 };
 
 export type EditableData = Extract<
@@ -72,7 +72,8 @@ export const userConverter = {
       totalTweets: 0,
       totalPhotos: 0,
       pinnedTweet: null,
-      interests: []
+      interests: [],
+      address: null
     } as UserFull;
   }
 };
