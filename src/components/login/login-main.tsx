@@ -66,7 +66,7 @@ export function LoginMain(): JSX.Element {
                        lg:text-6xl lg:before:content-["Happening_now"]'
           />
           <h2 className='hidden text-xl lg:block lg:text-3xl'>
-            Join Farcaster today.
+            Use Opencast today.
           </h2>
         </div>
         <div className='flex max-w-xs flex-col gap-6 [&_button]:py-2'>
@@ -83,7 +83,8 @@ export function LoginMain(): JSX.Element {
               className='inner:custom-underline inner:custom-underline text-center text-xs
                          text-light-secondary inner:text-accent-blue dark:text-dark-secondary'
             >
-              By signing up, you agree to the{' '}
+              By signing up you agree that you are doing so at your own risk.
+              {/* By signing up, you agree to the{' '}
               <a
                 href='https://twitter.com/tos'
                 target='_blank'
@@ -106,8 +107,8 @@ export function LoginMain(): JSX.Element {
                 rel='noreferrer'
               >
                 Cookie Use
-              </a>
-              .
+              </a> 
+              .*/}
             </p>
           </div>
           {/* <div className='flex flex-col gap-3'>

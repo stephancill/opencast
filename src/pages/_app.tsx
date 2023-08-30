@@ -30,7 +30,7 @@ const { chains, publicClient } = configureChains(
 
 const { connectors } = getDefaultWallets({
   appName: process.env.NEXT_PUBLIC_FC_CLIENT_NAME!,
-  projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_ID!,
+  projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_ID!, // TODO: Make this optional
   chains
 });
 
