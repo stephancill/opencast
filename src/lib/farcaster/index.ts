@@ -10,7 +10,7 @@ const globalForFarcaster = global as unknown as {
 
 export const hubClient =
   globalForFarcaster.hubClient ??
-  (process.env.FC_HUB_USE_TLS
+  (process.env.FC_HUB_USE_TLS && process.env.FC_HUB_USE_TLS !== 'false'
     ? getSSLHubRpcClient(process.env.FC_HUB_URL!)
     : getInsecureHubRpcClient(process.env.FC_HUB_URL!));
 
