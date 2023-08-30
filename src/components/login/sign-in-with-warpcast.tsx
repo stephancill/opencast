@@ -112,7 +112,7 @@ const WarpcastAuthPopup = () => {
     <div>
       {deepLinkUrl && (
         <div>
-          <div>
+          <div className={'rounded bg-white p-2'}>
             <QRCode value={deepLinkUrl} />{' '}
           </div>
           <span className='pt-4 text-gray-500'>
