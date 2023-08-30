@@ -36,11 +36,13 @@ model fids {
 }
 
 model fnames {
-  fname           String   @id
-  created_at      DateTime @default(now()) @db.Timestamp(6)
-  updated_at      DateTime @default(now()) @db.Timestamp(6)
-  custody_address Bytes
-  expires_at      DateTime @db.Timestamp(6)
+  fname           String    @id
+  created_at      DateTime  @default(now()) @db.Timestamp(6)
+  updated_at      DateTime  @default(now()) @db.Timestamp(6)
+  custody_address Bytes?
+  expires_at      DateTime? @db.Timestamp(6)
+  fid             BigInt?
+  deleted_at      DateTime? @db.Timestamp(6)
 }
 
 model hub_subscriptions {
@@ -91,7 +93,6 @@ model messages {
   raw              Bytes
   casts            casts?
   reactions        reactions?
-  signers          signers?
   user_data        user_data?
   verifications    verifications?
 
@@ -122,11 +123,10 @@ model signers {
   deleted_at      DateTime? @db.Timestamp(6)
   timestamp       DateTime  @db.Timestamp(6)
   fid             BigInt
-  hash            Bytes     @unique(map: "signers_hash_unique")
-  custody_address Bytes
+  hash            Bytes?
+  custody_address Bytes?
   signer          Bytes
   name            String?
-  messages        messages  @relation(fields: [hash], references: [hash], onDelete: NoAction, onUpdate: NoAction, map: "signers_hash_foreign")
 
   @@index([fid, timestamp], map: "signers_fid_timestamp_index")
 }
@@ -149,6 +149,7 @@ model user_data {
 
 /// This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.
 /// This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.
+/// This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.
 model verifications {
   id         BigInt    @id @default(autoincrement())
   created_at DateTime  @default(now()) @db.Timestamp(6)
@@ -161,4 +162,15 @@ model verifications {
   messages   messages  @relation(fields: [hash], references: [hash], onDelete: NoAction, onUpdate: NoAction, map: "verifications_hash_foreign")
 
   @@index([fid, timestamp], map: "verifications_fid_timestamp_index")
+}
+
+model storage {
+  id         BigInt    @id @default(autoincrement())
+  created_at DateTime  @default(now()) @db.Timestamp(6)
+  updated_at DateTime  @default(now()) @db.Timestamp(6)
+  deleted_at DateTime? @db.Timestamp(6)
+  timestamp  DateTime  @db.Timestamp(6)
+  fid        BigInt
+  units      BigInt
+  expiry     DateTime  @db.Timestamp(6)
 }
