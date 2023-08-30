@@ -8,6 +8,6 @@
       "typescript": true,
       "node": true
     }
-  }
-
+  },
+  "plugins": ["react-hooks"]
 }
