@@ -2,8 +2,11 @@ import * as ed from '@noble/ed25519';
 import { useEffect, useState } from 'react';
 import QRCode from 'react-qr-code';
 import { useAuth } from '../../lib/context/auth-context';
+import { BaseResponse } from '../../lib/types/responses';
+import { fetchJSON } from '../../lib/fetch';
+import { toast } from 'react-hot-toast';
 
-/* https://warpcast.notion.site/Warpcast-API-Docs-Signer-Requests-Public-e02ef71883374d2ca8d27239a8cc35d5 */
+/* https://warpcast.notion.site/Signer-Request-API-Migration-Guide-Public-9e74827f9070442fb6f2a7ffe7226b3c */
 
 export const useLocalStorage = (key: any, initialValue: any) => {
   const [storedValue, setStoredValue] = useState(() => {
@@ -53,21 +56,51 @@ const WarpcastAuthPopup = () => {
 
     setKeyPair(keyPair);
 
-    const res = await fetch(`https://api.warpcast.com/v2/signer-requests`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        publicKey: `0x${keyPair.publicKey}`,
-        name: process.env.NEXT_PUBLIC_FC_CLIENT_NAME || 'Opencast'
-      })
-    });
+    // Get app signature
+    const { result: appSignatureResult } = (await fetchJSON(
+      `/api/signer/${keyPair.publicKey}/new`
+    )) as BaseResponse<{
+      requestFid: number;
+      signature: string;
+      deadline: number;
+    }>;
 
-    const json = await res.json();
-    const { token, deepLinkUrl } = json.result;
+    if (!appSignatureResult) {
+      toast.error('Error generating signature');
+      return;
+    }
+
+    const { requestFid, signature, deadline } = appSignatureResult;
+
+    const { result: signedKeyResult } = (await fetchJSON(
+      `https://api.warpcast.com/v2/signed-key-requests`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          key: `0x${keyPair.publicKey}`,
+          signature,
+          requestFid,
+          deadline
+        })
+      }
+    )) as {
+      result: { signedKeyRequest: { token: string; deeplinkUrl: string } };
+    };
+
+    if (!signedKeyResult) {
+      toast.error('Error generating signed key');
+      return;
+    }
+
+    const { token, deeplinkUrl: newDeepLinkUrl } =
+      signedKeyResult.signedKeyRequest;
 
     pollForSigner(token);
 
-    setDeepLinkUrl(deepLinkUrl);
+    setDeepLinkUrl(newDeepLinkUrl);
   };
 
   // Poll for the status of the Signer request
@@ -79,14 +112,11 @@ const WarpcastAuthPopup = () => {
       tries += 1;
       await new Promise((r) => setTimeout(r, 2000));
 
-      const res = await fetch(
-        `https://api.warpcast.com/v2/signer-request?token=${token}`
-      );
-      const json = await res.json();
+      const { state } = (await fetchJSON(
+        `https://api.warpcast.com/v2/signed-key-request?token=${token}`
+      )) as { state: string };
 
-      const signerRequest = json.result.signerRequest;
-
-      if (signerRequest.base64SignedMessage) {
+      if (state === 'completed') {
         break;
       }
     }
