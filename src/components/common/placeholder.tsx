@@ -7,7 +7,7 @@ export function Placeholder(): JSX.Element {
       <SEO
         title='Opencast'
         description='Fully open source Twitter flavoured Farcaster client.'
-        image='/home.png'
+        image='/banner.png'
       />
       <i>
         <CustomIcon
