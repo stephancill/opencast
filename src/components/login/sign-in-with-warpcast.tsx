@@ -112,11 +112,11 @@ const WarpcastAuthPopup = () => {
       tries += 1;
       await new Promise((r) => setTimeout(r, 2000));
 
-      const { state } = (await fetchJSON(
+      const { result } = (await fetchJSON(
         `https://api.warpcast.com/v2/signed-key-request?token=${token}`
-      )) as { state: string };
+      )) as { result: { signedKeyRequest: { state: string } } };
 
-      if (state === 'completed') {
+      if (result.signedKeyRequest.state === 'completed') {
         break;
       }
     }
