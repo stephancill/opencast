@@ -52,7 +52,8 @@ export async function resolveUserFullFromFid(
   const followers = await prisma.links.findMany({
     where: {
       target_fid: fid,
-      type: 'follow'
+      type: 'follow',
+      deleted_at: null
     },
     distinct: ['target_fid', 'fid']
   });
