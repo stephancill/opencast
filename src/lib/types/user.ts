@@ -36,7 +36,9 @@ export type EditableData = Extract<
 
 export type EditableUserData = Pick<UserFull, EditableData>;
 
-export type UserResponse = BaseResponse<UserFull>;
+export type UserResponse = BaseResponse<UserFull | User>;
+
+export type UserFullResponse = BaseResponse<UserFull>;
 
 export type UsersMapType<T> = { [key: string]: T };
 

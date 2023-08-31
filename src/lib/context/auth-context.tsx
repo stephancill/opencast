@@ -1,15 +1,27 @@
 import { getRandomId } from '@lib/random';
 import type { Bookmark } from '@lib/types/bookmark';
-import type { User, UserFull } from '@lib/types/user';
+import type { UserFull, UserFullResponse, UserResponse } from '@lib/types/user';
 import type { ReactNode } from 'react';
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
-import { KeyPair } from '../types/keypair';
 import useSWR from 'swr';
-import { NotificationsResponse } from '../types/notifications';
+import { SignInModal } from '../../components/modal/sign-in-modal';
 import { fetchJSON } from '../fetch';
+import { useModal } from '../hooks/useModal';
+import {
+  addKeyPair,
+  getKeyPair,
+  getKeyPairs,
+  removeKeyPair,
+  setKeyPair
+} from '../storage';
+import { KeyPair } from '../types/keypair';
+import { NotificationsResponse } from '../types/notifications';
+
+type UserWithKey = UserFull & { keyPair: KeyPair };
 
 type AuthContext = {
   user: UserFull | null;
+  usersWithKeys: UserWithKey[];
   error: Error | null;
   loading: boolean;
   isAdmin: boolean;
@@ -17,7 +29,9 @@ type AuthContext = {
   userBookmarks: Bookmark[] | null;
   userNotifications: number | null;
   signOut: () => Promise<void>;
-  handleUserAuth: () => void;
+  showAddAccountModal: () => void;
+  setUser: (user: UserWithKey) => void;
+  handleUserAuth: (forceKeyPair?: KeyPair) => void;
   resetNotifications: () => void;
 };
 
@@ -30,40 +44,95 @@ type AuthContextProviderProps = {
 export function AuthContextProvider({
   children
 }: AuthContextProviderProps): JSX.Element {
-  const [userId, setUserId] = useState<string | null>(null); // '1689'
-
-  const [user, setUser] = useState<UserFull | null>(null);
+  const [user, setUser] = useState<UserWithKey | null>(null);
+  const [users, setUsers] = useState<UserWithKey[]>([]);
   const [userBookmarks, setUserBookmarks] = useState<Bookmark[] | null>(null);
   const [error, setError] = useState<Error | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const modal = useModal();
+
   const [lastCheckedNotifications, setLastCheckedNotifications] =
     useState<Date | null>(null);
 
-  const manageUser = async (keyPair: KeyPair): Promise<void> => {
-    const userResponse = await fetch(`/api/signer/${keyPair.publicKey}/user`);
+  /**
+   * Key storage explainer:
+   * 'keyPair' storage is used to store the key pair of the currently signed in user.
+   * 'keyPairs' storage is used to store all key pairs that have been used to sign in.
+   */
 
-    if (userResponse.ok) {
-      const { result: user } = await userResponse.json();
-      setUser(user);
-    }
+  const fetchUserForKey = async (
+    keyPair: KeyPair
+  ): Promise<UserFull | null> => {
+    const { result: user } = await fetchJSON<UserFullResponse>(
+      `/api/signer/${keyPair.publicKey}/user`
+    );
+    return (user as UserFull) || null;
+  };
+
+  const manageUser = async (keyPair: KeyPair): Promise<void> => {
+    const user = await fetchUserForKey(keyPair);
+
+    if (user) setUser({ ...user, keyPair });
 
     setLoading(false);
   };
 
-  const handleUserAuth = (): void => {
+  /**
+   * Updates users and current user
+   * @param forceKeyPair Force a key pair to be set as the current user
+   */
+  const handleUserAuth = (forceKeyPair?: KeyPair): void => {
     setLoading(true);
 
     // Get signer from local storage
-    const keyPairRaw = localStorage.getItem('keyPair') as string | null;
-    const keyPair = keyPairRaw ? JSON.parse(keyPairRaw) : null;
+    if (forceKeyPair) {
+      setKeyPair(forceKeyPair);
+    }
 
-    if (keyPair) void manageUser(keyPair);
-    else {
+    let keyPair = forceKeyPair || getKeyPair();
+    const keyPairs = getKeyPairs();
+
+    if (!keyPair && keyPairs.length > 0) {
+      keyPair = keyPairs[0];
+    }
+
+    if (keyPair) {
+      void manageUser(keyPair);
+    } else {
       setUser(null);
       setLoading(false);
     }
+
+    // Add key pair to storage if it's not already there
+    if (
+      keyPair &&
+      !keyPairs.find((keyPair_) => keyPair_.publicKey === keyPair.publicKey)
+    ) {
+      addKeyPair(keyPair);
+    }
+
+    // Fetch users for all key pairs
+    Promise.all(keyPairs.map(fetchUserForKey)).then((users) => {
+      const usersWithKeys = users
+        .map((user, index) =>
+          user ? { ...user, keyPair: keyPairs[index] } : null
+        )
+        .filter((user) => user !== null);
+      setUsers(usersWithKeys as UserWithKey[]);
+    });
   };
+
+  useEffect(() => {
+    // `user` is changed by the user selection menu
+    // When it changes we need to update the current user in local storage
+    if (user) {
+      const keyPair: KeyPair = getKeyPair();
+      if (!keyPair || keyPair.publicKey !== user.keyPair.publicKey) {
+        setKeyPair(user.keyPair);
+      }
+    }
+  }, [user]);
 
   useEffect(() => {
     handleUserAuth();
@@ -74,7 +143,9 @@ export function AuthContextProvider({
 
   const signOut = async (): Promise<void> => {
     try {
+      const keyPair = getKeyPair();
       localStorage.removeItem('keyPair');
+      removeKeyPair(keyPair);
       handleUserAuth();
     } catch (error) {
       setError(error as Error);
@@ -114,6 +185,8 @@ export function AuthContextProvider({
 
   const value: AuthContext = {
     user,
+    usersWithKeys: users,
+    setUser,
     error,
     loading,
     isAdmin,
@@ -121,11 +194,19 @@ export function AuthContextProvider({
     userBookmarks,
     userNotifications: userNotifications?.badgeCount || null,
     signOut,
+    showAddAccountModal: modal.openModal,
     handleUserAuth,
     resetNotifications
   };
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={value}>
+      <>
+        <SignInModal {...modal}></SignInModal>
+      </>
+      {children}
+    </AuthContext.Provider>
+  );
 }
 
 export function useAuth(): AuthContext {

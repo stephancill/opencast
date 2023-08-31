@@ -1,21 +1,27 @@
-import { AnimatePresence, motion } from 'framer-motion';
-import { Menu } from '@headlessui/react';
-import cn from 'clsx';
-import { useAuth } from '@lib/context/auth-context';
-import { useModal } from '@lib/hooks/useModal';
-import { Modal } from '@components/modal/modal';
 import { ActionModal } from '@components/modal/action-modal';
+import { Modal } from '@components/modal/modal';
 import { Button } from '@components/ui/button';
-import { HeroIcon } from '@components/ui/hero-icon';
 import { CustomIcon } from '@components/ui/custom-icon';
+import { HeroIcon } from '@components/ui/hero-icon';
 import { UserAvatar } from '@components/user/user-avatar';
 import { UserName } from '@components/user/user-name';
 import { UserUsername } from '@components/user/user-username';
-import { variants } from './more-settings';
+import { Menu } from '@headlessui/react';
+import { useAuth } from '@lib/context/auth-context';
+import { useModal } from '@lib/hooks/useModal';
 import type { User } from '@lib/types/user';
+import cn from 'clsx';
+import { AnimatePresence, motion } from 'framer-motion';
+import { variants } from './more-settings';
 
 export function SidebarProfile(): JSX.Element {
-  const { user, signOut } = useAuth();
+  const {
+    user,
+    usersWithKeys: users,
+    signOut,
+    setUser,
+    showAddAccountModal
+  } = useAuth();
   const { open, openModal, closeModal } = useModal();
 
   const { name, username, verified, photoURL } = user as User;
@@ -33,7 +39,10 @@ export function SidebarProfile(): JSX.Element {
           title='Log out of Opencast?'
           description='You can always log back in at any time. If you just want to switch accounts, you can do that by adding an existing account.'
           mainBtnLabel='Log out'
-          action={signOut}
+          action={() => {
+            signOut();
+            closeModal();
+          }}
           closeModal={closeModal}
         />
       </Modal>
@@ -63,31 +72,48 @@ export function SidebarProfile(): JSX.Element {
             <AnimatePresence>
               {open && (
                 <Menu.Items
-                  className='menu-container absolute -top-36 left-0 right-0 w-60 xl:w-full'
+                  className='menu-container absolute bottom-20 left-0 right-0 w-60 xl:w-full'
                   as={motion.div}
                   {...variants}
                   static
                 >
-                  <Menu.Item
-                    className='flex items-center justify-between gap-4 border-b 
-                               border-light-border px-4 py-3 dark:border-dark-border'
-                    as='div'
-                    disabled
-                  >
-                    <div className='flex items-center gap-3 truncate'>
-                      <UserAvatar src={photoURL} alt={name} />
-                      <div className='truncate'>
-                        <UserName name={name} verified={verified} />
-                        <UserUsername username={username} disableLink />
-                      </div>
-                    </div>
-                    <i>
-                      <HeroIcon
-                        className='h-5 w-5 text-main-accent'
-                        iconName='CheckIcon'
-                      />
-                    </i>
-                  </Menu.Item>
+                  {/* TODO: Mobile */}
+                  {users.map((menuUser) => {
+                    const { name, username, verified, photoURL, id } = menuUser;
+                    return (
+                      <Menu.Item
+                        className='flex items-center justify-between gap-4 border-b 
+                               border-light-border hover:bg-light-primary/10 dark:border-dark-border'
+                        as='div'
+                      >
+                        {({ active }): JSX.Element => (
+                          <Button
+                            className={cn(
+                              'flex w-full items-center gap-3 rounded-md rounded-t-none',
+                              active && 'bg-main-sidebar-background'
+                            )}
+                            onClick={() => setUser(menuUser)}
+                          >
+                            <div className='flex flex-grow items-center gap-3 truncate'>
+                              <UserAvatar src={photoURL} alt={name} />
+                              <div className='truncate'>
+                                <UserName name={name} verified={verified} />
+                                <UserUsername username={username} disableLink />
+                              </div>
+                            </div>
+                            {user?.id === id && (
+                              <i>
+                                <HeroIcon
+                                  className='h-5 w-5 text-main-accent'
+                                  iconName='CheckIcon'
+                                />
+                              </i>
+                            )}
+                          </Button>
+                        )}
+                      </Menu.Item>
+                    );
+                  })}
                   <Menu.Item>
                     {({ active }): JSX.Element => (
                       <Button
@@ -95,10 +121,24 @@ export function SidebarProfile(): JSX.Element {
                           'flex w-full gap-3 rounded-md rounded-t-none p-4',
                           active && 'bg-main-sidebar-background'
                         )}
+                        onClick={showAddAccountModal}
+                      >
+                        <HeroIcon iconName='UserPlusIcon' />
+                        Add another account
+                      </Button>
+                    )}
+                  </Menu.Item>
+                  <Menu.Item>
+                    {({ active }): JSX.Element => (
+                      <Button
+                        className={cn(
+                          'flex w-full gap-3 rounded-md rounded-t-none p-4',
+                          active && ' bg-main-sidebar-background'
+                        )}
                         onClick={openModal}
                       >
                         <HeroIcon iconName='ArrowRightOnRectangleIcon' />
-                        Log out @{username}
+                        <div className='truncate'>Log out @{username}</div>
                       </Button>
                     )}
                   </Menu.Item>

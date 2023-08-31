@@ -12,12 +12,14 @@ import {
   ReactionType
 } from '@farcaster/hub-web';
 
-function getSigner(): NobleEd25519Signer {
-  const privateKey = JSON.parse(
-    localStorage.getItem('keyPair') || '{}'
-  ).privateKey;
+function getSigner(privateKey: string): NobleEd25519Signer {
   const ed25519Signer = new NobleEd25519Signer(Buffer.from(privateKey, 'hex'));
   return ed25519Signer;
+}
+
+function getSignerFromStorage(key: string = 'keyPair'): NobleEd25519Signer {
+  const privateKey = JSON.parse(localStorage.getItem(key) || '{}').privateKey;
+  return getSigner(privateKey);
 }
 
 export async function createReactionMessage({
@@ -33,7 +35,7 @@ export async function createReactionMessage({
   remove?: boolean;
   fid: number;
 }) {
-  const signer = getSigner();
+  const signer = getSignerFromStorage();
 
   const messageDataOptions = {
     fid,
@@ -76,7 +78,7 @@ export async function createCastMessage({
   mentionsPositions?: number[];
   fid: number;
 }) {
-  const signer = getSigner();
+  const signer = getSignerFromStorage();
 
   const messageDataOptions = {
     fid,
@@ -119,7 +121,7 @@ export async function createRemoveCastMessage({
   castHash: string;
   castAuthorFid: number;
 }) {
-  const signer = getSigner();
+  const signer = getSignerFromStorage();
   const messageDataOptions = {
     fid: castAuthorFid,
     network: FarcasterNetwork.MAINNET
@@ -144,7 +146,7 @@ export async function createFollowMessage({
   fid: number;
   remove?: boolean;
 }) {
-  const signer = getSigner();
+  const signer = getSignerFromStorage();
   const messageDataOptions = {
     fid: fid,
     network: FarcasterNetwork.MAINNET

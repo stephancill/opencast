@@ -1,10 +1,12 @@
 import * as ed from '@noble/ed25519';
 import { useEffect, useState } from 'react';
+import { toast } from 'react-hot-toast';
 import QRCode from 'react-qr-code';
 import { useAuth } from '../../lib/context/auth-context';
-import { BaseResponse } from '../../lib/types/responses';
 import { fetchJSON } from '../../lib/fetch';
-import { toast } from 'react-hot-toast';
+import { addKeyPair } from '../../lib/storage';
+import { KeyPair } from '../../lib/types/keypair';
+import { BaseResponse } from '../../lib/types/responses';
 
 /* https://warpcast.notion.site/Signer-Request-API-Migration-Guide-Public-9e74827f9070442fb6f2a7ffe7226b3c */
 
@@ -33,8 +35,8 @@ export const useLocalStorage = (key: any, initialValue: any) => {
   return [storedValue, setValue];
 };
 
-const WarpcastAuthPopup = () => {
-  const [, setKeyPair] = useLocalStorage('keyPair', null);
+const WarpcastAuthPopup = ({ closeModal }: { closeModal?: () => void }) => {
+  const [, setKeyPair] = useLocalStorage('pendingKeyPair', null);
   const [deepLinkUrl, setDeepLinkUrl] = useState<string | null>(null);
   const [initiated, setInitiated] = useState<boolean>(false);
   const { handleUserAuth } = useAuth();
@@ -121,10 +123,17 @@ const WarpcastAuthPopup = () => {
       }
     }
 
+    // Move pending keypair to keypair
+    const pendingKeyPairRaw = localStorage.getItem('pendingKeyPair') as string;
+    const pendingKeyPair = JSON.parse(pendingKeyPairRaw) as KeyPair;
+    localStorage.removeItem('pendingKeyPair');
+    addKeyPair(pendingKeyPair);
+
     // TODO: Poll server to check if signer has been indexed
     setTimeout(() => {
-      handleUserAuth();
-    }, 5000);
+      closeModal?.();
+      handleUserAuth(pendingKeyPair);
+    }, 2000);
   };
 
   useEffect(() => {

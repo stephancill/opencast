@@ -6,7 +6,7 @@ import { UserContextProvider } from '@lib/context/user-context';
 import { useRouter } from 'next/router';
 import useSWR from 'swr';
 import { fetchJSON } from '../../lib/fetch';
-import { UserResponse } from '../../lib/types/user';
+import { UserFull, UserFullResponse, UserResponse } from '../../lib/types/user';
 import type { LayoutProps } from './common-layout';
 
 export function UserDataLayout({ children }: LayoutProps): JSX.Element {
@@ -17,13 +17,13 @@ export function UserDataLayout({ children }: LayoutProps): JSX.Element {
 
   const { data: user, isValidating: loading } = useSWR(
     id ? `/api/user/${id}` : null,
-    async (url) => (await fetchJSON<UserResponse>(url)).result,
+    async (url) => (await fetchJSON<UserFullResponse>(url)).result,
     { revalidateOnFocus: false, revalidateOnReconnect: false }
   );
 
   return (
     <UserContextProvider
-      value={{ user: user || null, loading: !user && loading }}
+      value={{ user: (user as UserFull) || null, loading: !user && loading }}
     >
       {!user && !loading && <SEO title='User not found / Opencast' />}
       <MainContainer>

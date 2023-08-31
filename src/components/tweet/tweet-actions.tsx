@@ -8,7 +8,7 @@ import { Dialog, Popover } from '@headlessui/react';
 import { useAuth } from '@lib/context/auth-context';
 import { useModal } from '@lib/hooks/useModal';
 import type { Tweet } from '@lib/types/tweet';
-import type { User, UserResponse } from '@lib/types/user';
+import type { User, UserFullResponse, UserResponse } from '@lib/types/user';
 import { preventBubbling } from '@lib/utils';
 import cn from 'clsx';
 import type { Variants } from 'framer-motion';
@@ -67,7 +67,7 @@ export function TweetActions({
   const [shouldFetchUser, setShouldFetchUser] = useState(false);
   const { data: user, isValidating: isUserLoading } = useSWR(
     shouldFetchUser ? `/api/user/${createdBy}` : null,
-    async (url) => (await fetchJSON<UserResponse>(url)).result,
+    async (url) => (await fetchJSON<UserFullResponse>(url)).result,
     { revalidateOnFocus: false }
   );
 

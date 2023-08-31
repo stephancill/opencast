@@ -1,6 +1,6 @@
 import { FollowButton } from '@components/ui/follow-button';
 import { useWindow } from '@lib/context/window-context';
-import type { User, UserResponse } from '@lib/types/user';
+import type { User, UserFullResponse, UserResponse } from '@lib/types/user';
 import cn from 'clsx';
 import Link from 'next/link';
 import { useState, type ReactNode } from 'react';
@@ -56,7 +56,7 @@ export function UserTooltip({
 
   const { data: user, isValidating } = useSWR(
     shouldFetch ? `/api/user/${id}` : null,
-    async (url) => (await fetchJSON<UserResponse>(url)).result,
+    async (url) => (await fetchJSON<UserFullResponse>(url)).result,
     { revalidateOnFocus: false }
   );
 
