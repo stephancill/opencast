@@ -12,29 +12,35 @@ export interface TweetTextProps {
   mentions: Mention[];
 }
 
-function splitAndInsert(
+export function splitAndInsert(
   input: string,
   indices: number[],
   insertions: JSX.Element[],
-  elementBuilder: (s: string) => JSX.Element
+  elementBuilder: (s: string, key: any) => JSX.Element
 ) {
   let result = [];
   let lastIndex = 0;
 
   indices.forEach((index, i) => {
     result.push(
-      elementBuilder(Buffer.from(input).slice(lastIndex, index).toString())
+      elementBuilder(
+        Buffer.from(input).slice(lastIndex, index).toString(),
+        `el-${i}`
+      )
     );
     result.push(insertions[i]);
     lastIndex = index;
   });
 
-  result.push(elementBuilder(Buffer.from(input).slice(lastIndex).toString())); // get remaining part of string
+  result.push(
+    elementBuilder(
+      Buffer.from(input).slice(lastIndex).toString(),
+      `el-${indices.length}`
+    )
+  ); // get remaining part of string
 
   return result;
 }
-
-const urlRegex = /(https?:\/\/[^\s]+)/g;
 
 export function TweetText({
   text,
@@ -57,17 +63,17 @@ export function TweetText({
           </Link>
         );
         return mention.user ? (
-          <span className='inline-block'>
+          <span className='inline-block' key={index}>
             <UserTooltip {...mention.user}>{link}</UserTooltip>
           </span>
         ) : (
           link
         );
       }),
-      (s) => {
+      (s, index) => {
         return (
-          <span className='inline' key={s}>
-            {s.split(/(\s|\n)/).map((part, index) => {
+          <span className='inline' key={index}>
+            {s.split(/(\s|\n)/).map((part, index_) => {
               if (isURL(part, { require_protocol: false })) {
                 return (
                   <Link
@@ -79,7 +85,7 @@ export function TweetText({
                         ? `https://${part}`
                         : part
                     }
-                    key={part}
+                    key={index_}
                     passHref
                   >
                     <a

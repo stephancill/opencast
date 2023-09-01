@@ -15,7 +15,8 @@ import {
   setKeyPair
 } from '../storage';
 import { KeyPair } from '../types/keypair';
-import { NotificationsResponse } from '../types/notifications';
+import { NotificationsResponseSummary } from '../types/notifications';
+import { useRouter } from 'next/router';
 
 type UserWithKey = UserFull & { keyPair: KeyPair };
 
@@ -28,6 +29,7 @@ type AuthContext = {
   randomSeed: string;
   userBookmarks: Bookmark[] | null;
   userNotifications: number | null;
+  lastCheckedNotifications: Date | null;
   signOut: () => Promise<void>;
   showAddAccountModal: () => void;
   setUser: (user: UserWithKey) => void;
@@ -44,6 +46,8 @@ type AuthContextProviderProps = {
 export function AuthContextProvider({
   children
 }: AuthContextProviderProps): JSX.Element {
+  const router = useRouter();
+
   const [user, setUser] = useState<UserWithKey | null>(null);
   const [users, setUsers] = useState<UserWithKey[]>([]);
   const [userBookmarks, setUserBookmarks] = useState<Bookmark[] | null>(null);
@@ -157,12 +161,15 @@ export function AuthContextProvider({
 
   const { data: userNotifications, isValidating: loadingNotifications } =
     useSWR(
-      user?.id && lastCheckedNotifications
+      router.pathname !== '/notifications' &&
+        user?.id &&
+        lastCheckedNotifications
         ? `/api/user/${
             user.id
           }/notifications?last_time=${lastCheckedNotifications.toISOString()}`
         : null,
-      async (url) => (await fetchJSON<NotificationsResponse>(url)).result,
+      async (url) =>
+        (await fetchJSON<NotificationsResponseSummary>(url)).result,
       {
         revalidateOnFocus: false,
         revalidateOnReconnect: false,
@@ -196,7 +203,8 @@ export function AuthContextProvider({
     signOut,
     showAddAccountModal: modal.openModal,
     handleUserAuth,
-    resetNotifications
+    resetNotifications,
+    lastCheckedNotifications
   };
 
   return (

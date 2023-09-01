@@ -21,9 +21,9 @@ import { useQuery } from 'react-query';
 import { Tweet } from '../../components/tweet/tweet';
 import { useInfiniteScroll } from '../../lib/hooks/useInfiniteScroll';
 import {
+  TweetResponse,
   populateTweetTopic,
-  populateTweetUsers,
-  TweetResponse
+  populateTweetUsers
 } from '../../lib/types/tweet';
 
 export default function TweetId(): JSX.Element {
@@ -41,7 +41,7 @@ export default function TweetId(): JSX.Element {
     const response = await fetch(`/api/tweet/${id}`);
 
     if (!response.ok) {
-      console.log(await response.json());
+      console.error(await response.json());
       return;
     }
 

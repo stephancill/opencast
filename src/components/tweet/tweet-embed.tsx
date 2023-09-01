@@ -35,16 +35,16 @@ export function TweetEmbeds({ embeds }: { embeds: ExternalEmbed[] }) {
   return embedsData !== undefined ? (
     embedsData && embedsCount > 0 && (
       <div className={embedsCount > 1 ? `mt-2 grid gap-2` : 'mt-2'}>
-        {embedsData?.map((embed) =>
-          embed ? <TweetEmbed {...embed} key={embed.url}></TweetEmbed> : <></>
+        {embedsData?.map((embed, index) =>
+          embed ? <TweetEmbed {...embed} key={index}></TweetEmbed> : <></>
         )}
       </div>
     )
   ) : (
     <div className={embeds.length > 1 ? `mt-2 grid gap-2` : 'mt-2'}>
-      {embeds?.map((embed) =>
+      {embeds?.map((embed, index) =>
         embed ? (
-          <TweetEmbed {...embed} key={embed.url} isLoading={true}></TweetEmbed>
+          <TweetEmbed {...embed} key={index} isLoading={true}></TweetEmbed>
         ) : (
           <></>
         )

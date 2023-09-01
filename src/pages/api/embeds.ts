@@ -11,8 +11,6 @@ export default async function handle(
     case 'GET':
       let urls = (req.query.urls as string).split(',');
 
-      // console.log(urls);
-
       const embeds = await Promise.all(
         urls.map((url) => populateEmbed({ url }))
       );
