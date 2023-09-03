@@ -24,7 +24,9 @@ export default async function handle(
       // Get all the target_fids (people that the user follows)
       const links = await prisma.links.findMany({
         where: {
-          AND: [{ fid: userFid }, { target_fid: { not: null } }]
+          fid: userFid,
+          target_fid: { not: null },
+          deleted_at: null
         },
         select: {
           target_fid: true
