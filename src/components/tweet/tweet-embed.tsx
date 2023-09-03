@@ -1,7 +1,7 @@
+import Link from 'next/link';
 import { useMemo } from 'react';
 import useSWR from 'swr';
 import { ExternalEmbed } from '../../lib/types/tweet';
-import { preventBubbling } from '../../lib/utils';
 import { NextImage } from '../ui/next-image';
 
 const hoverModifier =
@@ -60,15 +60,19 @@ export function TweetEmbed({
   provider,
   url,
   icon,
-  isLoading
-}: ExternalEmbed & { isLoading?: boolean }): JSX.Element {
-  return (
-    <button
-      className='w-full rounded-md border border-black border-light-border 
-    p-2  text-left text-sm dark:border-dark-border'
-      onClick={preventBubbling(() => window.open(url, '_blank'))}
-    >
-      <a href={url} target={'_blank'}>
+  isLoading,
+  newTab
+}: ExternalEmbed & {
+  isLoading?: boolean;
+  newTab?: boolean;
+}): JSX.Element {
+  const link = (
+    <Link href={url} passHref>
+      <a
+        className='override-nav inline-block w-full rounded-md border 
+border-black border-light-border p-2 text-left text-sm dark:border-dark-border'
+        target={newTab ? '_blank' : url.startsWith('/') ? undefined : '_blank'}
+      >
         <div className='flex items-center'>
           <div className='flex-grow'>
             <div className='flex items-center'>
@@ -125,6 +129,8 @@ export function TweetEmbed({
           )}
         </div>
       </a>
-    </button>
+    </Link>
   );
+
+  return link;
 }

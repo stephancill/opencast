@@ -1,6 +1,9 @@
+import { casts } from '@prisma/client';
 import getMetadata from 'metadata-scraper';
 import { LRU } from './lru-cache';
+import { prisma } from './prisma';
 import { ExternalEmbed, Tweet } from './types/tweet';
+import { isValidImageExtension } from './validation';
 
 const KNOWN_HOSTS_MAP: {
   [key: string]: { urlBuilder?: (url: string) => string; userAgent?: string };
@@ -19,6 +22,7 @@ const KNOWN_HOSTS_MAP: {
   }
 };
 
+// TODO: This method's inputs should be more generic
 export async function populateEmbed(
   embed: ExternalEmbed
 ): Promise<ExternalEmbed | null> {
@@ -40,6 +44,36 @@ export async function populateEmbed(
 
   try {
     const userAgent = KNOWN_HOSTS_MAP[host]?.userAgent || undefined;
+
+    // Replace warpcast links with opencast links
+    // Warpcast regex
+    const regex = /https:\/\/warpcast\.com\/([^\/]+)\/0x([a-fA-F0-9]+)/;
+    const match = url.match(regex);
+
+    if (match && match.length === 3) {
+      // Select cast
+      const [cast] = (await prisma.$queryRaw`
+        select c.* from casts c 
+        inner join user_data ud on c.fid = ud.fid 
+        where 
+          ud."type" = 6 and 
+          SUBSTRING(encode(c.hash, 'hex'), 1, 6) = ${match[2].toLowerCase()} and 
+          ud.value = ${match[1].toLowerCase()}
+        `) as casts[];
+      if (cast) {
+        const images = (
+          cast.embeds as { url?: string; cast?: string }[]
+        ).filter((e) => e.url && isValidImageExtension(e.url));
+        return {
+          url: `/tweet/${cast.hash.toString('hex')}`,
+          text: cast.text,
+          title: `@${match[1]}`,
+          icon: '/logo192.png',
+          image: images.length > 0 ? images[0].url : undefined
+        };
+      }
+    }
+
     const metadata = await getMetadata(url, {
       maxRedirects: 1,
       timeout: 1000,
