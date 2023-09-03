@@ -22,7 +22,7 @@ export function AsideFooter(): JSX.Element {
         ))}
       </nav>
       <div></div>
-      <p>Forked by @stephancill. Use at own risk.</p>
+      <p>Built by @stephancill. Use at own risk.</p>
     </footer>
   );
 }
