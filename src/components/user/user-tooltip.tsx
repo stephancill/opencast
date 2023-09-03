@@ -79,7 +79,7 @@ export function UserTooltip({
       )}
     >
       <span
-        className='inline'
+        className='override-nav inline'
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >

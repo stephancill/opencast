@@ -19,6 +19,7 @@ import { TweetEmbeds } from './tweet-embed';
 import { TweetStats } from './tweet-stats';
 import { TweetText } from './tweet-text';
 import { TweetTopicLazy } from './tweet-topic';
+import { hasAncestorWithClass } from '../../lib/utils';
 
 export type TweetProps = Tweet & {
   user: User;
@@ -94,7 +95,8 @@ export function Tweet(tweet: TweetProps): JSX.Element {
           const isSpecialElement =
             clickedElement.tagName === 'A' || // For links
             clickedElement.tagName === 'IMG' || // For images
-            clickedElement.classList.contains('override-nav');
+            clickedElement.classList.contains('override-nav') ||
+            hasAncestorWithClass(clickedElement, 'override-nav');
 
           // Prevent click when selecting text
           const text = window.getSelection()?.toString();

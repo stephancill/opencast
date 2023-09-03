@@ -14,6 +14,20 @@ export function preventBubbling(
   };
 }
 
+export function hasAncestorWithClass(element: HTMLElement, className: string) {
+  let currentElement: HTMLElement | null = element;
+  while (currentElement) {
+    if (
+      currentElement.classList &&
+      currentElement.classList.contains(className)
+    ) {
+      return true;
+    }
+    currentElement = currentElement.parentElement;
+  }
+  return false;
+}
+
 export function delayScroll(ms: number) {
   return (): NodeJS.Timeout => setTimeout(() => window.scrollTo(0, 0), ms);
 }

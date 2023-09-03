@@ -63,7 +63,7 @@ export function TweetText({
           </Link>
         );
         return mention.user ? (
-          <span className='inline-block' key={index}>
+          <span className='override-nav inline-block' key={index}>
             <UserTooltip {...mention.user}>{link}</UserTooltip>
           </span>
         ) : (
