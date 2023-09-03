@@ -6,12 +6,9 @@ import { StatsEmpty } from '@components/tweet/stats-empty';
 import { Tweet } from '@components/tweet/tweet';
 import { Loading } from '@components/ui/loading';
 import { useUser } from '@lib/context/user-context';
-import { useState, type ReactElement, type ReactNode, useEffect } from 'react';
+import { useEffect, useState, type ReactElement, type ReactNode } from 'react';
 import { useInfiniteScroll } from '../../../lib/hooks/useInfiniteScroll';
-import {
-  populateTweetTopic,
-  populateTweetUsers
-} from '../../../lib/types/tweet';
+import { populateTweetUsers } from '../../../lib/types/tweet';
 
 export default function UserTweets(): JSX.Element {
   const { user } = useUser();
@@ -60,7 +57,7 @@ export default function UserTweets(): JSX.Element {
         <div>
           {mergedTweets.pages.map((page) => {
             if (!page) return;
-            const { tweets, users, topics } = page;
+            const { tweets, users } = page;
             return tweets.map((tweet) => {
               if (!users[tweet.createdBy]) {
                 return <></>;
@@ -68,10 +65,7 @@ export default function UserTweets(): JSX.Element {
 
               return (
                 <Tweet
-                  {...populateTweetTopic(
-                    populateTweetUsers(tweet, users),
-                    topics
-                  )}
+                  {...populateTweetUsers(tweet, users)}
                   user={users[tweet.createdBy]}
                   key={tweet.id}
                 />

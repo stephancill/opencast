@@ -154,7 +154,7 @@ export default async function handle(
         result: {
           tweets,
           users: usersMap,
-          topics: topicsMap,
+          // topics: topicsMap,
           // recasts: recastMap,
           nextPageCursor
         }

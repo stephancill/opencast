@@ -1,6 +1,28 @@
 import Link from 'next/link';
-import { TopicType } from '../../lib/types/topic';
+import useSWR from 'swr';
+import { fetchJSON } from '../../lib/fetch';
+import { TopicResponse, TopicType } from '../../lib/types/topic';
 import { NextImage } from '../ui/next-image';
+
+export function TweetTopicLazy({ topicUrl }: { topicUrl: string }) {
+  const { data, isValidating } = useSWR(
+    `/api/topic?url=${encodeURIComponent(topicUrl)}`,
+    async (url) => (await fetchJSON<TopicResponse>(url)).result
+  );
+
+  return !data ? (
+    isValidating ? (
+      <div className='flex animate-pulse items-center text-light-secondary dark:text-dark-secondary'>
+        #{' '}
+        <span className='ml-2 mr-1 h-4 w-10 flex-shrink-0 flex-grow-0 rounded-md bg-light-secondary dark:bg-dark-secondary'></span>
+      </div>
+    ) : (
+      <></>
+    )
+  ) : (
+    <TweetTopic topic={data} />
+  );
+}
 
 export function TweetTopic({ topic }: { topic: TopicType }) {
   return (

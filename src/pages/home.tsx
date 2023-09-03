@@ -9,9 +9,9 @@ import { Error } from '@components/ui/error';
 import { Loading } from '@components/ui/loading';
 import { useWindow } from '@lib/context/window-context';
 import { useInfiniteScroll } from '@lib/hooks/useInfiniteScroll';
-import { useState, type ReactElement, type ReactNode, useEffect } from 'react';
+import { useEffect, useState, type ReactElement, type ReactNode } from 'react';
 import { useAuth } from '../lib/context/auth-context';
-import { populateTweetTopic, populateTweetUsers } from '../lib/types/tweet';
+import { populateTweetUsers } from '../lib/types/tweet';
 
 export default function Home(): JSX.Element {
   // Debounce
@@ -60,7 +60,7 @@ export default function Home(): JSX.Element {
           <>
             {data.pages.map((page) => {
               if (!page) return;
-              const { tweets, users, topics } = page;
+              const { tweets, users } = page;
               return tweets.map((tweet) => {
                 if (!users[tweet.createdBy]) {
                   return <></>;
@@ -68,10 +68,7 @@ export default function Home(): JSX.Element {
 
                 return (
                   <Tweet
-                    {...populateTweetTopic(
-                      populateTweetUsers(tweet, users),
-                      topics
-                    )}
+                    {...populateTweetUsers(tweet, users)}
                     user={users[tweet.createdBy]}
                     key={tweet.id}
                   />

@@ -14,7 +14,7 @@ import { useEffect, useState, type ReactElement, type ReactNode } from 'react';
 import useSWR from 'swr';
 import { fetchJSON } from '../../lib/fetch';
 import { TopicResponse } from '../../lib/types/topic';
-import { populateTweetTopic, populateTweetUsers } from '../../lib/types/tweet';
+import { populateTweetUsers } from '../../lib/types/tweet';
 
 export default function TopicPage(): JSX.Element {
   // Debounce
@@ -82,7 +82,7 @@ export default function TopicPage(): JSX.Element {
           <>
             {data.pages.map((page) => {
               if (!page) return;
-              const { tweets, users, topics } = page;
+              const { tweets, users } = page;
               return tweets.map((tweet) => {
                 if (!users[tweet.createdBy]) {
                   return <></>;
@@ -90,10 +90,7 @@ export default function TopicPage(): JSX.Element {
 
                 return (
                   <Tweet
-                    {...populateTweetTopic(
-                      populateTweetUsers(tweet, users),
-                      topics
-                    )}
+                    {...populateTweetUsers(tweet, users)}
                     user={users[tweet.createdBy]}
                     key={tweet.id}
                   />

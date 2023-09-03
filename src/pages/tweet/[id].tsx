@@ -20,11 +20,7 @@ import {
 import { useQuery } from 'react-query';
 import { Tweet } from '../../components/tweet/tweet';
 import { useInfiniteScroll } from '../../lib/hooks/useInfiniteScroll';
-import {
-  TweetResponse,
-  populateTweetTopic,
-  populateTweetUsers
-} from '../../lib/types/tweet';
+import { TweetResponse, populateTweetUsers } from '../../lib/types/tweet';
 
 export default function TweetId(): JSX.Element {
   const {
@@ -135,7 +131,7 @@ export default function TweetId(): JSX.Element {
                 <div>
                   {repliesData.pages.map((page) => {
                     if (!page) return;
-                    const { tweets, users, topics } = page;
+                    const { tweets, users } = page;
                     return tweets.map((tweet) => {
                       if (!users[tweet.createdBy]) {
                         return <></>;
@@ -143,10 +139,7 @@ export default function TweetId(): JSX.Element {
 
                       return (
                         <Tweet
-                          {...populateTweetTopic(
-                            populateTweetUsers(tweet, users),
-                            topics
-                          )}
+                          {...populateTweetUsers(tweet, users)}
                           user={users[tweet.createdBy]}
                           key={tweet.id}
                         />

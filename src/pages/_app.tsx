@@ -1,5 +1,5 @@
-import '@styles/globals.scss';
 import '@rainbow-me/rainbowkit/styles.css';
+import '@styles/globals.scss';
 
 import { AppHead } from '@components/common/app-head';
 import { AuthContextProvider } from '@lib/context/auth-context';

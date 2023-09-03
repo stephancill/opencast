@@ -11,10 +11,7 @@ import { useEffect, useState, type ReactElement, type ReactNode } from 'react';
 import { Tweet } from '../../../components/tweet/tweet';
 import { TweetParent } from '../../../components/tweet/tweet-parent';
 import { useInfiniteScroll } from '../../../lib/hooks/useInfiniteScroll';
-import {
-  populateTweetTopic,
-  populateTweetUsers
-} from '../../../lib/types/tweet';
+import { populateTweetUsers } from '../../../lib/types/tweet';
 
 export default function UserWithReplies(): JSX.Element {
   const { user } = useUser();
@@ -66,7 +63,7 @@ export default function UserWithReplies(): JSX.Element {
         <div>
           {data.pages.map((page) => {
             if (!page) return;
-            const { tweets, users, topics } = page;
+            const { tweets, users } = page;
             return tweets.map((tweet) => {
               if (!users[tweet.createdBy]) {
                 return <></>;
@@ -82,10 +79,7 @@ export default function UserWithReplies(): JSX.Element {
                     />
                   )}
                   <Tweet
-                    {...populateTweetTopic(
-                      populateTweetUsers(tweet, users),
-                      topics
-                    )}
+                    {...populateTweetUsers(tweet, users)}
                     user={users[tweet.createdBy]}
                     key={tweet.id}
                   />

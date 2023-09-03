@@ -18,7 +18,7 @@ import { TweetDate } from './tweet-date';
 import { TweetEmbeds } from './tweet-embed';
 import { TweetStats } from './tweet-stats';
 import { TweetText } from './tweet-text';
-import { TweetTopic } from './tweet-topic';
+import { TweetTopicLazy } from './tweet-topic';
 
 export type TweetProps = Tweet & {
   user: User;
@@ -51,6 +51,7 @@ export function Tweet(tweet: TweetProps): JSX.Element {
     userRetweets,
     mentions,
     topic,
+    topicUrl,
     retweet,
     embeds,
     user: tweetUserData
@@ -177,7 +178,7 @@ export function Tweet(tweet: TweetProps): JSX.Element {
                 />
               )}
               {embeds && embeds.length > 0 && <TweetEmbeds embeds={embeds} />}
-              {topic && <TweetTopic topic={topic} />}
+              {topicUrl && <TweetTopicLazy topicUrl={topicUrl} />}
               {!modal && (
                 <TweetStats
                   reply={reply}
