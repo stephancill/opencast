@@ -4,6 +4,8 @@ import { LRU } from './lru-cache';
 import { prisma } from './prisma';
 import { ExternalEmbed, Tweet } from './types/tweet';
 import { isValidImageExtension } from './validation';
+import { UserDataType } from '@farcaster/hub-web';
+import { resolveUserFromFid } from './user/resolve-user';
 
 const KNOWN_HOSTS_MAP: {
   [key: string]: { urlBuilder?: (url: string) => string; userAgent?: string };
@@ -56,19 +58,20 @@ export async function populateEmbed(
         select c.* from casts c 
         inner join user_data ud on c.fid = ud.fid 
         where 
-          ud."type" = 6 and 
+          ud."type" = ${UserDataType.USERNAME} and 
           SUBSTRING(encode(c.hash, 'hex'), 1, 6) = ${match[2].toLowerCase()} and 
           ud.value = ${match[1].toLowerCase()}
         `) as casts[];
       if (cast) {
+        const user = await resolveUserFromFid(cast.fid);
         const images = (
           cast.embeds as { url?: string; cast?: string }[]
         ).filter((e) => e.url && isValidImageExtension(e.url));
         return {
           url: `/tweet/${cast.hash.toString('hex')}`,
           text: cast.text,
-          title: `@${match[1]}`,
-          icon: '/logo192.png',
+          title: user?.name,
+          icon: user?.photoURL,
           image: images.length > 0 ? images[0].url : undefined
         };
       }

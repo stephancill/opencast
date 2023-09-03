@@ -77,7 +77,14 @@ border-black border-light-border p-2 text-left text-sm dark:border-dark-border'
           <div className='flex-grow'>
             <div className='flex items-center'>
               {icon && (
-                <span className='mx-1'>
+                // Only fully rounded if it's a link to a cast
+                <span
+                  className={`mx-1 ${
+                    url.startsWith('/tweet')
+                      ? 'overflow-hidden rounded-full'
+                      : ''
+                  }`}
+                >
                   <NextImage
                     src={icon}
                     alt={provider || ''}
