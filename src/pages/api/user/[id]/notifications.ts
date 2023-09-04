@@ -2,6 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { castsToTweets } from '../../../../lib/paginated-tweets';
 import { prisma } from '../../../../lib/prisma';
 import {
+  AccumulatedFollow,
   AccumulatedReaction,
   BasicFollow,
   BasicMention,
@@ -231,10 +232,20 @@ export default async function handle(
         {}
       );
 
+      const sortedFollows = basicFollows.sort((a, b) => {
+        return (
+          new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+        );
+      });
+      const accumulatedFollow: AccumulatedFollow = {
+        ...(sortedFollows[0] || {}),
+        follows: sortedFollows
+      };
+
       // Combine all notifications
       const allNotifications: BasicNotification[] = [
         ...Object.values(reactionsByCast),
-        ...basicFollows,
+        ...(sortedFollows.length > 0 ? [accumulatedFollow] : []),
         ...basicReplies,
         ...basicMentions
       ];

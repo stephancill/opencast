@@ -56,6 +56,10 @@ export type AccumulatedReaction = BasicNotification & {
   userId: string;
 };
 
+export type AccumulatedFollow = BasicNotification & {
+  follows: BasicFollow[];
+};
+
 export type NotificationsResponseFull = BaseResponse<
   NotificationsSummary & {
     notifications: BasicNotification[];

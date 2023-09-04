@@ -18,6 +18,7 @@ import { UserName } from '../components/user/user-name';
 import { UserTooltip } from '../components/user/user-tooltip';
 import { useAuth } from '../lib/context/auth-context';
 import {
+  AccumulatedFollow,
   AccumulatedReaction,
   BasicMention,
   BasicNotification,
@@ -184,7 +185,7 @@ export default function NotificationsPage(): JSX.Element {
                               </div>
                             );
                           case MessageType.LINK_ADD:
-                            const link = item as BasicNotification;
+                            const link = item as AccumulatedFollow;
                             const user = data.usersMap[link.userId];
                             return (
                               <div
@@ -197,18 +198,29 @@ export default function NotificationsPage(): JSX.Element {
                                 />
                                 <div className='flex flex-col'>
                                   <div className='flex gap-1 py-2'>
-                                    <UserTooltip
-                                      key={link.userId}
-                                      {...data.usersMap[link.userId]}
-                                    >
-                                      <UserAvatar
-                                        src={user.photoURL}
-                                        alt={user.name}
-                                        username={user.username}
-                                        className='h-8 w-8'
-                                      />
-                                    </UserTooltip>
+                                    {link.follows.slice(0, 8).map((follow) => (
+                                      <UserTooltip
+                                        key={follow.userId}
+                                        {...data.usersMap[follow.userId]}
+                                      >
+                                        <UserAvatar
+                                          src={
+                                            data.usersMap[follow.userId]
+                                              .photoURL
+                                          }
+                                          alt={
+                                            data.usersMap[follow.userId].name
+                                          }
+                                          username={
+                                            data.usersMap[follow.userId]
+                                              .username
+                                          }
+                                          className='h-8 w-8'
+                                        />
+                                      </UserTooltip>
+                                    ))}
                                   </div>
+
                                   <div>
                                     <span className='inline-block hover:underline'>
                                       <UserTooltip
@@ -221,6 +233,13 @@ export default function NotificationsPage(): JSX.Element {
                                         />
                                       </UserTooltip>
                                     </span>{' '}
+                                    {link.follows.length > 0
+                                      ? ` and ${link.follows.length} other${
+                                          isPlural(link.follows.length)
+                                            ? 's'
+                                            : ''
+                                        }`
+                                      : ''}{' '}
                                     followed you
                                   </div>
                                 </div>
