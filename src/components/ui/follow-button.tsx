@@ -1,14 +1,15 @@
+import { ActionModal } from '@components/modal/action-modal';
+import { Modal } from '@components/modal/modal';
+import { Button } from '@components/ui/button';
 import { useAuth } from '@lib/context/auth-context';
 import { useModal } from '@lib/hooks/useModal';
 import { preventBubbling } from '@lib/utils';
-import { Modal } from '@components/modal/modal';
-import { ActionModal } from '@components/modal/action-modal';
-import { Button } from '@components/ui/button';
+import { useState } from 'react';
+import toast from 'react-hot-toast';
 import {
   createFollowMessage,
   submitHubMessage
 } from '../../lib/farcaster/utils';
-import toast from 'react-hot-toast';
 
 type FollowButtonProps = {
   userTargetId: string;
@@ -26,6 +27,10 @@ export function FollowButton({
 
   const { id: userId, following } = user ?? {};
 
+  const [userIsFollowed, setUserIsFollowed] = useState<boolean>(
+    !!following?.includes(userTargetId ?? '')
+  );
+
   const handleFollow = async (): Promise<void> => {
     if (!userId) {
       toast.error(`Failed to follow @${userTargetUsername}`);
@@ -39,6 +44,9 @@ export function FollowButton({
 
     if (message) {
       const res = await submitHubMessage(message);
+      if (res) {
+        setUserIsFollowed(true);
+      }
     } else {
       toast.error(`Failed to follow @${userTargetUsername}`);
     }
@@ -58,13 +66,14 @@ export function FollowButton({
 
     if (message) {
       const res = await submitHubMessage(message);
+      if (res) {
+        setUserIsFollowed(false);
+      }
     } else {
       toast.error(`Failed to unfollow @${userTargetUsername}`);
     }
     closeModal();
   };
-
-  const userIsFollowed = !!following?.includes(userTargetId ?? '');
 
   return (
     <>
