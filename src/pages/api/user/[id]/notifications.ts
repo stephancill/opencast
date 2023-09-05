@@ -116,11 +116,9 @@ export default async function handle(
         casts.fid as message_fid, 
         casts.hash as message_hash, 
         casts.timestamp as message_timestamp,
-        messages.message_type as message_type,
-        parents.fid as parent_fid 
+        messages.message_type as message_type
         FROM casts
         JOIN messages ON casts.hash = messages.hash
-        JOIN casts parents on casts.parent_hash = parents.hash
         WHERE
             casts.deleted_at IS NULL AND
             casts.timestamp > ${afterTime} AND
