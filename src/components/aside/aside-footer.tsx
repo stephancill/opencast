@@ -5,7 +5,7 @@ const footerLinks = [
 export function AsideFooter(): JSX.Element {
   return (
     <footer
-      className='sticky top-[33rem] flex flex-col gap-3 text-center text-sm
+      className='sticky flex flex-col gap-3 text-center text-sm
                  text-light-secondary dark:text-dark-secondary'
     >
       <nav className='flex flex-wrap justify-center gap-2'>
