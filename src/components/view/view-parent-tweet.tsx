@@ -73,11 +73,19 @@ export function ViewParentTweet({
     );
 
   return (
-    <Tweet
-      parentTweet
-      {...data}
-      mentions={mentions || []}
-      user={data.users[data.createdBy]}
-    />
+    <>
+      {data.parent && (
+        <ViewParentTweet
+          parentId={data.parent.id}
+          viewTweetRef={viewTweetRef}
+        />
+      )}
+      <Tweet
+        parentTweet
+        {...data}
+        mentions={mentions || []}
+        user={data.users[data.createdBy]}
+      />
+    </>
   );
 }
