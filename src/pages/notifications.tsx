@@ -164,7 +164,7 @@ export default function NotificationsPage(): JSX.Element {
                                     your post
                                   </div>
                                   <Link href={`/tweet/${cast.id}`} passHref>
-                                    <a className='w-full cursor-pointer break-all text-gray-500 hover:brightness-75 dark:hover:brightness-125'>
+                                    <a className='w-full cursor-pointer break-words text-gray-500 [overflow-wrap:anywhere] hover:brightness-75 dark:hover:brightness-125'>
                                       {splitAndInsert(
                                         cast.text || '',
                                         cast.mentions.map(
