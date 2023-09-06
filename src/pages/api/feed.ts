@@ -20,6 +20,7 @@ export default async function handle(
         req.query.limit && req.query.limit !== 'undefined'
           ? Number(req.query.limit)
           : 10;
+      const after = !!req.query.after && req.query.after !== 'false';
 
       // Get all the target_fids (people that the user follows)
       const links = await prisma.links.findMany({
@@ -43,7 +44,8 @@ export default async function handle(
             in: targetFids
           },
           timestamp: {
-            lt: cursor || undefined
+            lt: !after ? cursor || undefined : undefined,
+            gt: after ? cursor || undefined : undefined
           },
           parent_hash: null,
           deleted_at: null,
