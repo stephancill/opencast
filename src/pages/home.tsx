@@ -16,6 +16,7 @@ import { useAuth } from '../lib/context/auth-context';
 import { PaginatedTweetsResponse } from '../lib/paginated-tweets';
 import { Tweet as TweetType, populateTweetUsers } from '../lib/types/tweet';
 import { User, UsersMapType } from '../lib/types/user';
+import { isPlural } from '../lib/utils';
 
 export default function Home(): JSX.Element {
   const { isMobile } = useWindow();
@@ -93,6 +94,17 @@ export default function Home(): JSX.Element {
       {!isMobile && <Input />}
       <section className='mt-0.5 xs:mt-0'>
         <>
+          {newPage?.result?.tweets &&
+            (newPage.result.tweets.length || 0) > 0 && (
+              <button
+                className='custom-button accent-tab hover-card border-bottom block w-full cursor-pointer rounded-none
+            border-b border-t-0 border-light-border text-center text-main-accent dark:border-dark-border'
+                onClick={onShowNewTweets}
+              >
+                Show {newPage.result.tweets.length} new cast
+                {isPlural(newPage.result.tweets.length) ? 's' : ''}
+              </button>
+            )}
           {newPageTweets.map((tweet) => (
             <Tweet
               {...populateTweetUsers(tweet, newPageUsers)}
@@ -100,15 +112,6 @@ export default function Home(): JSX.Element {
               key={tweet.id}
             />
           ))}
-          {(newPage?.result?.tweets.length || 0) > 0 && (
-            <button
-              className='custom-button accent-tab hover-card border-bottom block w-full cursor-pointer rounded-none
-            border-b border-t-0 border-light-border text-center text-main-accent dark:border-dark-border'
-              onClick={onShowNewTweets}
-            >
-              Show {newPage?.result?.tweets.length} new casts
-            </button>
-          )}
           {pages?.map(({ result }) => {
             if (!result) return;
             const { tweets, users } = result;
