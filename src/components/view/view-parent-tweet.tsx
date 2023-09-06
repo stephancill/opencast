@@ -1,7 +1,7 @@
 import { Tweet } from '@components/tweet/tweet';
-import { RefObject, useMemo } from 'react';
-import { useEffect } from 'react';
-import { useQuery } from 'react-query';
+import { RefObject, useEffect, useMemo } from 'react';
+import useSWR from 'swr';
+import { fetchJSON } from '../../lib/fetch';
 import { TweetResponse } from '../../lib/types/tweet';
 
 type ViewParentTweetProps = {
@@ -13,28 +13,9 @@ export function ViewParentTweet({
   parentId,
   viewTweetRef
 }: ViewParentTweetProps): JSX.Element | null {
-  const fetchCast = async () => {
-    const response = await fetch(`/api/tweet/${parentId}`);
-
-    if (!response.ok) {
-      console.error(await response.json());
-      return;
-    }
-
-    const responseJson = (await response.json()) as TweetResponse;
-
-    if (!responseJson.result) {
-      console.error(responseJson.message);
-    }
-
-    const tweet = responseJson.result;
-
-    return tweet;
-  };
-
-  const { data, isLoading: loading } = useQuery(
-    ['parentTweet', parentId],
-    fetchCast
+  const { data, isValidating: loading } = useSWR(
+    `/api/tweet/${parentId}`,
+    async (url) => (await fetchJSON<TweetResponse>(url)).result
   );
 
   const mentions = useMemo(() => {
@@ -49,10 +30,9 @@ export function ViewParentTweet({
   useEffect(() => {
     if (!loading) viewTweetRef.current?.scrollIntoView();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data?.id, loading]);
+  }, [data?.id]);
 
-  if (loading) return null;
-  if (!data)
+  if (!data && !loading)
     return (
       <div className='px-4 pb-2 pt-3'>
         <p
@@ -72,7 +52,7 @@ export function ViewParentTweet({
       </div>
     );
 
-  return (
+  return data ? (
     <>
       {data.parent && (
         <ViewParentTweet
@@ -87,5 +67,7 @@ export function ViewParentTweet({
         user={data.users[data.createdBy]}
       />
     </>
+  ) : (
+    <></>
   );
 }

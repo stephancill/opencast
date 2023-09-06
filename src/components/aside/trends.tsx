@@ -5,7 +5,8 @@ import cn from 'clsx';
 import type { MotionProps } from 'framer-motion';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { useQuery } from 'react-query';
+import useSWR from 'swr';
+import { fetchJSON } from '../../lib/fetch';
 import { TrendsResponse } from '../../lib/types/trends';
 import { NextImage } from '../ui/next-image';
 
@@ -20,26 +21,9 @@ type AsideTrendsProps = {
 };
 
 export function AsideTrends({ inTrendsPage }: AsideTrendsProps): JSX.Element {
-  const fetchTrends = async () => {
-    const response = await fetch(`/api/trends?limit=${inTrendsPage ? 20 : 5}`);
-
-    if (!response.ok) {
-      console.log(await response.json());
-      return;
-    }
-
-    const responseJson = (await response.json()) as TrendsResponse;
-
-    if (!responseJson.result) {
-      console.error(responseJson.message);
-    }
-
-    return responseJson.result;
-  };
-
-  const { data: trends, isLoading: loading } = useQuery(
-    ['trends'],
-    fetchTrends
+  const { data: trends, isValidating: loading } = useSWR(
+    `/api/trends?limit=${inTrendsPage ? 20 : 5}`,
+    async (url: string) => (await fetchJSON<TrendsResponse>(url)).result
   );
 
   return (

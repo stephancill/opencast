@@ -17,8 +17,9 @@ import {
   useRef,
   useState
 } from 'react';
-import { useQuery } from 'react-query';
+import useSWR from 'swr';
 import { Tweet } from '../../components/tweet/tweet';
+import { fetchJSON } from '../../lib/fetch';
 import { useInfiniteScroll } from '../../lib/hooks/useInfiniteScroll';
 import { TweetResponse, populateTweetUsers } from '../../lib/types/tweet';
 
@@ -33,33 +34,10 @@ export default function TweetId(): JSX.Element {
     setEnabled(true);
   }, []);
 
-  const fetchCast = async () => {
-    const response = await fetch(`/api/tweet/${id}`);
-
-    if (!response.ok) {
-      console.error(await response.json());
-      return;
-    }
-
-    const responseJson = (await response.json()) as TweetResponse;
-
-    if (!responseJson.result) {
-      console.error(responseJson.message);
-    }
-
-    const tweet = responseJson.result;
-
-    return tweet;
-  };
-
-  const {
-    data: tweetData,
-    isLoading: tweetLoading,
-    isError: tweetError
-  } = useQuery(['tweet', id], fetchCast, {
-    keepPreviousData: false,
-    refetchOnWindowFocus: false
-  });
+  const { data: tweetData, isValidating: tweetLoading } = useSWR(
+    `/api/tweet/${id}`,
+    async (url) => (await fetchJSON<TweetResponse>(url)).result
+  );
 
   const {
     data: repliesData,
@@ -101,7 +79,7 @@ export default function TweetId(): JSX.Element {
         action={back}
       />
       <section>
-        {tweetLoading ? (
+        {tweetLoading && !tweetData ? (
           <Loading className='mt-5' />
         ) : !(tweetWithPopulatedUsers && tweetData) ? (
           <>
