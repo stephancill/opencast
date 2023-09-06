@@ -41,21 +41,24 @@ export default function NotificationsPage(): JSX.Element {
     setSize,
     isValidating: loading,
     error
-  } = useSWRInfinite<NotificationsResponseFull>((pageIndex, prevPage) => {
-    if (!user) return null;
+  } = useSWRInfinite<NotificationsResponseFull>(
+    (pageIndex, prevPage) => {
+      if (!user) return null;
 
-    if (prevPage && !prevPage.result?.cursor) return null;
+      if (prevPage && !prevPage.result?.cursor) return null;
 
-    const baseUrl = `/api/user/${
-      user.id
-    }/notifications?before_time=${lastCheckedNotifications.toISOString()}&full=true`;
+      const baseUrl = `/api/user/${
+        user.id
+      }/notifications?before_time=${lastCheckedNotifications.toISOString()}&full=true`;
 
-    if (pageIndex === 0) return baseUrl;
+      if (pageIndex === 0) return baseUrl;
 
-    if (!prevPage?.result) return null;
+      if (!prevPage?.result) return null;
 
-    return `${baseUrl}&cursor=${prevPage.result.cursor}&limit=10`;
-  });
+      return `${baseUrl}&cursor=${prevPage.result.cursor}&limit=10`;
+    },
+    { revalidateFirstPage: false }
+  );
 
   const hasMore = !!pages?.[size - 1]?.result?.notifications.length;
 
