@@ -2,7 +2,7 @@ import { Dialog } from '@headlessui/react';
 import WarpcastAuthPopup from '../login/sign-in-with-warpcast';
 import { Modal } from './modal';
 
-export function SignInModal({
+export function WarpcastSignInModal({
   open,
   closeModal
 }: {

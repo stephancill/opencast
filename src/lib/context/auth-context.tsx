@@ -4,7 +4,7 @@ import type { UserFull, UserFullResponse, UserResponse } from '@lib/types/user';
 import type { ReactNode } from 'react';
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
-import { SignInModal } from '../../components/modal/sign-in-modal';
+import { WarpcastSignInModal } from '../../components/modal/sign-in-modal-warpcast';
 import { fetchJSON } from '../fetch';
 import { useModal } from '../hooks/useModal';
 import {
@@ -156,7 +156,7 @@ export function AuthContextProvider({
     }
   };
 
-  const isAdmin = user ? user.username === 'ccrsxx' : false;
+  const isAdmin = false;
   const randomSeed = useMemo(getRandomId, [user?.id]);
 
   const { data: userNotifications, isValidating: loadingNotifications } =
@@ -210,7 +210,7 @@ export function AuthContextProvider({
   return (
     <AuthContext.Provider value={value}>
       <>
-        <SignInModal {...modal}></SignInModal>
+        <WarpcastSignInModal {...modal}></WarpcastSignInModal>
       </>
       {children}
     </AuthContext.Provider>

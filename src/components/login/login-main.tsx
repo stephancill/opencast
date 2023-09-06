@@ -1,17 +1,23 @@
 import { Button } from '@components/ui/button';
 import { CustomIcon } from '@components/ui/custom-icon';
 import { NextImage } from '@components/ui/next-image';
-import { Dialog } from '@headlessui/react';
 import { useModal } from '../../lib/hooks/useModal';
-import { Modal } from '../modal/modal';
-import WarpcastAuthPopup from './sign-in-with-warpcast';
+import { WarpcastSignInModal } from '../modal/sign-in-modal-warpcast';
+import { HeroIcon } from '../ui/hero-icon';
+import WalletSignInModal from '../modal/sign-in-modal-wallet';
 
 export function LoginMain(): JSX.Element {
-  const { openModal, closeModal, open } = useModal();
+  const {
+    openModal: openModalWarpcast,
+    closeModal: closeModalWarpcast,
+    open: openWarpcast
+  } = useModal();
 
-  const signInWithWarpcast = () => {
-    openModal();
-  };
+  const {
+    openModal: openModalWallet,
+    closeModal: closeModalWallet,
+    open: openWallet
+  } = useModal();
 
   return (
     <main className='grid lg:grid-cols-[1fr,45vw]'>
@@ -28,31 +34,15 @@ export function LoginMain(): JSX.Element {
           <CustomIcon className='h-96 w-96 text-white' iconName='TwitterIcon' />
         </i>
       </div>
-      <Modal
-        className='flex items-start justify-center'
-        modalClassName='bg-main-background rounded-2xl max-w-xl p-4 overflow-hidden flex justify-center'
-        open={open}
-        closeModal={closeModal}
-      >
-        <div>
-          <div className='flex flex-col gap-2'>
-            <div className='flex'>
-              <Dialog.Title className='flex-grow text-xl font-bold'>
-                Sign in with Warpcast
-              </Dialog.Title>
-              <button onClick={closeModal}>x</button>
-            </div>
+      <WarpcastSignInModal
+        closeModal={closeModalWarpcast}
+        open={openWarpcast}
+      ></WarpcastSignInModal>
+      <WalletSignInModal
+        closeModal={closeModalWallet}
+        open={openWallet}
+      ></WalletSignInModal>
 
-            <Dialog.Description className='text-light-secondary dark:text-dark-secondary'>
-              Scan the QR code with the camera app on your device with Warpcast
-              installed.
-            </Dialog.Description>
-          </div>
-          <div className='flex justify-center p-8'>
-            <WarpcastAuthPopup></WarpcastAuthPopup>
-          </div>
-        </div>
-      </Modal>
       <div className='flex flex-col items-center justify-between gap-6 p-8 lg:items-start lg:justify-center'>
         <i className='mb-0 self-center lg:mb-10 lg:self-auto'>
           <CustomIcon
@@ -75,9 +65,17 @@ export function LoginMain(): JSX.Element {
               className='flex justify-center gap-2 border border-light-line-reply font-bold text-light-primary transition
                          hover:bg-[#e6e6e6] focus-visible:bg-[#e6e6e6] active:bg-[#cccccc] dark:border-0 dark:bg-white
                          dark:hover:brightness-90 dark:focus-visible:brightness-90 dark:active:brightness-75'
-              onClick={signInWithWarpcast}
+              onClick={openModalWarpcast}
             >
-              <CustomIcon iconName='TriangleIcon' /> Sign up with Warpcast
+              <CustomIcon iconName='TriangleIcon' /> Sign in with Warpcast
+            </Button>
+            <Button
+              className='flex justify-center gap-2 border border-light-line-reply font-bold text-light-primary transition
+                         hover:bg-[#e6e6e6] focus-visible:bg-[#e6e6e6] active:bg-[#cccccc] dark:border-0 dark:bg-white
+                         dark:hover:brightness-90 dark:focus-visible:brightness-90 dark:active:brightness-75'
+              onClick={openModalWallet}
+            >
+              <HeroIcon iconName='GlobeAltIcon' /> Sign in with Ethereum
             </Button>
             <p
               className='inner:custom-underline inner:custom-underline text-center text-xs

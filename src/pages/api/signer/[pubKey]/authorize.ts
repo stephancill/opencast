@@ -1,7 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { mnemonicToAccount } from 'viem/accounts';
-import { encodeAbiParameters } from 'viem';
-import { BaseResponse } from '../../../../lib/types/responses';
+import { AppAuthResponse } from '../../../../lib/types/app-auth';
 
 // https://warpcast.notion.site/Signer-Request-API-Migration-Guide-Public-9e74827f9070442fb6f2a7ffe7226b3c
 
@@ -24,9 +23,7 @@ const SIGNED_KEY_REQUEST_TYPE = [
 
 export default async function handle(
   req: NextApiRequest,
-  res: NextApiResponse<
-    BaseResponse<{ requestFid: number; signature: string; deadline: number }>
-  >
+  res: NextApiResponse<AppAuthResponse>
 ): Promise<void> {
   const { pubKey } = req.query as SignerEndpointQuery;
 
@@ -47,5 +44,12 @@ export default async function handle(
     }
   });
 
-  res.json({ result: { signature, requestFid: parseInt(appFid), deadline } });
+  res.json({
+    result: {
+      signature,
+      requestFid: parseInt(appFid),
+      deadline,
+      requestSigner: account.address
+    }
+  });
 }

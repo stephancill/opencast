@@ -60,7 +60,7 @@ const WarpcastAuthPopup = ({ closeModal }: { closeModal?: () => void }) => {
 
     // Get app signature
     const { result: appSignatureResult } = (await fetchJSON(
-      `/api/signer/${keyPair.publicKey}/new`
+      `/api/signer/${keyPair.publicKey}/authorize`
     )) as BaseResponse<{
       requestFid: number;
       signature: string;
