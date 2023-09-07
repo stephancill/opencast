@@ -1,15 +1,17 @@
-import { formatDate } from '@lib/date';
+import type { IconName } from '@components/ui/hero-icon';
 import { HeroIcon } from '@components/ui/hero-icon';
 import { ToolTip } from '@components/ui/tooltip';
-import { UserName } from './user-name';
-import { UserFollowing } from './user-following';
-import { UserFollowStats } from './user-follow-stats';
-import type { IconName } from '@components/ui/hero-icon';
-import type { User, UserFull } from '@lib/types/user';
+import { formatDate } from '@lib/date';
+import type { UserFull } from '@lib/types/user';
 import Link from 'next/link';
-import { TopicView } from '../tweet/tweet-topic';
+import { useAuth } from '../../lib/context/auth-context';
 import { TweetText } from '../tweet/tweet-text';
+import { TopicView } from '../tweet/tweet-topic';
 import { UserFid } from './user-fid';
+import { UserFollowStats } from './user-follow-stats';
+import { UserFollowing } from './user-following';
+import { UserKnownFollowersLazy } from './user-known-followers';
+import { UserName } from './user-name';
 
 type UserDetailsProps = Pick<
   UserFull,
@@ -46,6 +48,7 @@ export function UserDetails({
     [website, 'LinkIcon']
     // [`Joined ${formatDate(new Date(createdAt), 'joined')}`, 'CalendarDaysIcon']
   ];
+  const { user: currentUser } = useAuth();
 
   return (
     <>
@@ -108,6 +111,7 @@ export function UserDetails({
         ))}
       </div>
       <UserFollowStats following={following} followers={followers} />
+      {currentUser?.id !== id && <UserKnownFollowersLazy userId={id} />}
     </>
   );
 }

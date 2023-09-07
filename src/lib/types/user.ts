@@ -42,6 +42,11 @@ export type UserFullResponse = BaseResponse<UserFull>;
 
 export type UsersMapType<T> = { [key: string]: T };
 
+export type KnownFollowersResponse = BaseResponse<{
+  knownFollowerCount: number;
+  resolvedUsers: User[];
+}>;
+
 export const userConverter = {
   toUser(user: any): User {
     return {

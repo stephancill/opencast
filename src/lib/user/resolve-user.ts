@@ -133,7 +133,7 @@ export async function resolveUsers(
   full: boolean = false
 ): Promise<(User | UserFull)[]> {
   const users = await Promise.all(
-    full
+    !full
       ? fids.map((fid) => resolveUserFromFid(fid))
       : fids.map((fid) => resolveUserFullFromFid(fid))
   );

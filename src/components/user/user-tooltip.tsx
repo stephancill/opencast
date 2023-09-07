@@ -1,10 +1,11 @@
 import { FollowButton } from '@components/ui/follow-button';
 import { useWindow } from '@lib/context/window-context';
-import type { User, UserFullResponse, UserResponse } from '@lib/types/user';
+import type { User, UserFullResponse } from '@lib/types/user';
 import cn from 'clsx';
 import Link from 'next/link';
 import { useState, type ReactNode } from 'react';
 import useSWR from 'swr';
+import { useAuth } from '../../lib/context/auth-context';
 import { formatNumber } from '../../lib/date';
 import { fetchJSON } from '../../lib/fetch';
 import { TweetText } from '../tweet/tweet-text';
@@ -13,6 +14,7 @@ import { Loading } from '../ui/loading';
 import { UserAvatar } from './user-avatar';
 import { UserFid } from './user-fid';
 import { UserFollowing } from './user-following';
+import { UserKnownFollowersLazy } from './user-known-followers';
 import { UserName } from './user-name';
 import { UserUsername } from './user-username';
 
@@ -39,6 +41,7 @@ export function UserTooltip({
   username
 }: UserTooltipProps): JSX.Element {
   const { isMobile } = useWindow();
+  const { user: currentUser } = useAuth();
 
   const [shouldFetch, setShouldFetch] = useState(false);
   let hoverTimer: NodeJS.Timeout | null = null;
@@ -152,6 +155,9 @@ export function UserTooltip({
                 </Link>
               ))}
             </div>
+            {currentUser?.id !== id && (
+              <UserKnownFollowersLazy userId={id} enabled={shouldFetch} />
+            )}
           </div>
         ) : isValidating ? (
           <Loading className='p-4' />
