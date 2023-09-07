@@ -64,7 +64,7 @@ export default function Home(): JSX.Element {
         }&cursor=${timelineCursor.toISOString()}&limit=100&after=true`
       : null,
     null,
-    { refreshInterval: 1000 }
+    { refreshInterval: 10_000 }
   );
 
   const onShowNewTweets = () => {
