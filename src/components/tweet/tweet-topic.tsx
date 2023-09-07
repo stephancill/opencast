@@ -12,15 +12,21 @@ export function TweetTopicLazy({ topicUrl }: { topicUrl: string }) {
 
   return !data ? (
     isValidating ? (
-      <div className='flex animate-pulse items-center text-light-secondary dark:text-dark-secondary'>
-        #{' '}
-        <span className='ml-2 mr-1 h-4 w-10 flex-shrink-0 flex-grow-0 rounded-md bg-light-secondary dark:bg-dark-secondary'></span>
-      </div>
+      <TweetTopicSkeleton />
     ) : (
       <></>
     )
   ) : (
     <TweetTopic topic={data} />
+  );
+}
+
+export function TweetTopicSkeleton() {
+  return (
+    <div className='flex animate-pulse items-center text-light-secondary dark:text-dark-secondary'>
+      #{' '}
+      <span className='ml-2 mr-1 h-4 w-10 flex-shrink-0 flex-grow-0 rounded-md bg-light-secondary dark:bg-dark-secondary'></span>
+    </div>
   );
 }
 

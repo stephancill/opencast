@@ -23,7 +23,7 @@ import { ExternalEmbed } from '../../lib/types/tweet';
 import { SearchTopics } from '../search/search-topics';
 import { UserSearchResult } from '../search/user-search-result';
 import { TweetEmbed } from '../tweet/tweet-embed';
-import { TopicView } from '../tweet/tweet-topic';
+import { TopicView, TweetTopicSkeleton } from '../tweet/tweet-topic';
 import { Loading } from '../ui/loading';
 import { ImagePreview } from './image-preview';
 import { InputForm, fromTop } from './input-form';
@@ -555,7 +555,7 @@ export function Input({
 
           {loadingTopic ? (
             <div className='w-10'>
-              <Loading />
+              <TweetTopicSkeleton />
             </div>
           ) : showingTopicSelector && !parent ? (
             <SearchTopics
