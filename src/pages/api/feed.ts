@@ -1,13 +1,16 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import {
   getTweetsPaginated,
-  PaginatedTweetsResponse
+  PaginatedTweetsResponse,
+  TweetsResponse
 } from '../../lib/paginated-tweets';
 import { prisma } from '../../lib/prisma';
+import { Prisma } from '@prisma/client';
+import { tweetConverter } from '../../lib/types/tweet';
 
 export default async function handle(
   req: NextApiRequest,
-  res: NextApiResponse<PaginatedTweetsResponse>
+  res: NextApiResponse<PaginatedTweetsResponse | TweetsResponse>
 ) {
   const { method } = req;
   switch (method) {
@@ -21,6 +24,7 @@ export default async function handle(
           ? Number(req.query.limit)
           : 10;
       const after = !!req.query.after && req.query.after !== 'false';
+      const full = !!req.query.full && req.query.full !== 'false';
 
       // Get all the target_fids (people that the user follows)
       const links = await prisma.links.findMany({
@@ -38,7 +42,7 @@ export default async function handle(
         BigInt(userFid)
       ];
 
-      const result = await getTweetsPaginated({
+      let query: Prisma.castsFindManyArgs = {
         where: {
           fid: {
             in: targetFids
@@ -57,7 +61,18 @@ export default async function handle(
         orderBy: {
           timestamp: 'desc' // reverse chronological order
         }
-      });
+      };
+
+      if (!full) {
+        const casts = await prisma.casts.findMany(query);
+        const tweets = casts.map(tweetConverter.toTweet);
+        res.json({
+          result: { tweets }
+        });
+        return;
+      }
+
+      const result = await getTweetsPaginated(query);
 
       res.json({
         result

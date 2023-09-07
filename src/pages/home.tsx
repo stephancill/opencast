@@ -8,22 +8,24 @@ import { Tweet } from '@components/tweet/tweet';
 import { Error } from '@components/ui/error';
 import { Loading } from '@components/ui/loading';
 import { useWindow } from '@lib/context/window-context';
-import { useState, type ReactElement, type ReactNode } from 'react';
+import { type ReactElement, type ReactNode } from 'react';
 import useSWR from 'swr';
 import useSWRInfinite from 'swr/infinite';
 import { LoadMoreSentinel } from '../components/common/load-more';
 import { useAuth } from '../lib/context/auth-context';
-import { PaginatedTweetsResponse } from '../lib/paginated-tweets';
-import { Tweet as TweetType, populateTweetUsers } from '../lib/types/tweet';
-import { User, UsersMapType } from '../lib/types/user';
+import {
+  PaginatedTweetsResponse,
+  TweetsResponse
+} from '../lib/paginated-tweets';
+import { populateTweetUsers } from '../lib/types/tweet';
 import { isPlural } from '../lib/utils';
+
+const cursorKey = 'homeFeedCursor';
 
 export default function Home(): JSX.Element {
   const { isMobile } = useWindow();
-  const { user, userNotifications } = useAuth();
-
-  const [newTweetsCursor, setNewTweetsCursor] = useState(new Date());
-  const [pagesCursor] = useState(new Date());
+  const { user, userNotifications, timelineCursor, setTimelineCursor } =
+    useAuth();
 
   const {
     data: pages,
@@ -33,14 +35,14 @@ export default function Home(): JSX.Element {
     error
   } = useSWRInfinite<PaginatedTweetsResponse>(
     (pageIndex, prevPage) => {
-      if (!user) return null;
+      if (!user || !timelineCursor) return null;
 
       if (prevPage && !prevPage.result?.nextPageCursor) return null;
 
-      const baseUrl = `/api/feed?fid=${user?.id}&limit=10`;
+      const baseUrl = `/api/feed?fid=${user?.id}&limit=10&full=true`;
 
       if (pageIndex === 0) {
-        return `${baseUrl}&cursor=${pagesCursor.toISOString()}`;
+        return `${baseUrl}&cursor=${timelineCursor.toISOString()}`;
       }
 
       if (!prevPage?.result) return null;
@@ -55,26 +57,20 @@ export default function Home(): JSX.Element {
   const hasMore = !!pages?.[size - 1]?.result?.tweets.length;
 
   // Fetch new tweets every 20 seconds
-  const { data: newPage } = useSWR<PaginatedTweetsResponse>(
-    !!pages
+  const { data: newPage } = useSWR<TweetsResponse>(
+    !!pages && timelineCursor
       ? `/api/feed?fid=${
           user?.id
-        }&cursor=${newTweetsCursor.toISOString()}&limit=100&after=true`
+        }&cursor=${timelineCursor.toISOString()}&limit=100&after=true`
       : null,
     null,
-    { refreshInterval: 20_000 }
+    { refreshInterval: 1000 }
   );
-  const [newPageTweets, setNewPageTweets] = useState<TweetType[]>([]);
-  const [newPageUsers, setNewPageUsers] = useState<UsersMapType<User>>({});
 
   const onShowNewTweets = () => {
     if (!newPage?.result?.tweets) return;
-    setNewTweetsCursor(new Date());
-    // Merge new tweets with old tweets
-    // Populate these tweets with users before adding
-    const { tweets, users } = newPage.result;
-    setNewPageUsers((prev) => ({ ...prev, ...users }));
-    setNewPageTweets((prev) => [...tweets, ...prev]);
+    const cursor = new Date();
+    setTimelineCursor(cursor);
   };
 
   return (
@@ -105,13 +101,6 @@ export default function Home(): JSX.Element {
                 {isPlural(newPage.result.tweets.length) ? 's' : ''}
               </button>
             )}
-          {newPageTweets.map((tweet) => (
-            <Tweet
-              {...populateTweetUsers(tweet, newPageUsers)}
-              user={newPageUsers[tweet.createdBy]}
-              key={tweet.id}
-            />
-          ))}
           {pages?.map(({ result }) => {
             if (!result) return;
             const { tweets, users } = result;

@@ -30,6 +30,8 @@ type AuthContext = {
   userBookmarks: Bookmark[] | null;
   userNotifications: number | null;
   lastCheckedNotifications: Date | null;
+  timelineCursor: Date | null;
+  setTimelineCursor: (date: Date | null) => void;
   signOut: () => Promise<void>;
   showAddAccountModal: () => void;
   setUser: (user: UserWithKey) => void;
@@ -58,6 +60,8 @@ export function AuthContextProvider({
 
   const [lastCheckedNotifications, setLastCheckedNotifications] =
     useState<Date | null>(null);
+
+  const [timelineCursor, setTimelineCursor] = useState<Date | null>(null);
 
   /**
    * Key storage explainer:
@@ -143,6 +147,7 @@ export function AuthContextProvider({
     setLastCheckedNotifications(
       new Date(localStorage.getItem('lastChecked') || new Date().toISOString())
     );
+    setTimelineCursor(new Date());
   }, []);
 
   const signOut = async (): Promise<void> => {
@@ -200,6 +205,8 @@ export function AuthContextProvider({
     randomSeed,
     userBookmarks,
     userNotifications: userNotifications?.badgeCount || null,
+    timelineCursor,
+    setTimelineCursor,
     signOut,
     showAddAccountModal: modal.openModal,
     handleUserAuth,

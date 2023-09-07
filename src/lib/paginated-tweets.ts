@@ -14,6 +14,8 @@ export interface PaginatedTweetsResponse
     users: UsersMapType<User | UserFull>;
   }> {}
 
+export interface TweetsResponse extends BaseResponse<{ tweets: Tweet[] }> {}
+
 export async function getTweetsPaginated(
   findManyArgs: Prisma.castsFindManyArgs
 ) {
