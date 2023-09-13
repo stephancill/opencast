@@ -44,31 +44,35 @@ export function UserKnownFollowers({
   resolvedUsers: User[];
   knownFollowerCount: number;
 }) {
+  const otherKnownFollowerCount = knownFollowerCount - resolvedUsers.length;
   return (
-    <div className='flex text-sm text-light-secondary dark:text-dark-secondary'>
-      <div className='ml-2 mt-1 flex'>
-        {resolvedUsers.slice(0, 3).map((user) => (
-          <span className='-ml-2'>
-            <UserAvatar
-              src={user.photoURL}
-              alt={user.name}
-              size={18}
-              username={user.username}
-            />
+    knownFollowerCount > 0 && (
+      <div className='flex text-sm text-light-secondary dark:text-dark-secondary'>
+        <div className='ml-2 mt-1 flex'>
+          {resolvedUsers.slice(0, 3).map((user) => (
+            <span className='-ml-2'>
+              <UserAvatar
+                src={user.photoURL}
+                alt={user.name}
+                size={18}
+                username={user.username}
+              />
+            </span>
+          ))}
+        </div>
+        <div className='ml-2'>
+          <span>Followed by </span>
+          {resolvedUsers
+            .slice(0, 2)
+            .map((user) => user.name)
+            .join(', ')}
+          <span>
+            {otherKnownFollowerCount > 0 &&
+              `, and ${otherKnownFollowerCount} other
+            ${otherKnownFollowerCount > 1 && 's'} you follow`}
           </span>
-        ))}
+        </div>
       </div>
-      <div className='ml-2'>
-        <span>Followed by </span>
-        {resolvedUsers
-          .slice(0, 2)
-          .map((user) => user.name)
-          .join(', ')}
-        <span>
-          {', '}and {knownFollowerCount - resolvedUsers.length} other
-          {knownFollowerCount - resolvedUsers.length > 1 && 's'} you follow
-        </span>
-      </div>
-    </div>
+    )
   );
 }
