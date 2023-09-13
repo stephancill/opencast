@@ -8,7 +8,7 @@ import { Tweet } from '@components/tweet/tweet';
 import { Error } from '@components/ui/error';
 import { Loading } from '@components/ui/loading';
 import { useWindow } from '@lib/context/window-context';
-import { type ReactElement, type ReactNode } from 'react';
+import { useState, type ReactElement, type ReactNode } from 'react';
 import useSWR from 'swr';
 import useSWRInfinite from 'swr/infinite';
 import { LoadMoreSentinel } from '../components/common/load-more';
@@ -19,13 +19,14 @@ import {
 } from '../lib/paginated-tweets';
 import { populateTweetUsers } from '../lib/types/tweet';
 import { isPlural } from '../lib/utils';
-
-const cursorKey = 'homeFeedCursor';
+import { FeedOrderingType } from '../lib/types/feed';
 
 export default function Home(): JSX.Element {
   const { isMobile } = useWindow();
   const { user, userNotifications, timelineCursor, setTimelineCursor } =
     useAuth();
+
+  const [feedOrdering, setFeedOrdering] = useState<FeedOrderingType>('latest');
 
   const {
     data: pages,
@@ -39,15 +40,17 @@ export default function Home(): JSX.Element {
 
       if (prevPage && !prevPage.result?.nextPageCursor) return null;
 
-      const baseUrl = `/api/feed?fid=${user?.id}&limit=10&full=true`;
+      const baseUrl = `/api/feed?fid=${
+        user?.id
+      }&limit=10&full=true&cursor=${timelineCursor.toISOString()}&ordering=${feedOrdering}`;
 
       if (pageIndex === 0) {
-        return `${baseUrl}&cursor=${timelineCursor.toISOString()}`;
+        return `${baseUrl}&skip=0`;
       }
 
       if (!prevPage?.result) return null;
 
-      return `${baseUrl}&cursor=${prevPage.result.nextPageCursor}`;
+      return `${baseUrl}&skip=${prevPage.result.nextPageCursor}`;
     },
     {
       revalidateOnFocus: false,
@@ -58,7 +61,7 @@ export default function Home(): JSX.Element {
 
   // Fetch new tweets every 20 seconds
   const { data: newPage } = useSWR<TweetsResponse>(
-    !!pages && timelineCursor
+    !!pages && timelineCursor && feedOrdering === 'latest'
       ? `/api/feed?fid=${
           user?.id
         }&cursor=${timelineCursor.toISOString()}&limit=100&after=true`
@@ -84,9 +87,29 @@ export default function Home(): JSX.Element {
         useMobileSidebar
         title='Home'
         className='flex items-center justify-between'
-      >
-        {/* <UpdateUsername /> */}
-      </MainHeader>
+      ></MainHeader>
+      <div className='flex justify-between'>
+        {[
+          { name: 'Latest', value: 'latest' },
+          { name: 'Top', value: 'top' }
+        ].map((item) => (
+          <button
+            key={item.value}
+            onClick={() => {
+              setFeedOrdering(item.value as FeedOrderingType);
+              setTimelineCursor(new Date());
+            }}
+            className={`custom-button hover-card border-bottom block w-full cursor-pointer rounded-none border-b border-t-0
+              border-light-border text-center font-bold text-main-accent dark:border-dark-border ${
+                feedOrdering === item.value
+                  ? 'dark:bg-dark-background bg-main-background text-main-accent text-white'
+                  : 'text-light-secondary dark:text-dark-secondary'
+              }`}
+          >
+            {item.name}
+          </button>
+        ))}
+      </div>
       {!isMobile && <Input />}
       <section className='mt-0.5 xs:mt-0'>
         <>

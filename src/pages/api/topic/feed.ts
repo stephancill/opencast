@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import {
-  getTweetsPaginated,
+  getTweetsPaginatedPrismaArgs,
   PaginatedTweetsResponse
 } from '../../../lib/paginated-tweets';
 
@@ -20,7 +20,7 @@ export default async function handle(
           ? Number(req.query.limit)
           : 10;
 
-      const result = await getTweetsPaginated({
+      const result = await getTweetsPaginatedPrismaArgs({
         where: {
           timestamp: {
             lt: cursor || undefined

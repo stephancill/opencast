@@ -5,22 +5,52 @@ import { BaseResponse } from './types/responses';
 import { Tweet, tweetConverter } from './types/tweet';
 import { User, UserFull, UsersMapType } from './types/user';
 import { resolveUsersMap } from './user/resolve-user';
+import { Sql } from '@prisma/client/runtime/library';
 
+export type PaginatedTweetsType = {
+  tweets: Tweet[];
+  nextPageCursor: string | null;
+  // fid -> User
+  users: UsersMapType<User | UserFull>;
+};
 export interface PaginatedTweetsResponse
-  extends BaseResponse<{
-    tweets: Tweet[];
-    nextPageCursor: string | null;
-    // fid -> User
-    users: UsersMapType<User | UserFull>;
-  }> {}
+  extends BaseResponse<PaginatedTweetsType> {}
 
 export interface TweetsResponse extends BaseResponse<{ tweets: Tweet[] }> {}
 
-export async function getTweetsPaginated(
-  findManyArgs: Prisma.castsFindManyArgs
+/**
+ *
+ * @param sql Sql query which uses the returned cursor and returns all the fields of casts table
+ * @returns Promise<PaginatedTweets>
+ */
+export async function getTweetsPaginatedRawSql(sql: Sql, ...args: any[]) {
+  const casts = await prisma.$queryRaw<casts[]>(sql);
+  return getTweetsPaginated(casts, ...args);
+}
+
+/**
+ *
+ * @param findManyArgs Prisma.castsFindManyArgs
+ * @returns Promise<PaginatedTweets>
+ */
+export async function getTweetsPaginatedPrismaArgs(
+  findManyArgs: Prisma.castsFindManyArgs,
+  ...args: any[]
 ) {
   const casts = await prisma.casts.findMany(findManyArgs);
+  return await getTweetsPaginated(casts, ...args);
+}
 
+/**
+ *
+ * @param casts Casts to be converted to tweets
+ * @param calculateNextPageCursor Function to calculate the next page cursor
+ * @returns PaginatedTweets
+ */
+export async function getTweetsPaginated(
+  casts: casts[],
+  calculateNextPageCursor?: (casts: casts[]) => string | null
+): Promise<PaginatedTweetsType> {
   let { tweets } = await castsToTweets(casts);
 
   const fids: Set<bigint> = casts.reduce((acc: Set<bigint>, cur) => {
@@ -30,18 +60,11 @@ export async function getTweetsPaginated(
     return acc;
   }, new Set<bigint>());
 
-  // const [usersMap, topicsMap] = await Promise.all([
-  //   resolveUsersMap([...fids]),
-  //   resolveTopicsMap(
-  //     casts
-  //       .map((cast) => cast.parent_url)
-  //       .filter((url) => url !== null) as string[]
-  //   )
-  // ]);
   const usersMap = await resolveUsersMap([...fids]);
 
   const nextPageCursor =
-    casts.length > 0 ? casts[casts.length - 1].timestamp.toISOString() : null;
+    calculateNextPageCursor?.(casts) ||
+    (casts.length > 0 ? casts[casts.length - 1].timestamp.toISOString() : null);
 
   return {
     tweets,

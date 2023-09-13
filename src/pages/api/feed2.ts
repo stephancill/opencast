@@ -3,7 +3,7 @@ import { casts } from '@prisma/client';
 import { NextApiRequest, NextApiResponse } from 'next';
 import {
   castsToTweets,
-  getTweetsPaginated,
+  getTweetsPaginatedPrismaArgs,
   PaginatedTweetsResponse
 } from '../../lib/paginated-tweets';
 import { prisma } from '../../lib/prisma';

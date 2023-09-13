@@ -1,7 +1,7 @@
 import { UserDataType } from '@farcaster/hub-web';
 import { NextApiRequest, NextApiResponse } from 'next';
 import {
-  getTweetsPaginated,
+  getTweetsPaginatedPrismaArgs,
   PaginatedTweetsResponse
 } from '../../../../lib/paginated-tweets';
 import { prisma } from '../../../../lib/prisma';
@@ -40,7 +40,7 @@ export default async function handle(
         }
       }
 
-      const result = await getTweetsPaginated({
+      const result = await getTweetsPaginatedPrismaArgs({
         where: {
           timestamp: {
             lt: cursor || undefined
