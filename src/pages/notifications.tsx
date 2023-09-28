@@ -116,21 +116,23 @@ export default function NotificationsPage(): JSX.Element {
                                           key={reaction.userId}
                                           {...data.usersMap[reaction.userId]}
                                         >
-                                          <UserAvatar
-                                            src={
-                                              data.usersMap[reaction.userId]
-                                                .photoURL
-                                            }
-                                            alt={
-                                              data.usersMap[reaction.userId]
-                                                .name
-                                            }
-                                            username={
-                                              data.usersMap[reaction.userId]
-                                                .username
-                                            }
-                                            className='h-8 w-8'
-                                          />
+                                          {data.usersMap[reaction.userId] && (
+                                            <UserAvatar
+                                              src={
+                                                data.usersMap[reaction.userId]
+                                                  .photoURL
+                                              }
+                                              alt={
+                                                data.usersMap[reaction.userId]
+                                                  .name
+                                              }
+                                              username={
+                                                data.usersMap[reaction.userId]
+                                                  .username
+                                              }
+                                              className='h-8 w-8'
+                                            />
+                                          )}
                                         </UserTooltip>
                                       ))}
                                   </div>

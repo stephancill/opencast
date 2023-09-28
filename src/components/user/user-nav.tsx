@@ -1,18 +1,19 @@
 import { motion } from 'framer-motion';
 import cn from 'clsx';
 import { variants } from '@components/user/user-header';
-import { UserNavLink } from './user-nav-link';
+import { SegmentedNavLink } from '../ui/segmented-nav-link';
 
 type UserNavProps = {
   follow?: boolean;
+  userId: string;
 };
 
 const allNavs = [
   [
     { name: 'Casts', path: '' },
-    { name: 'Casts & replies', path: 'with_replies' },
+    { name: 'Casts & replies', path: '/with_replies' },
     // { name: 'Media', path: 'media' },
-    { name: 'Likes', path: 'likes' }
+    { name: 'Likes', path: '/likes' }
   ],
   [
     { name: 'Following', path: 'following' },
@@ -20,8 +21,10 @@ const allNavs = [
   ]
 ] as const;
 
-export function UserNav({ follow }: UserNavProps): JSX.Element {
+export function UserNav({ follow, userId }: UserNavProps): JSX.Element {
   const userNav = allNavs[+!!follow];
+
+  const userPath = `/user/${userId}`;
 
   return (
     <motion.nav
@@ -34,7 +37,7 @@ export function UserNav({ follow }: UserNavProps): JSX.Element {
       exit={undefined}
     >
       {userNav.map(({ name, path }) => (
-        <UserNavLink name={name} path={path} key={name} />
+        <SegmentedNavLink name={name} path={`${userPath}${path}`} key={name} />
       ))}
     </motion.nav>
   );

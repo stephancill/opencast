@@ -25,7 +25,7 @@ export interface TweetsResponse extends BaseResponse<{ tweets: Tweet[] }> {}
  */
 export async function getTweetsPaginatedRawSql(sql: Sql, ...args: any[]) {
   const casts = await prisma.$queryRaw<casts[]>(sql);
-  return getTweetsPaginated(casts, ...args);
+  return convertAndCalculateCursor(casts, ...args);
 }
 
 /**
@@ -38,7 +38,7 @@ export async function getTweetsPaginatedPrismaArgs(
   ...args: any[]
 ) {
   const casts = await prisma.casts.findMany(findManyArgs);
-  return await getTweetsPaginated(casts, ...args);
+  return await convertAndCalculateCursor(casts, ...args);
 }
 
 /**
@@ -47,7 +47,7 @@ export async function getTweetsPaginatedPrismaArgs(
  * @param calculateNextPageCursor Function to calculate the next page cursor
  * @returns PaginatedTweets
  */
-export async function getTweetsPaginated(
+export async function convertAndCalculateCursor(
   casts: casts[],
   calculateNextPageCursor?: (casts: casts[]) => string | null
 ): Promise<PaginatedTweetsType> {

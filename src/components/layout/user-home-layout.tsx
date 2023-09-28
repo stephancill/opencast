@@ -104,7 +104,7 @@ export function UserHomeLayout({ children }: LayoutProps): JSX.Element {
       </motion.section>
       {userData && (
         <>
-          <UserNav />
+          <UserNav userId={userData.username} />
           {children}
         </>
       )}

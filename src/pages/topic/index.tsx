@@ -4,17 +4,15 @@ import { MainHeader } from '@components/home/main-header';
 import { Input } from '@components/input/input';
 import { HomeLayout, ProtectedLayout } from '@components/layout/common-layout';
 import { MainLayout } from '@components/layout/main-layout';
-import { Tweet } from '@components/tweet/tweet';
-import { Error } from '@components/ui/error';
-import { Loading } from '@components/ui/loading';
 import { useWindow } from '@lib/context/window-context';
-import { useInfiniteScroll } from '@lib/hooks/useInfiniteScroll';
 import { useRouter } from 'next/router';
 import { useEffect, useState, type ReactElement, type ReactNode } from 'react';
 import useSWR from 'swr';
+import { TweetFeed } from '../../components/feed/tweet-feed';
+import { FeedOrderingSelector } from '../../components/ui/feed-ordering-selector';
 import { fetchJSON } from '../../lib/fetch';
+import { FeedOrderingType } from '../../lib/types/feed';
 import { TopicResponse } from '../../lib/types/topic';
-import { populateTweetUsers } from '../../lib/types/tweet';
 
 export default function TopicPage(): JSX.Element {
   // Debounce
@@ -38,23 +36,9 @@ export default function TopicPage(): JSX.Element {
     { revalidateOnFocus: false }
   );
 
-  const {
-    data,
-    loading: loadingFeed,
-    LoadMore
-  } = useInfiniteScroll(
-    (pageParam) => {
-      const url = `/api/topic/feed?url=${encodeURIComponent(
-        topicUrl
-      )}&limit=10${pageParam ? `&cursor=${pageParam}` : ''}`;
-      return url;
-    },
-    {
-      queryKey: ['topic', topicUrl],
-      enabled
-    }
-  );
   const { isMobile } = useWindow();
+
+  const [feedOrdering, setFeedOrdering] = useState<FeedOrderingType>('latest');
 
   return (
     <MainContainer>
@@ -72,35 +56,12 @@ export default function TopicPage(): JSX.Element {
         description={topic?.description}
         className='flex items-center justify-between'
       ></MainHeader>
+      <FeedOrderingSelector {...{ feedOrdering, setFeedOrdering }} />
       {!isMobile && <Input parentUrl={topicUrl} />}
-      <section className='mt-0.5 xs:mt-0'>
-        {loadingFeed ? (
-          <Loading className='mt-5' />
-        ) : !data ? (
-          <Error message='Something went wrong' />
-        ) : (
-          <>
-            {data.pages.map((page) => {
-              if (!page) return;
-              const { tweets, users } = page;
-              return tweets.map((tweet) => {
-                if (!users[tweet.createdBy]) {
-                  return <></>;
-                }
-
-                return (
-                  <Tweet
-                    {...populateTweetUsers(tweet, users)}
-                    user={users[tweet.createdBy]}
-                    key={tweet.id}
-                  />
-                );
-              });
-            })}
-            <LoadMore />
-          </>
-        )}
-      </section>
+      <TweetFeed
+        apiEndpoint={`/api/feed?topic_url=${encodeURIComponent(topicUrl)}`}
+        feedOrdering={feedOrdering}
+      />
     </MainContainer>
   );
 }

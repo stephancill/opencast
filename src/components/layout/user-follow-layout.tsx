@@ -25,7 +25,7 @@ export function UserFollowLayout({ children }: LayoutProps): JSX.Element {
         </motion.section>
       ) : (
         <>
-          <UserNav follow />
+          <UserNav follow userId={userData.username} />
           {children}
         </>
       )}

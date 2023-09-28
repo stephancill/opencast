@@ -120,6 +120,12 @@ export function Input({
   );
 
   useEffect(() => {
+    if (topicUrl !== parentUrl) {
+      setTopicUrl(parentUrl);
+    }
+  }, [parentUrl]);
+
+  useEffect(() => {
     if (topicUrl === topic?.url || topic === undefined) return;
     setTopicUrl(topic?.url);
   }, [topic]);
