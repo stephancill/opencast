@@ -54,14 +54,15 @@ export async function populateEmbed(
 
     if (match && match.length === 3) {
       // Select cast
+      const hashLength = match[2].length;
       const [cast] = (await prisma.$queryRaw`
-        select c.* from casts c 
+        select c.*, ud.value from casts c 
         inner join user_data ud on c.fid = ud.fid 
         where 
-          ud."type" = ${UserDataType.USERNAME} and 
-          SUBSTRING(encode(c.hash, 'hex'), 1, 6) = ${match[2].toLowerCase()} and 
-          ud.value = ${match[1].toLowerCase()}
-        `) as casts[];
+          ud."type" = ${UserDataType.USERNAME} 
+          and SUBSTRING(encode(c.hash, 'hex'), 1, ${hashLength}::integer) = ${match[2].toLowerCase()} 
+          and ud.value = ${match[1].toLowerCase()}
+      `) as casts[];
       if (cast) {
         const user = await resolveUserFromFid(cast.fid);
         const images = (
