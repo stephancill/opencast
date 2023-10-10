@@ -96,6 +96,10 @@ export async function castsToTweets(
     where: {
       target_hash: {
         in: castHashes
+      },
+      deleted_at: null,
+      messages: {
+        deleted_at: null
       }
     },
     select: {
