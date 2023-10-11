@@ -138,17 +138,20 @@ export default function NotificationsPage(): JSX.Element {
                                   </div>
                                   <div>
                                     <span className='inline-block hover:underline'>
-                                      <UserTooltip
-                                        key={reaction.userId}
-                                        {...data.usersMap[reaction.userId]}
-                                      >
-                                        <UserName
-                                          name={
-                                            data.usersMap[reaction.userId].name
-                                          }
-                                          verified={false}
-                                        />
-                                      </UserTooltip>
+                                      {data.usersMap[reaction.userId] && (
+                                        <UserTooltip
+                                          key={reaction.userId}
+                                          {...data.usersMap[reaction.userId]}
+                                        >
+                                          <UserName
+                                            name={
+                                              data.usersMap[reaction.userId]
+                                                .name
+                                            }
+                                            verified={false}
+                                          />
+                                        </UserTooltip>
+                                      )}
                                     </span>
                                     {}{' '}
                                     {reaction.reactions.length > 1
@@ -203,35 +206,41 @@ export default function NotificationsPage(): JSX.Element {
                                         key={follow.userId}
                                         {...data.usersMap[follow.userId]}
                                       >
-                                        <UserAvatar
-                                          src={
-                                            data.usersMap[follow.userId]
-                                              .photoURL
-                                          }
-                                          alt={
-                                            data.usersMap[follow.userId].name
-                                          }
-                                          username={
-                                            data.usersMap[follow.userId]
-                                              .username
-                                          }
-                                          className='h-8 w-8'
-                                        />
+                                        {data.usersMap[follow.userId] && (
+                                          <UserAvatar
+                                            src={
+                                              data.usersMap[follow.userId]
+                                                .photoURL
+                                            }
+                                            alt={
+                                              data.usersMap[follow.userId].name
+                                            }
+                                            username={
+                                              data.usersMap[follow.userId]
+                                                .username
+                                            }
+                                            className='h-8 w-8'
+                                          />
+                                        )}
                                       </UserTooltip>
                                     ))}
                                   </div>
 
                                   <div>
                                     <span className='inline-block hover:underline'>
-                                      <UserTooltip
-                                        key={item.userId}
-                                        {...data.usersMap[item.userId]}
-                                      >
-                                        <UserName
-                                          name={data.usersMap[item.userId].name}
-                                          verified={false}
-                                        />
-                                      </UserTooltip>
+                                      {data.usersMap[item.userId] && (
+                                        <UserTooltip
+                                          key={item.userId}
+                                          {...data.usersMap[item.userId]}
+                                        >
+                                          <UserName
+                                            name={
+                                              data.usersMap[item.userId].name
+                                            }
+                                            verified={false}
+                                          />
+                                        </UserTooltip>
+                                      )}
                                     </span>{' '}
                                     {link.follows.length > 0
                                       ? ` and ${link.follows.length} other${
