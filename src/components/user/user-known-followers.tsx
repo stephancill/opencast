@@ -68,8 +68,9 @@ export function UserKnownFollowers({
             .join(', ')}
           <span>
             {otherKnownFollowerCount > 0 &&
-              `, and ${otherKnownFollowerCount} other
-            ${otherKnownFollowerCount > 1 && 's'} you follow`}
+              `, and ${otherKnownFollowerCount} other${
+                otherKnownFollowerCount > 1 ? 's' : ''
+              } you follow`}
           </span>
         </div>
       </div>
