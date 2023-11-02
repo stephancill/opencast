@@ -1,4 +1,4 @@
-import { createPublicClient, http } from 'viem';
+import { createPublicClient, http, createClient } from 'viem';
 import * as chains from 'viem/chains';
 import { resolveChainIcon } from '../chains/resolve-chain-icon';
 import { populateEmbed } from '../embeds';
@@ -84,9 +84,11 @@ async function _resolveTopic(url: string): Promise<TopicType | null> {
       return null;
     }
 
+    const rpcUrl = process.env[`CHAIN_RPC_URL_${chainId}`];
+
     const client = createPublicClient({
       chain: chainById[chainId],
-      transport: http()
+      transport: http(rpcUrl)
     });
 
     let uri: string;
