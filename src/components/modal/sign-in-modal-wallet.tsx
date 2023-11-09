@@ -12,7 +12,7 @@ import {
   useSwitchNetwork,
   useWaitForTransaction
 } from 'wagmi';
-import { ID_REGISTRY, KEY_REGISTRY } from '../../contracts';
+import { ID_REGISTRY, KEY_GATEWAY } from '../../contracts';
 import { useAuth } from '../../lib/context/auth-context';
 import { generateKeyPair } from '../../lib/crypto';
 import { fetchJSON } from '../../lib/fetch';
@@ -88,7 +88,7 @@ const WalletSignInModal = ({
     );
 
   const { config: addKeyConfig, error: addKeyError } = usePrepareContractWrite({
-    ...KEY_REGISTRY,
+    ...KEY_GATEWAY,
     chainId: 10,
     functionName: !!(keypair && appAuth) ? 'add' : undefined,
     args: [
