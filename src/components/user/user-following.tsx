@@ -9,10 +9,12 @@ export function UserFollowing({
 }: UserFollowingProps): JSX.Element | null {
   const { user } = useAuth();
 
-  const isOwner =
-    user?.id !== userTargetId && user?.followers.includes(userTargetId);
+  const isFollowing =
+    user?.keyPair &&
+    user?.id !== userTargetId &&
+    user?.followers.includes(userTargetId);
 
-  if (!isOwner) return null;
+  if (!isFollowing) return null;
 
   return (
     <p className='rounded bg-main-search-background px-1 text-xs'>

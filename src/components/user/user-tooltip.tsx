@@ -155,7 +155,7 @@ export function UserTooltip({
                 </Link>
               ))}
             </div>
-            {currentUser?.id !== id && (
+            {currentUser?.keyPair && currentUser?.id !== id && (
               <UserKnownFollowersLazy userId={id} enabled={shouldFetch} />
             )}
           </div>

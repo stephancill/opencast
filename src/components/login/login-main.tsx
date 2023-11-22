@@ -2,9 +2,10 @@ import { Button } from '@components/ui/button';
 import { CustomIcon } from '@components/ui/custom-icon';
 import { NextImage } from '@components/ui/next-image';
 import { useModal } from '../../lib/hooks/useModal';
+import WalletSignInModal from '../modal/sign-in-modal-wallet';
 import { WarpcastSignInModal } from '../modal/sign-in-modal-warpcast';
 import { HeroIcon } from '../ui/hero-icon';
-import WalletSignInModal from '../modal/sign-in-modal-wallet';
+import Link from 'next/link';
 
 export function LoginMain(): JSX.Element {
   const {
@@ -77,49 +78,22 @@ export function LoginMain(): JSX.Element {
             >
               <HeroIcon iconName='GlobeAltIcon' /> Sign in with Ethereum
             </Button>
+            <Link href='/home' passHref>
+              <a
+                className='custom-button main-tab flex justify-center gap-2 border border-white bg-black font-bold text-white
+             transition hover:bg-opacity-90 focus-visible:bg-opacity-90 active:bg-opacity-80
+             dark:hover:brightness-125 dark:focus-visible:brightness-125 dark:active:brightness-150'
+              >
+                Continue without signing in
+              </a>
+            </Link>
             <p
               className='inner:custom-underline inner:custom-underline text-center text-xs
                          text-light-secondary inner:text-accent-blue dark:text-dark-secondary'
             >
               By signing up you agree that you are doing so at your own risk.
-              {/* By signing up, you agree to the{' '}
-              <a
-                href='https://twitter.com/tos'
-                target='_blank'
-                rel='noreferrer'
-              >
-                Terms of Service
-              </a>{' '}
-              and{' '}
-              <a
-                href='https://twitter.com/privacy'
-                target='_blank'
-                rel='noreferrer'
-              >
-                Privacy Policy
-              </a>
-              , including{' '}
-              <a
-                href='https://help.twitter.com/rules-and-policies/twitter-cookies'
-                target='_blank'
-                rel='noreferrer'
-              >
-                Cookie Use
-              </a> 
-              .*/}
             </p>
           </div>
-          {/* <div className='flex flex-col gap-3'>
-            <p className='font-bold'>Already have an account? </p>
-            <Button
-              className='border border-light-line-reply font-bold text-accent-blue hover:bg-accent-blue/10
-                         focus-visible:bg-accent-blue/10 focus-visible:!ring-accent-blue/80 active:bg-accent-blue/20
-                         dark:border-light-secondary'
-              onClick={signInWithGoogle}
-            >
-              Sign in
-            </Button>
-          </div> */}
         </div>
       </div>
     </main>

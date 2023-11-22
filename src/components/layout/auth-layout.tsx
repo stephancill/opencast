@@ -5,7 +5,10 @@ import { sleep } from '@lib/utils';
 import { Placeholder } from '@components/common/placeholder';
 import type { LayoutProps } from './common-layout';
 
-export function AuthLayout({ children }: LayoutProps): JSX.Element {
+export function AuthLayout({
+  children,
+  forceLogin
+}: LayoutProps & { forceLogin?: boolean }): JSX.Element {
   const [pending, setPending] = useState(true);
 
   const { user, loading } = useAuth();
@@ -15,7 +18,7 @@ export function AuthLayout({ children }: LayoutProps): JSX.Element {
     const checkLogin = async (): Promise<void> => {
       setPending(true);
 
-      if (user) {
+      if (user && !forceLogin) {
         await sleep(500);
         void replace('/home');
       } else if (!loading) {
@@ -26,7 +29,7 @@ export function AuthLayout({ children }: LayoutProps): JSX.Element {
 
     void checkLogin();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, loading]);
+  }, [user, loading, forceLogin]);
 
   if (loading || pending) return <Placeholder />;
 

@@ -21,7 +21,7 @@ export default function Home(): JSX.Element {
     <MainContainer>
       <SEO
         title={`${
-          userNotifications ? `(${userNotifications}) ` : ''
+          userNotifications && user?.keyPair ? `(${userNotifications}) ` : ''
         }Home / Opencast`}
       />
       <MainHeader
@@ -30,7 +30,7 @@ export default function Home(): JSX.Element {
         className='flex items-center justify-between'
       ></MainHeader>
       <FeedOrderingSelector {...{ feedOrdering, setFeedOrdering }} />
-      {!isMobile && <Input />}
+      {!isMobile && user?.keyPair && <Input />}
       <TweetFeed
         feedOrdering={feedOrdering}
         apiEndpoint={`/api/feed?fid=${user?.id}`}
