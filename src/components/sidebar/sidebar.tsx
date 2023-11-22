@@ -20,7 +20,7 @@ export type NavLink = {
   newTab?: boolean;
 };
 
-const navLinks: Readonly<NavLink[]> = [
+export const navLinks: Readonly<NavLink[]> = [
   {
     href: '/home',
     linkName: 'Home',
@@ -76,47 +76,68 @@ export function Sidebar(): JSX.Element {
             {navLinks.map(({ ...linkData }) => (
               <SidebarLink {...linkData} key={linkData.href} />
             ))}
-            <div
-              onClick={() => {
-                resetNotifications();
-              }}
-            >
-              {userNotifications && (
-                <div className='absolute ml-6 mt-2 flex h-4 min-w-[16px] items-center rounded-full bg-main-accent text-white'>
-                  <div className='mx-auto px-1 text-xs'>
-                    {userNotifications < 100 ? userNotifications : '99+'}
-                  </div>
+            {user?.keyPair && (
+              <>
+                <div
+                  onClick={() => {
+                    resetNotifications();
+                  }}
+                >
+                  {userNotifications && (
+                    <div className='absolute ml-6 mt-2 flex h-4 min-w-[16px] items-center rounded-full bg-main-accent text-white'>
+                      <div className='mx-auto px-1 text-xs'>
+                        {userNotifications < 100 ? userNotifications : '99+'}
+                      </div>
+                    </div>
+                  )}
+                  <SidebarLink
+                    // href='https://warpcast.com/~/notifications'
+                    href='/notifications'
+                    iconName='BellIcon'
+                    linkName={`Notifications`}
+                  />
                 </div>
-              )}
-              <SidebarLink
-                // href='https://warpcast.com/~/notifications'
-                href='/notifications'
-                iconName='BellIcon'
-                linkName={`Notifications`}
-              />
-            </div>
-            <SidebarLink
-              href={`/user/${username}`}
-              username={username}
-              linkName='Profile'
-              iconName='UserIcon'
-            />
+                <SidebarLink
+                  href={`/user/${username}`}
+                  username={username}
+                  linkName='Profile'
+                  iconName='UserIcon'
+                />
+              </>
+            )}
             {!isMobile && <MoreSettings />}
           </nav>
-          <Button
-            className='accent-tab absolute right-4 -translate-y-[72px] bg-main-accent text-lg font-bold text-white
+          {user?.keyPair && (
+            <Button
+              className='accent-tab absolute right-4 -translate-y-[72px] bg-main-accent text-lg font-bold text-white
                        outline-none transition hover:brightness-90 active:brightness-75 xs:static xs:translate-y-0
                        xs:hover:bg-main-accent/90 xs:active:bg-main-accent/75 xl:w-11/12'
-            onClick={openModal}
-          >
-            <CustomIcon
-              className='block h-6 w-6 xl:hidden'
-              iconName='FeatherIcon'
-            />
-            <p className='hidden xl:block'>Cast</p>
-          </Button>
+              onClick={openModal}
+            >
+              <CustomIcon
+                className='block h-6 w-6 xl:hidden'
+                iconName='FeatherIcon'
+              />
+              <p className='hidden xl:block'>Cast</p>
+            </Button>
+          )}
         </section>
-        {!isMobile && <SidebarProfile />}
+        {!isMobile && user?.keyPair && <SidebarProfile />}
+        {!user?.keyPair && (
+          <Link passHref href='/login'>
+            <a
+              className='custom-button main-tab accent-tab absolute right-4 -translate-y-[72px] bg-main-accent text-center text-lg font-bold text-white
+                       outline-none transition hover:brightness-90 active:brightness-75 xs:static xs:translate-y-0
+                       xs:hover:bg-main-accent/90 xs:active:bg-main-accent/75 xl:w-11/12'
+            >
+              <CustomIcon
+                className='block h-6 w-6 xl:hidden'
+                iconName='FeatherIcon'
+              />
+              <p className='hidden xl:block'>Login</p>
+            </a>
+          </Link>
+        )}
       </div>
     </header>
   );

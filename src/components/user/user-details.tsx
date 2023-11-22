@@ -111,7 +111,9 @@ export function UserDetails({
         ))}
       </div>
       <UserFollowStats following={following} followers={followers} />
-      {currentUser?.id !== id && <UserKnownFollowersLazy userId={id} />}
+      {currentUser?.keyPair && currentUser?.id !== id && (
+        <UserKnownFollowersLazy userId={id} />
+      )}
     </>
   );
 }

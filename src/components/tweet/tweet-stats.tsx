@@ -11,6 +11,7 @@ import {
 import { TweetOption } from './tweet-option';
 import { TweetShare } from './tweet-share';
 import { ReactionType } from '@farcaster/hub-web';
+import { useAuth } from '../../lib/context/auth-context';
 
 type TweetStatsProps = Pick<
   Tweet,
@@ -37,6 +38,8 @@ export function TweetStats({
   tweetAuthorId,
   openModal
 }: TweetStatsProps): JSX.Element {
+  const { user } = useAuth();
+
   const totalLikes = userLikes.length;
   const totalRetweets = userRetweets.length;
 
@@ -70,9 +73,11 @@ export function TweetStats({
     [totalRetweets]
   );
 
-  const [tweetIsLiked, setTweetIsLiked] = useState(userLikes.includes(userId));
+  const [tweetIsLiked, setTweetIsLiked] = useState(
+    user?.keyPair && userLikes.includes(userId)
+  );
   const [tweetIsRetweeted, setTweetIsRetweeted] = useState(
-    userRetweets.includes(userId)
+    user?.keyPair && userRetweets.includes(userId)
   );
 
   const isStatsVisible = !!(totalReplies || totalRetweets || totalLikes);
@@ -105,6 +110,7 @@ export function TweetStats({
                          group-focus-visible:bg-accent-blue/10 group-focus-visible:ring-accent-blue/80'
           tip='Reply'
           move={replyMove}
+          disabled={!!!user?.keyPair}
           stats={currentReplies}
           iconName='ChatBubbleOvalLeftIcon'
           viewTweet={viewTweet}
@@ -119,6 +125,7 @@ export function TweetStats({
                          group-focus-visible:bg-accent-green/10 group-focus-visible:ring-accent-green/80'
           tip={tweetIsRetweeted ? 'Undo Recast' : 'Recast'}
           move={tweetMove}
+          disabled={!!!user?.keyPair}
           stats={currentRetweets}
           iconName='ArrowPathRoundedSquareIcon'
           viewTweet={viewTweet}
@@ -156,6 +163,7 @@ export function TweetStats({
                          group-focus-visible:bg-accent-pink/10 group-focus-visible:ring-accent-pink/80'
           tip={tweetIsLiked ? 'Unlike' : 'Like'}
           move={likeMove}
+          disabled={!!!user?.keyPair}
           stats={currentLikes}
           iconName='HeartIcon'
           viewTweet={viewTweet}

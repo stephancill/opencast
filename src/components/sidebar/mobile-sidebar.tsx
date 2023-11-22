@@ -6,6 +6,7 @@ import { MobileSidebarModal } from '@components/modal/mobile-sidebar-modal';
 import { UserAvatar } from '@components/user/user-avatar';
 import type { Variants } from 'framer-motion';
 import type { User, UserFull } from '@lib/types/user';
+import { HeroIcon } from '../ui/hero-icon';
 
 const variant: Variants = {
   initial: { x: '-100%', opacity: 0.8 },
@@ -36,7 +37,13 @@ export function MobileSidebar(): JSX.Element {
         <MobileSidebarModal {...user!} closeModal={closeModal} />
       </Modal>
       <Button className='accent-tab p-0 xs:hidden' onClick={openModal}>
-        <UserAvatar src={photoURL} alt={name} size={30} />
+        {user?.keyPair ? (
+          <UserAvatar src={photoURL} alt={name} size={30} />
+        ) : (
+          <div className='py-2'>
+            <HeroIcon className={'h-7 w-7'} iconName={'UserIcon'} />
+          </div>
+        )}
       </Button>
     </>
   );

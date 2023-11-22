@@ -18,10 +18,10 @@ import { KeyPair } from '../types/keypair';
 import { NotificationsResponseSummary } from '../types/notifications';
 import { useRouter } from 'next/router';
 
-type UserWithKey = UserFull & { keyPair: KeyPair };
+type UserWithKey = UserFull & { keyPair?: KeyPair };
 
 type AuthContext = {
-  user: UserFull | null;
+  user: UserWithKey | null;
   usersWithKeys: UserWithKey[];
   error: Error | null;
   loading: boolean;
@@ -78,10 +78,22 @@ export function AuthContextProvider({
     return (user as UserFull) || null;
   };
 
-  const manageUser = async (keyPair: KeyPair): Promise<void> => {
-    const user = await fetchUserForKey(keyPair);
+  const manageUser = async ({
+    keyPair,
+    id
+  }: {
+    keyPair?: KeyPair;
+    id?: string;
+  }): Promise<void> => {
+    let fetchedUser: UserFull | null = null;
+    if (keyPair) {
+      fetchedUser = await fetchUserForKey(keyPair);
+    } else if (id) {
+      const { result } = await fetchJSON<UserResponse>(`/api/user/${id}`);
+      fetchedUser = result as UserFull;
+    }
 
-    if (user) setUser({ ...user, keyPair });
+    if (fetchedUser) setUser({ ...fetchedUser, keyPair });
 
     setLoading(false);
   };
@@ -106,10 +118,10 @@ export function AuthContextProvider({
     }
 
     if (keyPair) {
-      void manageUser(keyPair);
+      void manageUser({ keyPair });
     } else {
-      setUser(null);
-      setLoading(false);
+      // Default to fid 3 view-only account
+      void manageUser({ id: '3' });
     }
 
     // Add key pair to storage if it's not already there
@@ -129,12 +141,16 @@ export function AuthContextProvider({
         .filter((user) => user !== null);
       setUsers(usersWithKeys as UserWithKey[]);
     });
+
+    // Go to /home if user is on /login
+    if (router.pathname === '/login' || router.pathname === '/')
+      router.push('/home');
   };
 
   useEffect(() => {
     // `user` is changed by the user selection menu
     // When it changes we need to update the current user in local storage
-    if (user) {
+    if (user?.keyPair) {
       const keyPair: KeyPair = getKeyPair();
       if (!keyPair || keyPair.publicKey !== user.keyPair.publicKey) {
         setKeyPair(user.keyPair);
@@ -167,7 +183,7 @@ export function AuthContextProvider({
   const { data: userNotifications, isValidating: loadingNotifications } =
     useSWR(
       router.pathname !== '/notifications' &&
-        user?.id &&
+        user?.keyPair &&
         lastCheckedNotifications
         ? `/api/user/${
             user.id

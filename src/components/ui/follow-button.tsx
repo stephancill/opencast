@@ -28,7 +28,7 @@ export function FollowButton({
   const { id: userId, following } = user ?? {};
 
   const [userIsFollowed, setUserIsFollowed] = useState<boolean>(
-    !!following?.includes(userTargetId ?? '')
+    user?.keyPair != undefined && !!following?.includes(userTargetId ?? '')
   );
 
   const handleFollow = async (): Promise<void> => {
@@ -106,6 +106,7 @@ export function FollowButton({
                      dark:text-light-primary dark:hover:bg-light-border/90 dark:focus-visible:bg-light-border/90 
                      dark:active:bg-light-border/75'
           onClick={preventBubbling(handleFollow)}
+          disabled={!!!user?.keyPair}
         >
           Follow
         </Button>
