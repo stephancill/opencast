@@ -8,7 +8,11 @@ import {
 } from '../../lib/paginated-tweets';
 import { prisma } from '../../lib/prisma';
 import { FeedOrderingType } from '../../lib/types/feed';
-import { tweetConverter } from '../../lib/types/tweet';
+import {
+  mergeMetadataCacheResponse,
+  tweetConverter
+} from '../../lib/types/tweet';
+import { getEmbedsForTweetIds } from '../../lib/embeds';
 
 export default async function handle(
   req: NextApiRequest,
@@ -185,8 +189,21 @@ export default async function handle(
           : undefined
       );
 
+      // Get embed metadata for each tweet
+      const tweetMetadata = await getEmbedsForTweetIds(
+        result.tweets.map((t) => t.id)
+      );
+
+      const mergedTweets = mergeMetadataCacheResponse(
+        result.tweets,
+        tweetMetadata
+      );
+
       res.json({
-        result
+        result: {
+          ...result,
+          tweets: mergedTweets
+        }
       });
       break;
     default:

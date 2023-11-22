@@ -3,6 +3,8 @@ import {
   getTweetsPaginatedPrismaArgs,
   PaginatedTweetsResponse
 } from '../../../../lib/paginated-tweets';
+import { getEmbedsForTweetIds } from '../../../../lib/embeds';
+import { mergeMetadataCacheResponse } from '../../../../lib/types/tweet';
 
 export default async function handle(
   req: NextApiRequest,
@@ -34,8 +36,17 @@ export default async function handle(
         }
       });
 
+      const tweetMetadata = await getEmbedsForTweetIds(
+        result.tweets.map((t) => t.id)
+      );
+
+      const mergedTweets = mergeMetadataCacheResponse(
+        result.tweets,
+        tweetMetadata
+      );
+
       res.json({
-        result
+        result: { ...result, tweets: mergedTweets }
       });
       break;
     default:

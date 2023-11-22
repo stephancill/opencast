@@ -6,6 +6,7 @@ import { ExternalEmbed, Tweet } from './types/tweet';
 import { isValidImageExtension } from './validation';
 import { UserDataType } from '@farcaster/hub-web';
 import { resolveUserFromFid } from './user/resolve-user';
+import { Embed as ModEmbed } from '@mod-protocol/core';
 
 const KNOWN_HOSTS_MAP: {
   [key: string]: { urlBuilder?: (url: string) => string; userAgent?: string };
@@ -23,6 +24,24 @@ const KNOWN_HOSTS_MAP: {
       'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36'
   }
 };
+
+export async function getEmbedsForTweetIds(
+  ids: string[]
+): Promise<{ [key: string]: ModEmbed[] }> {
+  const request = await fetch(
+    'https://api.modprotocol.org/api/cast-embeds-metadata',
+    {
+      body: JSON.stringify(ids),
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    }
+  );
+  const metadata = await request.json();
+
+  return metadata;
+}
 
 // TODO: This method's inputs should be more generic
 export async function populateEmbed(
@@ -111,12 +130,12 @@ export async function populateEmbed(
   return result;
 }
 
-export async function populateTweetEmbeds(tweet: Tweet): Promise<Tweet> {
-  const populatedTweet: Tweet = {
-    ...tweet,
-    embeds: (await Promise.all(tweet.embeds.map(populateEmbed))).filter(
-      (embed) => embed !== null
-    ) as ExternalEmbed[]
-  };
-  return populatedTweet;
-}
+// export async function populateTweetEmbeds(tweet: Tweet): Promise<Tweet> {
+//   const populatedTweet: Tweet = {
+//     ...tweet,
+//     embeds: (await Promise.all(tweet.embeds.map(populateEmbed))).filter(
+//       (embed) => embed !== null
+//     ) as ExternalEmbed[]
+//   };
+//   return populatedTweet;
+// }

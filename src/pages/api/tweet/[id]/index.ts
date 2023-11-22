@@ -1,15 +1,15 @@
 import { ReactionType } from '@farcaster/hub-web';
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { populateEmbed } from '../../../../lib/embeds';
+import { getEmbedsForTweetIds } from '../../../../lib/embeds';
 import { prisma } from '../../../../lib/prisma';
 import { resolveTopic } from '../../../../lib/topics/resolve-topic';
 import { TopicType } from '../../../../lib/types/topic';
 import {
-  ExternalEmbed,
   Tweet,
-  tweetConverter,
   TweetResponse,
-  TweetWithUsers
+  TweetWithUsers,
+  mergeMetadataCacheResponse,
+  tweetConverter
 } from '../../../../lib/types/tweet';
 import { resolveUsersMap } from '../../../../lib/user/resolve-user';
 
@@ -95,7 +95,13 @@ export default async function tweetIdEndpoint(
     client: signer?.name || null
   };
 
+  const embeds = await getEmbedsForTweetIds([tweetWithUsers.id]);
+  const mergedTweets = mergeMetadataCacheResponse(
+    [tweetWithUsers],
+    embeds
+  ) as TweetWithUsers[];
+
   res.json({
-    result: tweetWithUsers
+    result: mergedTweets[0]
   });
 }

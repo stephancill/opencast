@@ -16,9 +16,9 @@ import type { User } from '@lib/types/user';
 import cn from 'clsx';
 import Link from 'next/link';
 import { RefObject } from 'react';
-import { TweetEmbeds } from '../tweet/tweet-embed';
 import { TweetText } from '../tweet/tweet-text';
 import { TweetTopic } from '../tweet/tweet-topic';
+import { ModEmbeds } from '../tweet/tweet-embeds-mod';
 
 type ViewTweetProps = Tweet & {
   user: User;
@@ -139,7 +139,7 @@ export function ViewTweet(tweet: ViewTweetProps): JSX.Element {
             previewCount={images.length}
           />
         )}
-        {embeds && embeds.length > 0 && <TweetEmbeds embeds={embeds} />}
+        {embeds && embeds.length > 0 && <ModEmbeds embeds={embeds} />}
         {topic && (
           <span className='mt-2 inline-block'>
             <TweetTopic topic={topic} />
@@ -178,11 +178,11 @@ export function ViewTweet(tweet: ViewTweetProps): JSX.Element {
           />
         </div>
         {user?.keyPair && (
-        <Input
-          reply
-          parent={{ id: tweetId, username: username, userId: ownerId }}
-          parentUrl={topic?.url || undefined}
-        />
+          <Input
+            reply
+            parent={{ id: tweetId, username: username, userId: ownerId }}
+            parentUrl={topic?.url || undefined}
+          />
         )}
       </div>
     </article>

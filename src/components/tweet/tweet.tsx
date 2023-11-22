@@ -15,11 +15,11 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { TweetActions } from './tweet-actions';
 import { TweetDate } from './tweet-date';
-import { TweetEmbeds } from './tweet-embed';
 import { TweetStats } from './tweet-stats';
 import { TweetText } from './tweet-text';
 import { TweetTopicLazy } from './tweet-topic';
 import { hasAncestorWithClass } from '../../lib/utils';
+import { ModEmbeds } from './tweet-embeds-mod';
 
 export type TweetProps = Tweet & {
   user: User;
@@ -179,7 +179,13 @@ export function Tweet(tweet: TweetProps): JSX.Element {
                   previewCount={images.length}
                 />
               )}
-              {embeds && embeds.length > 0 && <TweetEmbeds embeds={embeds} />}
+              {embeds && embeds.length > 0 && (
+                <ModEmbeds
+                  embeds={embeds.filter(
+                    (embed) => !embed.metadata?.mimeType?.startsWith('image/')
+                  )}
+                />
+              )}
               {topicUrl && <TweetTopicLazy topicUrl={topicUrl} />}
               {!modal && (
                 <TweetStats
