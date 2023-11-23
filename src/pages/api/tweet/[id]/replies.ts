@@ -36,13 +36,13 @@ export default async function handle(
         }
       });
 
-      const tweetMetadata = await getEmbedsForTweetIds(
+      const tweetEmbeds = await getEmbedsForTweetIds(
         result.tweets.map((t) => t.id)
       );
 
       const mergedTweets = mergeMetadataCacheResponse(
         result.tweets,
-        tweetMetadata
+        tweetEmbeds
       );
 
       res.json({

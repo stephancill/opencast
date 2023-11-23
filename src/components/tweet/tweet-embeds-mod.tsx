@@ -8,6 +8,7 @@ import {
   defaultContentMiniApp,
   contentMiniApps
 } from '@mod-protocol/miniapp-registry';
+import { NextImage } from '../ui/next-image';
 
 export function ModEmbeds(props: { embeds: Array<Embed> }) {
   return (
@@ -15,10 +16,12 @@ export function ModEmbeds(props: { embeds: Array<Embed> }) {
       {props.embeds.map((embed, i) =>
         embed.metadata && Object.keys(embed.metadata).length > 0 ? (
           <RenderEmbed
-            api={'https://api.modprotocol.org'}
+            api={'https://api.modprotocol.org/api'}
             embed={embed}
             key={i}
-            renderers={renderers}
+            renderers={{
+              ...renderers
+            }}
             defaultContentMiniApp={defaultContentMiniApp}
             contentMiniApps={contentMiniApps}
           />
