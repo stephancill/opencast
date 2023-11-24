@@ -23,7 +23,10 @@ type AsideTrendsProps = {
 export function AsideTrends({ inTrendsPage }: AsideTrendsProps): JSX.Element {
   const { data: trends, isValidating: loading } = useSWR(
     `/api/trends?limit=${inTrendsPage ? 20 : 5}`,
-    async (url: string) => (await fetchJSON<TrendsResponse>(url)).result
+    async (url: string) => (await fetchJSON<TrendsResponse>(url)).result,
+    {
+      revalidateOnFocus: false
+    }
   );
 
   return (
