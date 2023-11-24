@@ -72,6 +72,13 @@
   body {
     @apply hover-animation bg-main-background font-twitter-chirp text-light-primary dark:text-dark-primary;
   }
+
+  // Mod Embed border colour
+  *,
+  ::before,
+  ::after {
+    @apply dark:border-dark-border;
+  }
 }
 
 @layer components {

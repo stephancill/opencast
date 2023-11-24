@@ -1,10 +1,9 @@
 import { NextApiRequest, NextApiResponse } from 'next';
+import { populateEmbedsForTweets } from '../../../../lib/embeds';
 import {
-  getTweetsPaginatedPrismaArgs,
-  PaginatedTweetsResponse
+  PaginatedTweetsResponse,
+  getTweetsPaginatedPrismaArgs
 } from '../../../../lib/paginated-tweets';
-import { getEmbedsForTweetIds } from '../../../../lib/embeds';
-import { mergeMetadataCacheResponse } from '../../../../lib/types/tweet';
 
 export default async function handle(
   req: NextApiRequest,
@@ -36,17 +35,10 @@ export default async function handle(
         }
       });
 
-      const tweetEmbeds = await getEmbedsForTweetIds(
-        result.tweets.map((t) => t.id)
-      );
-
-      const mergedTweets = mergeMetadataCacheResponse(
-        result.tweets,
-        tweetEmbeds
-      );
+      const tweetsWithEmbeds = await populateEmbedsForTweets(result.tweets);
 
       res.json({
-        result: { ...result, tweets: mergedTweets }
+        result: { ...result, tweets: tweetsWithEmbeds }
       });
       break;
     default:

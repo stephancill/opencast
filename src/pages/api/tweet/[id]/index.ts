@@ -1,6 +1,6 @@
 import { ReactionType } from '@farcaster/hub-web';
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { getEmbedsForTweetIds } from '../../../../lib/embeds';
+import { populateEmbedsForTweets } from '../../../../lib/embeds';
 import { prisma } from '../../../../lib/prisma';
 import { resolveTopic } from '../../../../lib/topics/resolve-topic';
 import { TopicType } from '../../../../lib/types/topic';
@@ -8,7 +8,6 @@ import {
   Tweet,
   TweetResponse,
   TweetWithUsers,
-  mergeMetadataCacheResponse,
   tweetConverter
 } from '../../../../lib/types/tweet';
 import { resolveUsersMap } from '../../../../lib/user/resolve-user';
@@ -85,9 +84,10 @@ export default async function tweetIdEndpoint(
   }
 
   let tweet: Tweet = tweetConverter.toTweet(cast);
+  const [tweetWithEmbeds] = await populateEmbedsForTweets([tweet]);
 
   const tweetWithUsers: TweetWithUsers = {
-    ...tweet,
+    ...tweetWithEmbeds,
     topic: topic,
     userLikes: reactions[ReactionType.LIKE] || [],
     userRetweets: reactions[ReactionType.RECAST] || [],
@@ -95,13 +95,7 @@ export default async function tweetIdEndpoint(
     client: signer?.name || null
   };
 
-  const embeds = await getEmbedsForTweetIds([tweetWithUsers.id]);
-  const mergedTweets = mergeMetadataCacheResponse(
-    [tweetWithUsers],
-    embeds
-  ) as TweetWithUsers[];
-
   res.json({
-    result: mergedTweets[0]
+    result: tweetWithUsers
   });
 }
