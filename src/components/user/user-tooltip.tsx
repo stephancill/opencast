@@ -139,7 +139,7 @@ export function UserTooltip({
                 ))}
               </div>
             )}
-            <div className='text-secondary flex gap-4'>
+            <div className='flex gap-4 text-secondary'>
               {allStats.map(([id, label, stat]) => (
                 <Link href={`${userLink}/${id}`} key={id}>
                   <a
@@ -147,7 +147,9 @@ export function UserTooltip({
                              outline-none hover:border-b-light-primary focus-visible:border-b-light-primary
                              dark:hover:border-b-dark-primary dark:focus-visible:border-b-dark-primary'
                   >
-                    <p className='font-bold'>{formatNumber(stat)}</p>
+                    <p className='font-bold text-light-primary dark:text-dark-primary'>
+                      {formatNumber(stat)}
+                    </p>
                     <p className='text-light-secondary dark:text-dark-secondary'>
                       {label}
                     </p>
