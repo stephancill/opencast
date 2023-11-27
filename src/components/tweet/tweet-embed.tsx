@@ -69,8 +69,7 @@ export function TweetEmbed({
   const link = (
     <Link href={url} passHref>
       <a
-        className='override-nav inline-block w-full rounded-md border 
-border-black border-light-border p-2 text-left text-sm dark:border-dark-border'
+        className='override-nav inline-block w-full rounded-2xl border p-2 text-left text-sm dark:border-dark-border'
         target={newTab ? '_blank' : url.startsWith('/') ? undefined : '_blank'}
       >
         <div className='flex items-center'>
@@ -103,7 +102,7 @@ border-black border-light-border p-2 text-left text-sm dark:border-dark-border'
             </div>
             {text ? (
               <span
-                className={`mx-1 line-clamp-4 text-gray-400 ${hoverModifier}`}
+                className={`mx-1 line-clamp-4 text-muted-foreground ${hoverModifier}`}
               >
                 {text
                   .split(' ')
