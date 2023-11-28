@@ -71,7 +71,8 @@ async function processWarpcastEmbed(embed: ModEmbed): Promise<ModEmbed> {
           title: `${user?.name} (@${user?.username})`,
           publisher: `Farcaster`,
           image: images.length > 0 ? { url: images[0].url } : undefined,
-          description: cast?.text,
+          // Hacky way to get full cast text
+          description: embed.metadata?.description,
           logo: user?.photoURL
             ? {
                 url: user.photoURL
