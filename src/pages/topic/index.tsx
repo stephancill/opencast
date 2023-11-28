@@ -13,6 +13,7 @@ import { FeedOrderingSelector } from '../../components/ui/feed-ordering-selector
 import { fetchJSON } from '../../lib/fetch';
 import { FeedOrderingType } from '../../lib/types/feed';
 import { TopicResponse } from '../../lib/types/topic';
+import { useAuth } from '../../lib/context/auth-context';
 
 export default function TopicPage(): JSX.Element {
   // Debounce
@@ -20,6 +21,8 @@ export default function TopicPage(): JSX.Element {
   useEffect(() => {
     setEnabled(true);
   }, []);
+
+  const { user } = useAuth();
 
   const {
     query: { url: topicUrlParam }
@@ -57,7 +60,7 @@ export default function TopicPage(): JSX.Element {
         className='flex items-center justify-between'
       ></MainHeader>
       <FeedOrderingSelector {...{ feedOrdering, setFeedOrdering }} />
-      {!isMobile && <Input parentUrl={topicUrl} />}
+      {!isMobile && user?.keyPair && <Input parentUrl={topicUrl} />}
       <TweetFeed
         apiEndpoint={`/api/feed?topic_url=${encodeURIComponent(topicUrl)}`}
         feedOrdering={feedOrdering}
