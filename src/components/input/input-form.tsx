@@ -126,63 +126,34 @@ export function InputForm({
           closeModal={closeModal}
         />
       </Modal>
-      <div className='flex flex-col gap-6'>
-        {/* {isVisibilityShown && (
-          <motion.button
-            type='button'
-            className='custom-button accent-tab accent-bg-tab flex cursor-not-allowed items-center gap-1
-                       self-start border border-light-line-reply px-3 py-0 text-main-accent
-                       hover:bg-main-accent/10 active:bg-main-accent/20 dark:border-light-secondary'
-            {...fromTop}
-          >
-            <p className='font-bold'>Everyone</p>
-            <HeroIcon className='h-4 w-4' iconName='ChevronDownIcon' />
-          </motion.button>
-        )} */}
-        <div className='flex items-center gap-3'>
-          <TextArea
-            id={formId}
-            className='w-full min-w-0 resize-none bg-transparent text-xl outline-none
+      <div className='flex items-center gap-9'>
+        <TextArea
+          id={formId}
+          className='w-full min-w-0 resize-none bg-transparent text-xl outline-none
                        placeholder:text-light-secondary dark:placeholder:text-dark-secondary'
-            value={inputValue}
-            placeholder={
-              reply || replyModal ? 'Cast your reply' : "What's happening?"
-            }
-            onBlur={handleShowHideNav(true)}
-            minRows={loading ? 1 : modal && !isUploadingImages ? 3 : 1}
-            maxRows={isUploadingImages ? 5 : 15}
-            onFocus={handleFormFocus}
-            onPaste={handleImageUpload}
-            onKeyUp={handleKeyboardShortcut}
-            onChange={handleChange}
-            ref={inputRef}
-          />
-          {reply && !visited && (
-            <Button
-              className='cursor-pointer bg-main-accent px-4 py-1.5 font-bold text-white opacity-50'
-              onClick={handleFocus}
-            >
-              Reply
-            </Button>
-          )}
-        </div>
+          value={inputValue}
+          placeholder={
+            reply || replyModal ? 'Cast your reply' : "What's happening?"
+          }
+          onBlur={handleShowHideNav(true)}
+          minRows={loading ? 1 : modal && !isUploadingImages ? 3 : 1}
+          maxRows={isUploadingImages ? 5 : 15}
+          onFocus={handleFormFocus}
+          onPaste={handleImageUpload}
+          onKeyUp={handleKeyboardShortcut}
+          onChange={handleChange}
+          ref={inputRef}
+        />
+        {reply && !visited && (
+          <Button
+            className='cursor-pointer bg-main-accent px-4 py-1.5 font-bold text-white opacity-50'
+            onClick={handleFocus}
+          >
+            Reply
+          </Button>
+        )}
       </div>
       {children}
-      {/* {isVisibilityShown && (
-        <motion.div
-          className='flex border-b border-light-border pb-2 dark:border-dark-border'
-          {...fromBottom}
-        >
-          <button
-            type='button'
-            className='custom-button accent-tab accent-bg-tab flex cursor-not-allowed items-center gap-1 px-3
-                       py-0 text-main-accent hover:bg-main-accent/10 active:bg-main-accent/20'
-          >
-            <HeroIcon className='h-4 w-4' iconName='GlobeAmericasIcon' />
-            <p className='font-bold'>Everyone can reply</p>
-          </button>
-        </motion.div>
-      )} */}
     </div>
   );
 }
