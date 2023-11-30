@@ -144,7 +144,14 @@ export default function EditorExample({
     linkClassName: 'text-blue-600',
     renderMentionsSuggestionConfig: createRenderMentionsSuggestionConfig({
       getResults: getMentions
-    })
+    }),
+    editorOptions: {
+      editorProps: {
+        attributes: {
+          style: 'outline: 0;  min-height: 48px;'
+        }
+      }
+    }
   });
 
   /* Topic */
@@ -215,16 +222,12 @@ export default function EditorExample({
           username={currentUser!.username}
         />
         <div className='mt-3 flex w-full flex-col gap-4'>
-          <div className='flex min-h-[48px] w-full flex-col justify-center gap-4'>
+          <div className='flex min-h-[48px] flex-col justify-center'>
             <div
-              className='w-full min-w-0 resize-none bg-transparent text-xl outline-none
-                       placeholder:text-light-secondary dark:placeholder:text-dark-secondary'
+              className='w-full min-w-0 cursor-text resize-none bg-transparent text-xl
+                       outline-none placeholder:text-light-secondary dark:placeholder:text-dark-secondary'
             >
-              <EditorContent
-                editor={editor}
-                autoFocus
-                className='break-text w-full'
-              />
+              <EditorContent editor={editor} autoFocus />
               <EmbedsEditor embeds={getEmbeds()} setEmbeds={setEmbeds} />
             </div>
             <div className='flex flex-row gap-1 pt-2'>
