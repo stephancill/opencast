@@ -83,6 +83,7 @@ export function SearchBar<T>({
 
   return (
     <div className='hover-animation sticky top-0 z-10 flex-col bg-main-background py-2'>
+      {/* TODO: Use SearchBar component */}
       <form className='' onSubmit={handleSubmit}>
         <label
           className='group flex items-center justify-between gap-4 rounded-full

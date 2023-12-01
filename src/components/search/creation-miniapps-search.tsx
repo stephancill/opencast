@@ -1,9 +1,9 @@
 'use client';
 
 import { ModManifest } from '@mod-protocol/core';
-import cn from 'clsx';
 import { Button } from 'components/ui/button';
 import * as React from 'react';
+import { SearchBar } from '../input/search-bar';
 
 type Props = {
   miniapps: ModManifest[];
@@ -30,14 +30,12 @@ export function CreationMiniAppsSearch(props: Props) {
 
   return (
     <div>
-      <input
-        className={cn(
-          'flex h-10 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50'
-        )}
-        placeholder='Search Mini-apps...'
-        value={query}
+      <SearchBar
+        inputValue={query}
+        setInputValue={setQuery}
         onChange={(e) => setQuery(e.target.value)}
-      ></input>
+        className='mb-4'
+      ></SearchBar>
       <div className='flex flex-col'>
         {miniapps
           .filter((m) => m.name.toLowerCase().includes(query.toLowerCase()))
@@ -48,11 +46,13 @@ export function CreationMiniAppsSearch(props: Props) {
               onClick={() => handleSelect(m.slug)}
             >
               <div className='flex items-center'>
-                <img
-                  src={m.logo}
-                  className='mr-2 h-6 w-6 rounded-md'
-                  alt={m.name}
-                ></img>
+                <div className='mr-2 flex h-7 w-7 items-center rounded-full bg-white'>
+                  <img
+                    src={m.logo}
+                    className='mx-auto h-6 w-6 rounded-md '
+                    alt={m.name}
+                  ></img>
+                </div>
                 {m.name}
               </div>
             </Button>
