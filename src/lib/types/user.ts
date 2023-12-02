@@ -52,8 +52,8 @@ export const userConverter = {
     return {
       id: user.fid.toString(),
       bio: user[UserDataType.BIO] ?? null,
-      name: user[UserDataType.DISPLAY],
-      username: user[UserDataType.USERNAME],
+      name: user[UserDataType.DISPLAY] || '',
+      username: user[UserDataType.USERNAME] || '',
       photoURL: user[UserDataType.PFP], //user['1'],
       verified: false
     } as User;
@@ -63,13 +63,13 @@ export const userConverter = {
     return {
       id: user.fid.toString(),
       bio: user[UserDataType.BIO] ?? null,
-      name: user[UserDataType.DISPLAY],
+      name: user[UserDataType.DISPLAY] || '',
       theme: null,
       accent: null,
       website: null,
       location: null,
-      username: user[UserDataType.USERNAME],
-      photoURL: user[UserDataType.PFP], //user['1'],
+      username: user[UserDataType.USERNAME] || '',
+      photoURL: user[UserDataType.PFP] || '', //user['1'],
       coverPhotoURL: null,
       verified: false,
       following: [],
