@@ -13,8 +13,7 @@ module.exports = {
   ],
   theme: {
     screens: {
-      xs: '500px',
-      ...defaultTheme.screens
+      xs: '500px'
     },
     extend: {
       ...modConfig.theme.extend,

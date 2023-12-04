@@ -13,9 +13,10 @@ export function TweetReplyModal({
 }: TweetReplyModalProps): JSX.Element {
   return (
     <Input
-      modal
+      isModal
       replyModal
-      parent={{
+      isReply
+      parentPost={{
         id: tweet.id,
         username: tweet.user.username,
         userId: tweet.user.id
