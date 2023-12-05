@@ -18,7 +18,7 @@
     "@farcaster/hub-web": "^0.6.0",
     "@headlessui/react": "^1.7.2",
     "@heroicons/react": "^2.0.11",
-    "@mod-protocol/miniapp-registry": "^0.0.2",
+    "@mod-protocol/mod-registry": "*",
     "@mod-protocol/react": "^0.0.2",
     "@mod-protocol/react-editor": "^0.0.2",
     "@mod-protocol/react-ui-shadcn": "^0.0.3",

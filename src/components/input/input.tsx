@@ -16,8 +16,8 @@ import {
   getFarcasterMentions,
   getMentionFidsByUsernames
 } from '@mod-protocol/farcaster';
-import { creationMiniApps } from '@mod-protocol/miniapp-registry';
-import { CreationMiniApp } from '@mod-protocol/react';
+import { creationMods, richEmbedMods } from '@mod-protocol/mod-registry';
+import { CreationMod, RichEmbed } from '@mod-protocol/react';
 import { EditorContent, useEditor } from '@mod-protocol/react-editor';
 import {
   Popover,
@@ -41,6 +41,7 @@ import { CreationMiniAppsSearch } from '../search/creation-miniapps-search';
 import { SearchTopics } from '../search/search-topics';
 import { TopicView, TweetTopicSkeleton } from '../tweet/tweet-topic';
 import { InputOptions } from './input-options';
+import { defaultRichEmbedMod } from '@mod-protocol/mod-registry';
 
 type InputProps = {
   isModal?: boolean;
@@ -320,7 +321,19 @@ export function Input({
                 onFocus={handleFocus}
               />
               <div className='text-base'>
-                <EmbedsEditor embeds={getEmbeds()} setEmbeds={setEmbeds} />
+                <EmbedsEditor
+                  embeds={getEmbeds()}
+                  setEmbeds={setEmbeds}
+                  RichEmbed={({ embed }) => (
+                    <RichEmbed
+                      api={API_URL}
+                      defaultRichEmbedMod={defaultRichEmbedMod}
+                      mods={[defaultRichEmbedMod]}
+                      embed={embed}
+                      renderers={renderers}
+                    />
+                  )}
+                />
               </div>
             </div>
             <div className='flex flex-row gap-1 pt-2'>
@@ -383,7 +396,7 @@ export function Input({
                         disabled: false,
                         popoverContent: () => (
                           <CreationMiniAppsSearch
-                            miniapps={creationMiniApps}
+                            miniapps={creationMods}
                             onSelect={(miniapp) => {
                               setCurrentMiniapp(miniapp);
                             }}
@@ -415,7 +428,7 @@ export function Input({
                   </h4>
                   <hr />
                   {currentMiniapp && (
-                    <CreationMiniApp
+                    <CreationMod
                       input={getText()}
                       embeds={getEmbeds()}
                       api={API_URL}
