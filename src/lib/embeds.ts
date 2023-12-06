@@ -102,11 +102,9 @@ export async function populateEmbedsForTweets(
           const embedCopy = { ...embed };
 
           // If collection creator is a string, it is an fid, otherwise it is already a user object
-          const farcasterUserOrFid = embed.metadata?.nft?.collection?.creator;
-          const creator: User | null = farcasterUserOrFid
-            ? typeof farcasterUserOrFid === 'string'
-              ? await resolveUserFromFid(BigInt(farcasterUserOrFid))
-              : await resolveUserFromFid(BigInt(farcasterUserOrFid.fid))
+          const partialFarcasterUser = embed.metadata?.nft?.collection?.creator;
+          const creator: User | null = partialFarcasterUser?.fid
+            ? await resolveUserFromFid(BigInt(partialFarcasterUser.fid))
             : null;
           const users: UsersMapType<User> = {};
           if (creator) {
