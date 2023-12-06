@@ -1205,7 +1205,7 @@
     semver "^7.3.8"
     superstruct "^1.0.3"
 
-"@mod-protocol/core@*", "@mod-protocol/core@^0.0.2":
+"@mod-protocol/core@^0.0.2":
   version "0.0.2"
   resolved "https://registry.yarnpkg.com/@mod-protocol/core/-/core-0.0.2.tgz#b37117418efd74d65bc03ad738d159dc1cce6d2d"
   integrity sha512-FNNL4bMKeUPcDDVqDfkdMk4GBtCGxEUUBN95VJwQP8ditZL5lNBa+ez1IMY9+8da3RpHe2Q3orxAuKxuv2KAQw==
@@ -1223,13 +1223,6 @@
   version "0.0.1"
   resolved "https://registry.yarnpkg.com/@mod-protocol/farcaster/-/farcaster-0.0.1.tgz#39d9360ce34fa27fe483c7544041f8beb0cd97c2"
   integrity sha512-RRb74j9uNJSOiF7HqCJSFWz8TOXVb6a/+kYMemb4tq04y6LfY9Wi36qc4wIaS01wnlFmf0RMZ8RX4sAto4CesQ==
-
-"@mod-protocol/miniapp-registry@^0.0.2":
-  version "0.0.2"
-  resolved "https://registry.yarnpkg.com/@mod-protocol/miniapp-registry/-/miniapp-registry-0.0.2.tgz#de0038be3ea108b5ae6b9ba85a3f0d587b1f3331"
-  integrity sha512-0LjQnebEGpu1Uj3hBuaEpn8CFlzLt5LOTF1MvD6CNmg5H8Jt0F74jEzHJ4xg+G+BZxUnCaZPLI6H3lpoP3D2tw==
-  dependencies:
-    "@mod-protocol/core" "*"
 
 "@mod-protocol/react-editor@^0.0.2":
   version "0.0.2"
