@@ -42,6 +42,7 @@ import { SearchTopics } from '../search/search-topics';
 import { TopicView, TweetTopicSkeleton } from '../tweet/tweet-topic';
 import { InputOptions } from './input-options';
 import { defaultRichEmbedMod } from '@mod-protocol/mod-registry';
+import { useAccount } from 'wagmi';
 
 type InputProps = {
   isModal?: boolean;
@@ -107,6 +108,7 @@ export function Input({
   );
   const [miniappPopoverEnabled, setMiniappPopoverEnabled] = useState(false);
   const [visited, setVisited] = useState(false);
+  const { address } = useAccount();
 
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -123,6 +125,8 @@ export function Input({
     { revalidateOnFocus: false }
   );
   useEffect(() => {
+    console.log(`Parent url changed: ${parentUrl}`);
+
     if (topicUrl !== parentUrl) {
       setTopicUrl(parentUrl);
     }
@@ -143,86 +147,83 @@ export function Input({
     setVisited(!loading);
   };
 
-  const onSubmit = useCallback(
-    async ({
+  const onSubmit = async ({
+    text,
+    embeds
+  }: {
+    text: string;
+    embeds: Embed[];
+    channel: Channel;
+  }): Promise<boolean> => {
+    if (!currentUser) return false;
+
+    setLoading?.(true);
+
+    // if (!inputValue && selectedImages.length === 0) {
+    //   setLoading?.(false);
+    //   return;
+    // }
+
+    const formattedCast = await formatPlaintextToHubCastMessage({
       text,
-      embeds
-    }: {
-      text: string;
-      embeds: Embed[];
-      channel: Channel;
-    }): Promise<boolean> => {
-      if (!currentUser) return false;
+      embeds,
+      parentUrl: topicUrl || undefined,
+      getMentionFidsByUsernames: getMentionFids
+    });
+    if (!formattedCast) {
+      setLoading?.(false);
+      return false;
+    }
 
-      setLoading?.(true);
+    // submit the cast to a hub
+    const castMessage = await createCastMessage({
+      text: text,
+      fid: parseInt(currentUser?.id),
+      embeds: formattedCast.embeds,
+      mentions: formattedCast.mentions,
+      mentionsPositions: formattedCast.mentionsPositions,
+      parentCastHash: isReply && parentPost ? parentPost.id : undefined,
+      parentCastFid:
+        isReply && parentPost ? parseInt(parentPost.userId) : undefined,
+      parentUrl: !parentPost ? topicUrl : undefined
+    });
 
-      // if (!inputValue && selectedImages.length === 0) {
-      //   setLoading?.(false);
-      //   return;
-      // }
+    if (castMessage) {
+      const res = await submitHubMessage(castMessage);
+      const message = Message.fromJSON(res);
 
-      const formattedCast = await formatPlaintextToHubCastMessage({
-        text,
-        embeds,
-        parentUrl: parentUrl || undefined,
-        getMentionFidsByUsernames: getMentionFids
-      });
-      if (!formattedCast) {
-        setLoading?.(false);
-        return false;
-      }
+      // await sleep(500);
 
-      // submit the cast to a hub
-      const castMessage = await createCastMessage({
-        text: text,
-        fid: parseInt(currentUser?.id),
-        embeds: formattedCast.embeds,
-        mentions: formattedCast.mentions,
-        mentionsPositions: formattedCast.mentionsPositions,
-        parentCastHash: isReply && parentPost ? parentPost.id : undefined,
-        parentCastFid:
-          isReply && parentPost ? parseInt(parentPost.userId) : undefined,
-        parentUrl: !parentPost ? parentUrl : undefined
-      });
-
-      if (castMessage) {
-        const res = await submitHubMessage(castMessage);
-        const message = Message.fromJSON(res);
-
-        // await sleep(500);
-
-        if (!isModal && !replyModal) {
-          // discardTweet();
-          setLoading(false);
-        }
-
-        if (closeModal) closeModal();
-
-        const tweetId = Buffer.from(message.hash).toString('hex');
-
-        toast.success(
-          () => (
-            <span className='flex gap-2'>
-              Your post was sent
-              <Link href={`/tweet/${tweetId}`}>
-                <a className='custom-underline font-bold'>View</a>
-              </Link>
-            </span>
-          ),
-          { duration: 6000 }
-        );
-      } else {
+      if (!isModal && !replyModal) {
+        // discardTweet();
         setLoading(false);
-        toast.error(
-          () => <span className='flex gap-2'>Failed to create post</span>,
-          { duration: 6000 }
-        );
       }
 
-      return true;
-    },
-    []
-  );
+      if (closeModal) closeModal();
+
+      const tweetId = Buffer.from(message.hash).toString('hex');
+
+      toast.success(
+        () => (
+          <span className='flex gap-2'>
+            Your post was sent
+            <Link href={`/tweet/${tweetId}`}>
+              <a className='custom-underline font-bold'>View</a>
+            </Link>
+          </span>
+        ),
+        { duration: 6000 }
+      );
+    } else {
+      setLoading(false);
+      toast.error(
+        () => <span className='flex gap-2'>Failed to create post</span>,
+        { duration: 6000 }
+      );
+    }
+
+    return true;
+  };
 
   const {
     editor,
@@ -431,6 +432,14 @@ export function Input({
                     <CreationMod
                       input={getText()}
                       embeds={getEmbeds()}
+                      user={{
+                        wallet: {
+                          address: address ? address : undefined
+                        },
+                        farcaster: {
+                          fid: currentUser?.id
+                        }
+                      }}
                       api={API_URL}
                       variant='creation'
                       manifest={currentMiniapp}
