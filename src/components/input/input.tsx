@@ -37,7 +37,7 @@ import useSWR from 'swr';
 import { createCastMessage, submitHubMessage } from '../../lib/farcaster/utils';
 import { fetchJSON } from '../../lib/fetch';
 import { TopicResponse, TopicType } from '../../lib/types/topic';
-import { CreationMiniAppsSearch } from '../search/creation-miniapps-search';
+import { CreationModsSearch } from '../search/creation-mods-search';
 import { SearchTopics } from '../search/search-topics';
 import { TopicView, TweetTopicSkeleton } from '../tweet/tweet-topic';
 import { InputOptions } from './input-options';
@@ -103,10 +103,8 @@ export function Input({
   const [loading, setLoading] = useState(false);
   const { user: currentUser } = useAuth();
   const formId = useId();
-  const [currentMiniapp, setCurrentMiniapp] = useState<ModManifest | null>(
-    null
-  );
-  const [miniappPopoverEnabled, setMiniappPopoverEnabled] = useState(false);
+  const [currentMod, setCurrentMod] = useState<ModManifest | null>(null);
+  const [modPopoverEnabled, setModPopoverEnabled] = useState(false);
   const [visited, setVisited] = useState(false);
   const { address } = useAccount();
 
@@ -125,8 +123,6 @@ export function Input({
     { revalidateOnFocus: false }
   );
   useEffect(() => {
-    console.log(`Parent url changed: ${parentUrl}`);
-
     if (topicUrl !== parentUrl) {
       setTopicUrl(parentUrl);
     }
@@ -254,8 +250,8 @@ export function Input({
   });
 
   useEffect(() => {
-    setMiniappPopoverEnabled(false);
-  }, [currentMiniapp]);
+    setModPopoverEnabled(false);
+  }, [currentMod]);
   useEffect(() => {
     topic &&
       setChannel({
@@ -396,16 +392,15 @@ export function Input({
                         iconName: 'PlusIcon',
                         disabled: false,
                         popoverContent: () => (
-                          <CreationMiniAppsSearch
-                            miniapps={creationMods}
-                            onSelect={(miniapp) => {
-                              setCurrentMiniapp(miniapp);
+                          <CreationModsSearch
+                            mods={creationMods}
+                            onSelect={(mod) => {
+                              setCurrentMod(mod);
                             }}
-                            open={!!currentMiniapp}
+                            open={!!currentMod}
                             setOpen={(op: boolean) => {
-                              setMiniappPopoverEnabled(true);
-                              if (!op && miniappPopoverEnabled)
-                                setCurrentMiniapp(null);
+                              setModPopoverEnabled(true);
+                              if (!op && modPopoverEnabled) setCurrentMod(null);
                             }}
                           />
                         )
@@ -416,19 +411,19 @@ export function Input({
               )}
             </div>
             <Popover
-              open={!!currentMiniapp}
+              open={!!currentMod}
               onOpenChange={(op: boolean) => {
-                if (!op) setCurrentMiniapp(null);
+                if (!op) setCurrentMod(null);
               }}
             >
               <PopoverTrigger></PopoverTrigger>
               <PopoverContent className='ml-2 w-[400px]' align='start'>
                 <div className='space-y-4'>
                   <h4 className='font-medium leading-none'>
-                    {currentMiniapp?.name}
+                    {currentMod?.name}
                   </h4>
                   <hr />
-                  {currentMiniapp && (
+                  {currentMod && (
                     <CreationMod
                       input={getText()}
                       embeds={getEmbeds()}
@@ -442,10 +437,10 @@ export function Input({
                       }}
                       api={API_URL}
                       variant='creation'
-                      manifest={currentMiniapp}
+                      manifest={currentMod}
                       renderers={renderers}
                       onOpenFileAction={handleOpenFile}
-                      onExitAction={() => setCurrentMiniapp(null)}
+                      onExitAction={() => setCurrentMod(null)}
                       onSetInputAction={handleSetInput(setText)}
                       onAddEmbedAction={handleAddEmbed(addEmbed)}
                     />

@@ -6,26 +6,25 @@ import * as React from 'react';
 import { SearchBar } from '../input/search-bar';
 
 type Props = {
-  miniapps: ModManifest[];
+  mods: ModManifest[];
   onSelect: (value: ModManifest) => void;
   open: boolean;
   setOpen: (value: boolean) => void;
 };
 
-export function CreationMiniAppsSearch(props: Props) {
-  const { miniapps, onSelect, open, setOpen } = props;
+export function CreationModsSearch({ mods, onSelect, open, setOpen }: Props) {
   const [query, setQuery] = React.useState('');
 
   const handleSelect = React.useCallback(
     (id: string) => {
-      const miniapp = miniapps.find((m) => m.slug === id);
+      const miniapp = mods.find((m) => m.slug === id);
       if (miniapp) {
         // TODO: this needs to happen in input-options.tsx
         setOpen(false);
         onSelect(miniapp);
       }
     },
-    [onSelect, miniapps]
+    [onSelect, mods]
   );
 
   return (
@@ -37,7 +36,7 @@ export function CreationMiniAppsSearch(props: Props) {
         className='mb-4'
       ></SearchBar>
       <div className='flex flex-col'>
-        {miniapps
+        {mods
           .filter((m) => m.name.toLowerCase().includes(query.toLowerCase()))
           .map((m) => (
             <Button

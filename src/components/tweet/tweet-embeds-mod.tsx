@@ -1,7 +1,10 @@
 'use client';
 
 import { Embed } from '@mod-protocol/core';
-import { richEmbedMods, defaultRichEmbedMod } from '@mod-protocol/mod-registry';
+import {
+  richEmbedModsExperimental as richEmbedMods,
+  defaultRichEmbedMod
+} from '@mod-protocol/mod-registry';
 import { RichEmbed } from '@mod-protocol/react';
 import { renderers } from '@mod-protocol/react-ui-shadcn/dist/renderers';
 import {
