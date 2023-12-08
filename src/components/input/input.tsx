@@ -240,7 +240,7 @@ export function Input({
     fetchUrlMetadata: getUrlMetadata,
     onError,
     onSubmit,
-    linkClassName: 'text-blue-600',
+    linkClassName: 'text-main-accent',
     renderMentionsSuggestionConfig: createRenderMentionsSuggestionConfig({
       getResults: getMentions
     }),
