@@ -89,16 +89,12 @@ export function ProgressBar({
       <span
         className={cn(
           `absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-[45%]
-           scale-50 opacity-0`,
+           scale-50 text-3xl opacity-0`,
           {
             'scale-100 opacity-100 transition': isCloseToLimit,
             'text-accent-red': isHittingCharLimit
           }
-        )},
-        style={{
-          fontSize: 'xx-large,
-          lineHeight: '1rem',
-        }}
+        )}
       >
         {remainingCharacters}
       </span>
