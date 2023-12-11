@@ -88,8 +88,8 @@ export function ProgressBar({
       </i>
       <span
         className={cn(
-          `absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-[45%]
-           scale-50 text-3xl opacity-0`,
+          `absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2
+           scale-50 text-3xl opacity-0 text-light-secondary dark:text-dark-secondary`,
           {
             'scale-100 opacity-100 transition': isCloseToLimit,
             'text-accent-red': isHittingCharLimit
