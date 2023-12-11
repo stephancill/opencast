@@ -109,6 +109,17 @@
   ::after {
     @apply dark:border-dark-border;
   }
+
+  // Handle broken images
+  img:before {
+    content: ' ';
+    display: block;
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    @apply dark:bg-dark-secondary;
+    @apply bg-light-secondary;
+  }
 }
 
 @layer components {
