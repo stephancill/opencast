@@ -117,7 +117,7 @@ export default async function handle(
           SELECT * FROM casts
           WHERE
             (
-              ${cursor} IS NULL
+              ${cursor}::timestamp IS NULL
               OR 
               (${!after} IS TRUE AND timestamp < ${cursor}::timestamp)
               OR
