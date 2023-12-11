@@ -24,7 +24,18 @@ export function ModEmbeds(props: { embeds: Array<Embed> }) {
         embed.metadata && Object.keys(embed.metadata).length > 0 ? (
           <RichEmbed
             api={process.env.NEXT_PUBLIC_MOD_API_URL!}
-            embed={embed}
+            embed={{
+              ...embed,
+              metadata: {
+                ...embed.metadata,
+                description:
+                  embed.metadata.description?.slice(0, 200) +
+                  (embed.metadata.description?.length &&
+                  embed.metadata.description?.length > 200
+                    ? '...'
+                    : '')
+              }
+            }}
             key={i}
             renderers={{
               ...renderers,
