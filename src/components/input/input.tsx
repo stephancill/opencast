@@ -43,6 +43,7 @@ import { TopicView, TweetTopicSkeleton } from '../tweet/tweet-topic';
 import { InputOptions } from './input-options';
 import { defaultRichEmbedMod } from '@mod-protocol/mod-registry';
 import { useAccount } from 'wagmi';
+import { Loading } from '../ui/loading';
 
 type InputProps = {
   isModal?: boolean;
@@ -101,6 +102,7 @@ export function Input({
   closeModal
 }: InputProps): JSX.Element {
   const [loading, setLoading] = useState(false);
+  const [contentLoading, setContentLoading] = useState(false);
   const { user: currentUser } = useAuth();
   const formId = useId();
   const [currentMod, setCurrentMod] = useState<ModManifest | null>(null);
@@ -313,6 +315,70 @@ export function Input({
               ></p>
               <EditorContent
                 editor={editor}
+                onPaste={async (e) => {
+                  const isPastingText = e.clipboardData.getData('text');
+                  if (isPastingText) return;
+
+                  const files = e.clipboardData.files;
+
+                  // Mod expects a blob, so we convert the file to a blob
+                  const imageFiles = await Promise.all(
+                    Array.from(files)
+                      .filter(({ type }) => {
+                        return type.startsWith('image/');
+                      })
+                      .map(async (file) => {
+                        const arrayBuffer = await file.arrayBuffer();
+                        const blob = new Blob([new Uint8Array(arrayBuffer)], {
+                          type: file.type
+                        });
+                        return { blob, ...file };
+                      })
+                  );
+
+                  if (imageFiles.length === 0) return;
+
+                  setContentLoading(true);
+                  try {
+                    // Upload to imgur
+                    await Promise.all(
+                      imageFiles.map(async (file) => {
+                        const formData = new FormData();
+                        formData.append('file', file.blob);
+                        const res = await fetch(
+                          `${process.env.NEXT_PUBLIC_MOD_API_URL}/imgur-upload`,
+                          {
+                            method: 'POST',
+                            body: formData
+                          }
+                        );
+
+                        const { url } = await res.json();
+                        if (!url) return;
+
+                        const currentEmbeds = getEmbeds();
+                        const newEmbeds: typeof currentEmbeds = [
+                          ...currentEmbeds,
+                          {
+                            url,
+                            metadata: {
+                              image: {
+                                url: url
+                              },
+                              mimeType: 'image/png'
+                            },
+                            status: 'loaded'
+                          }
+                        ];
+
+                        setEmbeds(newEmbeds);
+                      })
+                    );
+                  } catch (e) {
+                    console.error(e);
+                  }
+                  setContentLoading(false);
+                }}
                 autoFocus
                 placeholder="What's happening?"
                 onFocus={handleFocus}
@@ -358,16 +424,15 @@ export function Input({
                 )
               )}
             </div>
+            {contentLoading && <Loading />}
             <div className='mt-2'>
               {(isReply ? isReply && visited && !loading : !loading) && (
                 <InputOptions
-                  // reply={reply}
-                  // modal={modal}
-                  // inputLimit={inputLimit}
                   inputLength={Buffer.from(getText()).length}
                   isValidTweet={
-                    Buffer.from(getText()).length > 0 &&
-                    Buffer.from(getText()).length < 320
+                    (Buffer.from(getText()).length > 0 &&
+                      Buffer.from(getText()).length < 320) ||
+                    getEmbeds().length > 0
                   }
                   inputLimit={320}
                   isCharLimitExceeded={Buffer.from(getText()).length > 320}
