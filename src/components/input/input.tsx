@@ -246,6 +246,12 @@ export function Input({
       editorProps: {
         attributes: {
           style: 'outline: 0;  min-height: 48px;'
+        },
+        handleDrop(view, event, slice, moved) {
+          const files = event.dataTransfer?.files;
+          if (!files) return false;
+          handleFileUpload(files);
+          return true;
         }
       }
     }
@@ -263,6 +269,66 @@ export function Input({
         name: topic.name
       });
   }, [topic]);
+
+  const handleFileUpload = useCallback(async (files: FileList) => {
+    // Mod expects a blob, so we convert the file to a blob
+    const imageFiles = await Promise.all(
+      Array.from(files)
+        .filter(({ type }) => {
+          return type.startsWith('image/');
+        })
+        .map(async (file) => {
+          const arrayBuffer = await file.arrayBuffer();
+          const blob = new Blob([new Uint8Array(arrayBuffer)], {
+            type: file.type
+          });
+          return { blob, ...file };
+        })
+    );
+
+    if (imageFiles.length === 0) return;
+
+    setContentLoading(true);
+    try {
+      // Upload to imgur
+      await Promise.all(
+        imageFiles.map(async (file) => {
+          const formData = new FormData();
+          formData.append('file', file.blob);
+          const res = await fetch(
+            `${process.env.NEXT_PUBLIC_MOD_API_URL}/imgur-upload`,
+            {
+              method: 'POST',
+              body: formData
+            }
+          );
+
+          const { url } = await res.json();
+          if (!url) return;
+
+          const currentEmbeds = getEmbeds();
+          const newEmbeds: typeof currentEmbeds = [
+            ...currentEmbeds,
+            {
+              url,
+              metadata: {
+                image: {
+                  url: url
+                },
+                mimeType: 'image/png'
+              },
+              status: 'loaded'
+            }
+          ];
+
+          setEmbeds(newEmbeds);
+        })
+      );
+    } catch (e) {
+      console.error(e);
+    }
+    setContentLoading(false);
+  }, []);
 
   return (
     <form
@@ -321,63 +387,7 @@ export function Input({
 
                   const files = e.clipboardData.files;
 
-                  // Mod expects a blob, so we convert the file to a blob
-                  const imageFiles = await Promise.all(
-                    Array.from(files)
-                      .filter(({ type }) => {
-                        return type.startsWith('image/');
-                      })
-                      .map(async (file) => {
-                        const arrayBuffer = await file.arrayBuffer();
-                        const blob = new Blob([new Uint8Array(arrayBuffer)], {
-                          type: file.type
-                        });
-                        return { blob, ...file };
-                      })
-                  );
-
-                  if (imageFiles.length === 0) return;
-
-                  setContentLoading(true);
-                  try {
-                    // Upload to imgur
-                    await Promise.all(
-                      imageFiles.map(async (file) => {
-                        const formData = new FormData();
-                        formData.append('file', file.blob);
-                        const res = await fetch(
-                          `${process.env.NEXT_PUBLIC_MOD_API_URL}/imgur-upload`,
-                          {
-                            method: 'POST',
-                            body: formData
-                          }
-                        );
-
-                        const { url } = await res.json();
-                        if (!url) return;
-
-                        const currentEmbeds = getEmbeds();
-                        const newEmbeds: typeof currentEmbeds = [
-                          ...currentEmbeds,
-                          {
-                            url,
-                            metadata: {
-                              image: {
-                                url: url
-                              },
-                              mimeType: 'image/png'
-                            },
-                            status: 'loaded'
-                          }
-                        ];
-
-                        setEmbeds(newEmbeds);
-                      })
-                    );
-                  } catch (e) {
-                    console.error(e);
-                  }
-                  setContentLoading(false);
+                  handleFileUpload(files);
                 }}
                 autoFocus
                 placeholder="What's happening?"
