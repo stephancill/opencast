@@ -197,7 +197,7 @@ export function UserEditProfile({ hide }: UserEditProfileProps): JSX.Element {
     ctrlKey
   }: KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
     if (ctrlKey && key === 'Enter' && !inputNameError) {
-      target.blur();
+      (target as HTMLTextAreaElement).blur();
       void updateData();
     }
   };

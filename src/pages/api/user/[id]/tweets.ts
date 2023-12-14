@@ -1,8 +1,9 @@
 import { UserDataType } from '@farcaster/hub-web';
 import { NextApiRequest, NextApiResponse } from 'next';
+import { populateEmbedsForTweets } from '../../../../lib/embeds';
 import {
-  getTweetsPaginatedPrismaArgs,
-  PaginatedTweetsResponse
+  PaginatedTweetsResponse,
+  getTweetsPaginatedPrismaArgs
 } from '../../../../lib/paginated-tweets';
 import { prisma } from '../../../../lib/prisma';
 
@@ -58,8 +59,10 @@ export default async function handle(
         }
       });
 
+      const tweetsWithEmbeds = await populateEmbedsForTweets(result.tweets);
+
       res.json({
-        result
+        result: { ...result, tweets: tweetsWithEmbeds }
       });
       break;
     default:

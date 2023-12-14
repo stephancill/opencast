@@ -1,4 +1,5 @@
-import { Embed } from '@farcaster/hub-web';
+import { Embed as FarcasterEmbed } from '@farcaster/hub-web';
+import { Embed as ModEmbed } from '@mod-protocol/core';
 import { casts } from '@prisma/client';
 import { TopicsMapType } from '../topics/resolve-topic';
 import { TopicType } from './topic';
@@ -27,7 +28,7 @@ export type Tweet = {
   id: string;
   text: string | null;
   images: ImagesPreview | null;
-  embeds: ExternalEmbed[];
+  embeds: ModEmbed[];
   parent: { id: string; username?: string; userId?: string } | null;
   userLikes: string[];
   createdBy: string;
@@ -122,7 +123,7 @@ export const tweetConverter = {
       };
     }
 
-    const embeds = cast.embeds as Embed[];
+    const embeds = cast.embeds as FarcasterEmbed[];
 
     const images =
       embeds.length > 0
@@ -135,12 +136,13 @@ export const tweetConverter = {
             }))
         : [];
 
-    const externalEmbeds: ExternalEmbed[] =
+    const externalEmbeds: ModEmbed[] =
       embeds.length > 0
         ? embeds
             .filter((embed) => embed.url && !isValidImageExtension(embed.url))
             .map((embed) => ({
-              url: embed.url!
+              url: embed.url!,
+              status: 'loading'
             }))
         : [];
 

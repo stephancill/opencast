@@ -13,6 +13,11 @@ export default async function handle(
     case 'GET':
       const query = req.query.q as string;
 
+      if (!query.length) {
+        res.json({ result: [] });
+        return;
+      }
+
       // Get users that match query
       const userData = await prisma.user_data.findMany({
         where: {

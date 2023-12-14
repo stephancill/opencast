@@ -1,3 +1,4 @@
+import { populateEmbedsForTweets } from '@lib/embeds';
 import { Prisma, casts } from '@prisma/client';
 import { NextApiRequest, NextApiResponse } from 'next';
 import {
@@ -185,8 +186,13 @@ export default async function handle(
           : undefined
       );
 
+      const tweetsWithEmbeds = await populateEmbedsForTweets(result.tweets);
+
       res.json({
-        result
+        result: {
+          ...result,
+          tweets: tweetsWithEmbeds
+        }
       });
       break;
     default:

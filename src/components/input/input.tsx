@@ -1,38 +1,57 @@
 import { UserAvatar } from '@components/user/user-avatar';
 import { Message } from '@farcaster/hub-web';
 import { useAuth } from '@lib/context/auth-context';
-import type { FilesWithId, ImageData, ImagesPreview } from '@lib/types/file';
-import type { User, UsersMapType } from '@lib/types/user';
-import { getHttpsUrls, sleep } from '@lib/utils';
-import { getImagesData } from '@lib/validation';
+import {
+  Embed,
+  ModManifest,
+  fetchUrlMetadata,
+  handleAddEmbed,
+  handleOpenFile,
+  handleSetInput
+} from '@mod-protocol/core';
+import {
+  Channel,
+  formatPlaintextToHubCastMessage,
+  getFarcasterChannels,
+  getFarcasterMentions,
+  getMentionFidsByUsernames
+} from '@mod-protocol/farcaster';
+import { creationMods, richEmbedMods } from '@mod-protocol/mod-registry';
+import { CreationMod, RichEmbed } from '@mod-protocol/react';
+import { EditorContent, useEditor } from '@mod-protocol/react-editor';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger
+} from '@mod-protocol/react-ui-shadcn/dist/components/ui/popover';
+import { EmbedsEditor } from '@mod-protocol/react-ui-shadcn/dist/lib/embeds';
+import { createRenderMentionsSuggestionConfig } from '@mod-protocol/react-ui-shadcn/dist/lib/mentions';
+import { renderers } from '@mod-protocol/react-ui-shadcn/dist/renderers';
 import cn from 'clsx';
 import type { Variants } from 'framer-motion';
-import { AnimatePresence, motion } from 'framer-motion';
-import { debounce } from 'lodash';
 import Link from 'next/link';
-import type { ChangeEvent, ClipboardEvent, FormEvent, ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { toast } from 'react-hot-toast';
 import useSWR from 'swr';
 import { createCastMessage, submitHubMessage } from '../../lib/farcaster/utils';
 import { fetchJSON } from '../../lib/fetch';
-import { uploadToImgur } from '../../lib/imgur/upload';
-import { BaseResponse } from '../../lib/types/responses';
 import { TopicResponse, TopicType } from '../../lib/types/topic';
-import { ExternalEmbed } from '../../lib/types/tweet';
+import { CreationModsSearch } from '../search/creation-mods-search';
 import { SearchTopics } from '../search/search-topics';
-import { UserSearchResult } from '../search/user-search-result';
-import { TweetEmbed } from '../tweet/tweet-embed';
 import { TopicView, TweetTopicSkeleton } from '../tweet/tweet-topic';
-import { Loading } from '../ui/loading';
-import { ImagePreview } from './image-preview';
-import { InputForm, fromTop } from './input-form';
 import { InputOptions } from './input-options';
+import { defaultRichEmbedMod } from '@mod-protocol/mod-registry';
+import { useAccount } from 'wagmi';
+import { Loading } from '../ui/loading';
+// import { FarcasterMention as ModMention } from '@mod-protocol/farcaster';
+// import { BaseResponse } from '../../lib/types/responses';
+// import { User } from '../../lib/types/user';
 
 type InputProps = {
-  modal?: boolean;
-  reply?: boolean;
-  parent?: { id: string; username: string; userId: string };
+  isModal?: boolean;
+  isReply?: boolean;
+  parentPost?: { id: string; username: string; userId: string };
   disabled?: boolean;
   children?: ReactNode;
   replyModal?: boolean;
@@ -45,71 +64,63 @@ export const variants: Variants = {
   animate: { opacity: 1 }
 };
 
-// TODO: Generalize this and move it somewhere else
-function extractAndReplaceMentions(
-  input: string,
-  usersMap: { [key: string]: number }
-) {
-  let result = '';
-  let mentions: number[] = [];
-  let mentionsPositions: number[] = [];
+// Optionally replace with your API_URL here
+const API_URL = process.env.NEXT_PUBLIC_MOD_API_URL!;
 
-  // Split on newlines and spaces, preserving delimiters
-  let splits = input.split(/(\s|\n)/);
+// TODO: Implement independent mentions
+// const getMentions: (query: string) => Promise<ModMention[]> = async (
+//   query: string
+// ) => {
+//   if (!query.length) return [];
 
-  splits.forEach((split, i) => {
-    if (split.startsWith('@')) {
-      const username = split.slice(1);
+//   const { result } = await fetchJSON<BaseResponse<User[]>>(
+//     `/api/search?q=${query}`
+//   );
+//   const modMentions: ModMention[] =
+//     result?.map((user) => ({
+//       fid: parseInt(user.id),
+//       avatar_url: user.photoURL,
+//       display_name: user.name,
+//       username: user.username
+//     })) || [];
 
-      // Check if user is in the usersMap
-      if (username in usersMap) {
-        // Get the starting position of each username mention
-        const position = Buffer.from(result).length;
+//   if (modMentions) console.log(modMentions);
 
-        mentions.push(usersMap[username]);
-        mentionsPositions.push(position);
+//   return modMentions;
+// };
 
-        // result += '@[...]'; // replace username mention with what you would like
-      } else {
-        result += split;
-      }
-    } else {
-      result += split;
-    }
-  });
+const getMentions = getFarcasterMentions(API_URL);
 
-  // Return object with replaced text and user mentions array
-  return {
-    text: result,
-    mentions,
-    mentionsPositions
-  };
-}
+const getChannels = getFarcasterChannels(API_URL);
+const getMentionFids = getMentionFidsByUsernames(API_URL);
+const getUrlMetadata = fetchUrlMetadata(API_URL);
+const onError = (err: any) => console.error(err.message);
 
 export function Input({
-  modal,
-  reply,
-  parent,
+  isModal: isModal,
+  isReply: isReply,
+  parentPost: parentPost,
   disabled,
   children,
   replyModal,
   parentUrl,
   closeModal
 }: InputProps): JSX.Element {
-  const [selectedImages, setSelectedImages] = useState<FilesWithId>([]);
-  const [imagesPreview, setImagesPreview] = useState<ImagesPreview>([]);
-  const [inputValue, setInputValue] = useState('');
   const [loading, setLoading] = useState(false);
+  const [contentLoading, setContentLoading] = useState(false);
+  const { user: currentUser } = useAuth();
+  const formId = useId();
+  const [currentMod, setCurrentMod] = useState<ModManifest | null>(null);
+  const [modPopoverEnabled, setModPopoverEnabled] = useState(false);
   const [visited, setVisited] = useState(false);
+  const { address } = useAccount();
 
-  const [embedUrls, setEmbedUrls] = useState<string[]>([]); // URLs to be fetched
-  const [embeds, setEmbeds] = useState<ExternalEmbed[]>([]); // Fetched embeds
-  const [ignoredEmbedUrls, setIgnoredEmbedUrls] = useState<string[]>([]); // URLs of embeds to be ignored in the cast message
+  const inputRef = useRef<HTMLTextAreaElement>(null);
 
+  /* Topic */
   const [topicUrl, setTopicUrl] = useState(parentUrl);
   const [showingTopicSelector, setShowingTopicSelector] = useState(false);
   const [topic, setTopic] = useState<TopicType | null>();
-
   const { data: topicResult, isValidating: loadingTopic } = useSWR(
     topicUrl ? `/api/topic?url=${encodeURIComponent(topicUrl)}` : null,
     async (url) => {
@@ -118,13 +129,11 @@ export function Input({
     },
     { revalidateOnFocus: false }
   );
-
   useEffect(() => {
     if (topicUrl !== parentUrl) {
       setTopicUrl(parentUrl);
     }
   }, [parentUrl]);
-
   useEffect(() => {
     if (topicUrl === topic?.url || topic === undefined) return;
     setTopicUrl(topic?.url);
@@ -136,126 +145,60 @@ export function Input({
     }
   }, [topicResult]);
 
-  const { user, isAdmin } = useAuth();
-  const { name, username, photoURL } = user as User;
+  const handleFocus = (): void => {
+    console.log('focused');
+    setVisited(!loading);
+  };
 
-  const inputRef = useRef<HTMLTextAreaElement>(null);
+  const onSubmit = async ({
+    text,
+    embeds
+  }: {
+    text: string;
+    embeds: Embed[];
+    channel: Channel;
+  }): Promise<boolean> => {
+    if (!currentUser) return false;
 
-  const previewCount = imagesPreview.length;
-  const isUploadingImages = !!previewCount;
+    setLoading?.(true);
 
-  useEffect(
-    () => {
-      if (modal) inputRef.current?.focus();
-      return cleanImage;
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
-  );
+    // if (!inputValue && selectedImages.length === 0) {
+    //   setLoading?.(false);
+    //   return;
+    // }
 
-  const sendTweet = async (): Promise<void> => {
-    inputRef.current?.blur();
-
-    setLoading(true);
-
-    if (!inputValue && selectedImages.length === 0) {
-      setLoading(false);
-      return;
+    const formattedCast = await formatPlaintextToHubCastMessage({
+      text,
+      embeds,
+      parentUrl: topicUrl || undefined,
+      getMentionFidsByUsernames: getMentionFids
+    });
+    if (!formattedCast) {
+      setLoading?.(false);
+      return false;
     }
 
-    const isReplying = reply ?? replyModal;
-
-    const userId = user?.id as string;
-
-    if (isReplying && !parent) {
-      setLoading(false);
-      return;
-    }
-
-    const uploadedLinks: string[] = [];
-
-    // Sequentially upload files
-    for (let i = 0; i < selectedImages.length; i++) {
-      const link = await uploadToImgur(selectedImages[i]);
-
-      if (!link) {
-        toast.error(
-          () => <span className='flex gap-2'>Failed to upload image</span>,
-          { duration: 6000 }
-        );
-        setLoading(false);
-        return;
-      }
-
-      uploadedLinks.push(link);
-    }
-
-    const rawText = inputValue.trim();
-
-    // Get fids of mentioned users
-    const mentionedUsers = ((input: string) => {
-      let splits = input.split(/(\s|\n)/);
-
-      const usernames: string[] = [];
-
-      splits.forEach((split, i) => {
-        if (split.startsWith('@')) {
-          const username = split.slice(1);
-          usernames.push(username);
-        }
-      });
-
-      return usernames;
-    })(rawText);
-
-    const usersMapResponse = await fetchJSON<
-      BaseResponse<{ [key: string]: number }>
-    >(`/api/user/resolve-usernames?usernames=${mentionedUsers.join(',')}`);
-    const usersMap = usersMapResponse.result;
-
-    if (!usersMap) {
-      toast.error(
-        () => <span className='flex gap-2'>Failed to resolve usernames</span>,
-        { duration: 6000 }
-      );
-      setLoading(false);
-      return;
-    }
-
-    // Extract mentions for cast message
-    const { text, mentions, mentionsPositions } = extractAndReplaceMentions(
-      rawText,
-      usersMap
-    );
-
-    // setLoading(false);
-    // return;
-
-    // TODO: Limit to only 2 embeds
+    // submit the cast to a hub
     const castMessage = await createCastMessage({
       text: text,
-      fid: parseInt(userId),
-      embeds: [
-        ...uploadedLinks.map((link) => ({ url: link })),
-        ...embeds
-          .filter((embed) => !ignoredEmbedUrls.includes(embed.url))
-          .map(({ url }) => ({ url }))
-      ],
-      mentions: mentions,
-      mentionsPositions: mentionsPositions,
-      parentCastHash: isReplying && parent ? parent.id : undefined,
-      parentCastFid: isReplying && parent ? parseInt(parent.userId) : undefined,
-      parentUrl: !parent ? topicUrl : undefined
+      fid: parseInt(currentUser?.id),
+      embeds: formattedCast.embeds,
+      mentions: formattedCast.mentions,
+      mentionsPositions: formattedCast.mentionsPositions,
+      parentCastHash: isReply && parentPost ? parentPost.id : undefined,
+      parentCastFid:
+        isReply && parentPost ? parseInt(parentPost.userId) : undefined,
+      parentUrl: !parentPost ? topicUrl : undefined
     });
 
     if (castMessage) {
       const res = await submitHubMessage(castMessage);
       const message = Message.fromJSON(res);
 
-      await sleep(500);
+      // await sleep(500);
 
-      if (!modal && !replyModal) {
-        discardTweet();
+      if (!isModal && !replyModal) {
+        // discardTweet();
         setLoading(false);
       }
 
@@ -281,207 +224,142 @@ export function Input({
         { duration: 6000 }
       );
     }
+
+    return true;
   };
-
-  const handleImageUpload = (
-    e: ChangeEvent<HTMLInputElement> | ClipboardEvent<HTMLTextAreaElement>
-  ): void => {
-    const isClipboardEvent = 'clipboardData' in e;
-
-    if (isClipboardEvent) {
-      const isPastingText = e.clipboardData.getData('text');
-      if (isPastingText) return;
-    }
-
-    const files = isClipboardEvent ? e.clipboardData.files : e.target.files;
-
-    const imagesData = getImagesData(files, previewCount);
-
-    if (!imagesData) {
-      toast.error('Please choose a GIF or photo up to 4');
-      return;
-    }
-
-    const { imagesPreviewData, selectedImagesData } = imagesData;
-
-    setImagesPreview([...imagesPreview, ...imagesPreviewData]);
-    setSelectedImages([...selectedImages, ...selectedImagesData]);
-
-    inputRef.current?.focus();
-  };
-
-  const removeImage = (targetId: string) => (): void => {
-    setSelectedImages(selectedImages.filter(({ id }) => id !== targetId));
-    setImagesPreview(imagesPreview.filter(({ id }) => id !== targetId));
-
-    const { src } = imagesPreview.find(
-      ({ id }) => id === targetId
-    ) as ImageData;
-
-    URL.revokeObjectURL(src);
-  };
-
-  const cleanImage = (): void => {
-    imagesPreview.forEach(({ src }) => URL.revokeObjectURL(src));
-
-    setSelectedImages([]);
-    setImagesPreview([]);
-  };
-
-  const discardTweet = (): void => {
-    setInputValue('');
-    setVisited(false);
-    cleanImage();
-    setEmbedUrls([]);
-    setEmbeds([]);
-    setIgnoredEmbedUrls([]);
-
-    inputRef.current?.blur();
-  };
-
-  const handleEmbedsChange = (value: string) => {
-    if (value) {
-      const urls = getHttpsUrls(value).filter(
-        (url) => !ignoredEmbedUrls.includes(url)
-      );
-      setEmbedUrls(urls.slice(0, 2));
-    }
-  };
-
-  const handleChangeDebounced = useCallback(
-    debounce((e) => {
-      handleEmbedsChange(e.target.value);
-    }, 1500),
-    []
-  );
-
-  const [showUsers, setShowUsers] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
 
   const {
-    data: usersSearch,
-    error,
-    isValidating: usersSearchLoading
-  } = useSWR(
-    searchTerm.length > 0 ? `/api/search?q=${searchTerm}` : null,
-    async (url) => (await fetchJSON<BaseResponse<User[]>>(url)).result
-  );
-
-  const debouncedSetSearchTerm = useCallback(
-    debounce((value) => {
-      setSearchTerm(value);
-    }, 1000),
-    []
-  );
-
-  useEffect(() => {
-    if (!inputRef.current) return;
-    const cursorPosition = inputRef.current.selectionStart;
-    const textBeforeCursor = inputValue.slice(0, cursorPosition);
-
-    // TODO: Handle edge cases like \n
-    const lastKeyword = textBeforeCursor.split(' ').pop() || '';
-
-    if (lastKeyword.startsWith('@')) {
-      setShowUsers(true);
-      debouncedSetSearchTerm(lastKeyword.slice(1));
-    } else {
-      setShowUsers(false);
-    }
-  }, [inputValue]);
-
-  const handleUserClick = (user: User) => {
-    if (!inputRef.current) return;
-    const cursorPosition = inputRef.current.selectionStart;
-    const textBeforeCursor = inputValue.slice(0, cursorPosition);
-    const textAfterCursor = inputValue.slice(cursorPosition);
-
-    const lastSpaceBeforeCursorIndex = textBeforeCursor.lastIndexOf(' ');
-
-    const newTextBeforeCursor = textBeforeCursor.slice(
-      0,
-      lastSpaceBeforeCursorIndex + 1
-    );
-    const newTextAfterCursor = '@' + user.username + ' ' + textAfterCursor;
-
-    setInputValue(newTextBeforeCursor + newTextAfterCursor);
-
-    setShowUsers(false);
-  };
-
-  const handleChange = ({
-    target: { value }
-  }: ChangeEvent<HTMLTextAreaElement>): void => {
-    setInputValue(value);
-  };
-
-  const handleSubmit = (e: FormEvent<HTMLFormElement>): void => {
-    e.preventDefault();
-    void sendTweet();
-  };
-
-  const handleFocus = (): void => setVisited(!loading);
-
-  const formId = useId();
-
-  const inputLimit = 320;
-
-  const inputLength = Buffer.from(inputValue).length;
-  const isValidInput = !!inputValue.trim().length;
-  const isCharLimitExceeded = inputLength > inputLimit;
-
-  const isValidTweet =
-    !isCharLimitExceeded && (isValidInput || isUploadingImages);
-
-  const { data: newEmbeds, isValidating } = useSWR(
-    embedUrls.length > 0 ? `/api/embeds?urls=${embedUrls.join(',')}` : null,
-    fetchJSON<(ExternalEmbed | null)[]>
-  );
-
-  useEffect(() => {
-    setEmbeds((prevEmbeds) => {
-      if (newEmbeds) {
-        return newEmbeds.filter((embed) => embed !== null) as ExternalEmbed[];
-      } else {
-        return prevEmbeds;
+    editor,
+    getText,
+    getEmbeds,
+    setEmbeds,
+    setText,
+    setChannel,
+    getChannel,
+    addEmbed,
+    handleSubmit
+  } = useEditor({
+    placeholderText: isReply ? 'Cast your reply' : "What's happening?",
+    fetchUrlMetadata: getUrlMetadata,
+    onError,
+    onSubmit,
+    linkClassName: 'text-main-accent',
+    renderMentionsSuggestionConfig: createRenderMentionsSuggestionConfig({
+      getResults: getMentions
+    }),
+    editorOptions: {
+      editorProps: {
+        attributes: {
+          style: 'outline: 0;  min-height: 48px;'
+        },
+        handleDrop(view, event, slice, moved) {
+          const files = event.dataTransfer?.files;
+          if (!files) return false;
+          handleFileUpload(files);
+          return true;
+        }
       }
-    });
-  }, [newEmbeds]);
+    }
+  });
 
   useEffect(() => {
-    handleEmbedsChange(inputValue);
-  }, [ignoredEmbedUrls]);
+    setModPopoverEnabled(false);
+  }, [currentMod]);
+  useEffect(() => {
+    topic &&
+      setChannel({
+        parent_url: topic.url,
+        image: topic.image || null,
+        channel_id: topic.url,
+        name: topic.name
+      });
+  }, [topic]);
+
+  const handleFileUpload = useCallback(async (files: FileList) => {
+    // Mod expects a blob, so we convert the file to a blob
+    const imageFiles = await Promise.all(
+      Array.from(files)
+        .filter(({ type }) => {
+          return type.startsWith('image/');
+        })
+        .map(async (file) => {
+          const arrayBuffer = await file.arrayBuffer();
+          const blob = new Blob([new Uint8Array(arrayBuffer)], {
+            type: file.type
+          });
+          return { blob, ...file };
+        })
+    );
+
+    if (imageFiles.length === 0) return;
+
+    setContentLoading(true);
+    try {
+      // Upload to imgur
+      await Promise.all(
+        imageFiles.map(async (file) => {
+          const formData = new FormData();
+          formData.append('file', file.blob);
+          const res = await fetch(
+            `${process.env.NEXT_PUBLIC_MOD_API_URL}/imgur-upload`,
+            {
+              method: 'POST',
+              body: formData
+            }
+          );
+
+          const { url } = await res.json();
+          if (!url) return;
+
+          const currentEmbeds = getEmbeds();
+          const newEmbeds: typeof currentEmbeds = [
+            ...currentEmbeds,
+            {
+              url,
+              metadata: {
+                image: {
+                  url: url
+                },
+                mimeType: 'image/png'
+              },
+              status: 'loaded'
+            }
+          ];
+
+          setEmbeds(newEmbeds);
+        })
+      );
+    } catch (e) {
+      console.error(e);
+    }
+    setContentLoading(false);
+  }, []);
 
   return (
     <form
       className={cn('flex flex-col', {
-        '-mx-4': reply,
-        'gap-2': replyModal,
+        '-mx-4': isReply && !isModal,
+        'my-2': replyModal,
         'cursor-not-allowed': disabled
       })}
       onSubmit={handleSubmit}
     >
-      {loading && (
-        <motion.i className='h-1 animate-pulse bg-main-accent' {...variants} />
-      )}
+      {loading && <i className='h-1 animate-pulse bg-main-accent' />}
       {children}
-      {reply && visited && (
-        <motion.p
-          className='-mb-2 ml-[75px] mt-2 text-light-secondary dark:text-dark-secondary'
-          {...fromTop}
-        >
+      {isReply && visited && !replyModal && (
+        <p className='-mb-2 ml-[75px] mt-2 text-light-secondary dark:text-dark-secondary'>
           Replying to{' '}
-          <Link href={`/user/${parent?.username as string}`}>
+          <Link href={`/user/${parentPost?.username as string}`}>
             <a className='custom-underline text-main-accent'>
-              {parent?.username as string}
+              @{parentPost?.username as string}
             </a>
           </Link>
-        </motion.p>
+        </p>
       )}
       <label
         className={cn(
           'hover-animation grid w-full grid-cols-[auto,1fr] gap-3 px-4 py-3',
-          reply
+          isReply
             ? 'pb-1 pt-3'
             : replyModal
             ? 'pt-0'
@@ -490,125 +368,174 @@ export function Input({
         )}
         htmlFor={formId}
       >
-        <UserAvatar src={photoURL} alt={name} username={username} />
-        <div className='flex w-full flex-col gap-4'>
-          <InputForm
-            modal={modal}
-            reply={reply}
-            formId={formId}
-            visited={visited}
-            loading={loading}
-            inputRef={inputRef}
-            replyModal={replyModal}
-            inputValue={inputValue}
-            isValidTweet={isValidTweet}
-            isUploadingImages={isUploadingImages}
-            sendTweet={sendTweet}
-            handleFocus={handleFocus}
-            discardTweet={discardTweet}
-            handleChange={(e) => {
-              handleChangeDebounced(e);
-              handleChange(e);
-            }}
-            handleImageUpload={handleImageUpload}
-          >
-            {showUsers &&
-              (usersSearchLoading ? (
-                <Loading />
-              ) : (
-                usersSearch &&
-                usersSearch.length > 0 && (
-                  <ul className='menu-container hover-animation mt-1 overflow-hidden rounded-2xl bg-main-background'>
-                    {usersSearch.map((user) => {
-                      return (
-                        <li
-                          key={user.id}
-                          className='cursor-pointer p-2'
-                          onClick={() => handleUserClick(user)}
-                        >
-                          <UserSearchResult user={user} />
-                        </li>
-                      );
-                    })}
-                  </ul>
-                )
-              ))}
-            {isUploadingImages && (
-              <ImagePreview
-                imagesPreview={imagesPreview}
-                previewCount={previewCount}
-                removeImage={!loading ? removeImage : undefined}
+        <UserAvatar
+          src={currentUser!.photoURL}
+          alt={currentUser!.name}
+          username={currentUser!.username}
+        />
+        <div className='mt-3 flex w-full flex-col gap-4'>
+          <div className='flex min-h-[48px] flex-col justify-center'>
+            <div
+              className='w-full min-w-0 cursor-text resize-none bg-transparent text-xl
+                       outline-none placeholder:text-light-secondary dark:placeholder:text-dark-secondary'
+            >
+              {/* Tailwind doesn't compile properly without (?) */}
+              <p
+                data-placeholder=''
+                className='is-empty before:text-foreground-secondary before-pointer-events-none hidden cursor-text before:absolute before:opacity-50 before:content-[attr(data-placeholder)]'
+              ></p>
+              <EditorContent
+                editor={editor}
+                onPaste={async (e) => {
+                  const isPastingText = e.clipboardData.getData('text');
+                  if (isPastingText) return;
+
+                  const files = e.clipboardData.files;
+
+                  handleFileUpload(files);
+                }}
+                autoFocus
+                placeholder="What's happening?"
+                onFocus={handleFocus}
               />
-            )}
-            {embeds?.map(
-              (embed) =>
-                embed &&
-                !ignoredEmbedUrls.includes(embed.url) && (
-                  <div key={embed.url} className='flex items-center gap-2'>
-                    <button
-                      className='text-light-secondary dark:text-dark-secondary'
-                      onClick={() => {
-                        setIgnoredEmbedUrls([...ignoredEmbedUrls, embed.url]);
-                      }}
-                    >
-                      x
-                    </button>
-                    <TweetEmbed {...embed} key={embed.url} />
+              <div className='text-base'>
+                <EmbedsEditor
+                  embeds={getEmbeds()}
+                  setEmbeds={setEmbeds}
+                  RichEmbed={({ embed }) => (
+                    <RichEmbed
+                      api={API_URL}
+                      defaultRichEmbedMod={defaultRichEmbedMod}
+                      mods={[defaultRichEmbedMod]}
+                      embed={embed}
+                      renderers={renderers}
+                    />
+                  )}
+                />
+              </div>
+            </div>
+            <div className='flex flex-row gap-1 pt-2'>
+              {loadingTopic ? (
+                <div className='w-10'>
+                  <TweetTopicSkeleton />
+                </div>
+              ) : showingTopicSelector && !parentPost ? (
+                <SearchTopics
+                  enabled={showingTopicSelector}
+                  onSelectRawUrl={setTopicUrl}
+                  onSelectTopic={(topic) => {
+                    setTopic(topic);
+                  }}
+                  setShowing={setShowingTopicSelector}
+                />
+              ) : (
+                topic && (
+                  <div
+                    className='cursor-pointer text-light-secondary dark:text-dark-secondary'
+                    onClick={() => setShowingTopicSelector(true)}
+                  >
+                    <TopicView topic={topic} />
                   </div>
                 )
-            )}
-          </InputForm>
-
-          {loadingTopic ? (
-            <div className='w-10'>
-              <TweetTopicSkeleton />
+              )}
             </div>
-          ) : showingTopicSelector && !parent ? (
-            <SearchTopics
-              enabled={showingTopicSelector}
-              onSelectRawUrl={setTopicUrl}
-              onSelectTopic={setTopic}
-              setShowing={setShowingTopicSelector}
-            />
-          ) : (
-            topic && (
-              <div
-                className='cursor-pointer text-light-secondary dark:text-dark-secondary'
-                onClick={() => setShowingTopicSelector(true)}
-              >
-                <TopicView topic={topic} />
-              </div>
-            )
-          )}
-
-          <AnimatePresence initial={false}>
-            {(reply ? reply && visited && !loading : !loading) && (
-              <InputOptions
-                reply={reply}
-                modal={modal}
-                inputLimit={inputLimit}
-                inputLength={inputLength}
-                isValidTweet={isValidTweet}
-                isCharLimitExceeded={isCharLimitExceeded}
-                handleImageUpload={handleImageUpload}
-                options={[
-                  {
-                    name: 'Media',
-                    iconName: 'PhotoIcon',
-                    disabled: false
-                  },
-                  {
-                    name: 'Topic',
-                    iconName: 'ChatBubbleBottomCenterTextIcon',
-                    disabled: false,
-                    onClick() {
-                      setShowingTopicSelector(!showingTopicSelector);
-                    }
+            {contentLoading && <Loading />}
+            <div className='mt-2'>
+              {(isReply ? isReply && visited && !loading : !loading) && (
+                <InputOptions
+                  inputLength={Buffer.from(getText()).length}
+                  isValidTweet={
+                    (Buffer.from(getText()).length > 0 &&
+                      Buffer.from(getText()).length < 320) ||
+                    getEmbeds().length > 0
                   }
-                ]}
-              />
-            )}
-          </AnimatePresence>
+                  inputLimit={320}
+                  isCharLimitExceeded={Buffer.from(getText()).length > 320}
+                  handleImageUpload={() => {}}
+                  options={
+                    [
+                      !isReply && {
+                        name: 'Topic',
+                        iconName: 'HashtagIcon',
+                        disabled: false,
+                        popoverContent: () => (
+                          <SearchTopics
+                            enabled={true}
+                            onSelectRawUrl={setTopicUrl}
+                            onSelectTopic={setTopic}
+                            setShowing={setShowingTopicSelector}
+                          />
+                        )
+                      },
+                      {
+                        name: 'Mods',
+                        iconName: 'PlusIcon',
+                        disabled: false,
+                        popoverContent: () => (
+                          <CreationModsSearch
+                            mods={creationMods.filter(
+                              (mod) =>
+                                // Mods to exclude
+                                ![
+                                  'livepeer-video',
+                                  'infura-ipfs-upload'
+                                ].includes(mod.slug)
+                            )}
+                            onSelect={(mod) => {
+                              setCurrentMod(mod);
+                            }}
+                            open={!!currentMod}
+                            setOpen={(op: boolean) => {
+                              setModPopoverEnabled(true);
+                              if (!op && modPopoverEnabled) setCurrentMod(null);
+                            }}
+                          />
+                        )
+                      }
+                    ].filter(Boolean) as any[]
+                  }
+                />
+              )}
+            </div>
+            <Popover
+              open={!!currentMod}
+              onOpenChange={(op: boolean) => {
+                if (!op) setCurrentMod(null);
+              }}
+            >
+              <PopoverTrigger></PopoverTrigger>
+              <PopoverContent className='ml-2 w-[400px]' align='start'>
+                <div className='space-y-4'>
+                  <h4 className='font-medium leading-none'>
+                    {currentMod?.name}
+                  </h4>
+                  <hr />
+                  {currentMod && (
+                    <CreationMod
+                      input={getText()}
+                      embeds={getEmbeds()}
+                      user={{
+                        wallet: {
+                          address: address ? address : undefined
+                        },
+                        farcaster: {
+                          fid: currentUser?.id
+                        }
+                      }}
+                      api={API_URL}
+                      variant='creation'
+                      manifest={currentMod}
+                      renderers={renderers}
+                      onOpenFileAction={handleOpenFile}
+                      onExitAction={() => setCurrentMod(null)}
+                      onSetInputAction={handleSetInput(setText)}
+                      onAddEmbedAction={handleAddEmbed(addEmbed)}
+                    />
+                  )}
+                </div>
+              </PopoverContent>
+            </Popover>
+          </div>
         </div>
       </label>
     </form>

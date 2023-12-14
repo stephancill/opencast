@@ -1,15 +1,14 @@
 import { ReactionType } from '@farcaster/hub-web';
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { populateEmbed } from '../../../../lib/embeds';
+import { populateEmbedsForTweets } from '../../../../lib/embeds';
 import { prisma } from '../../../../lib/prisma';
 import { resolveTopic } from '../../../../lib/topics/resolve-topic';
 import { TopicType } from '../../../../lib/types/topic';
 import {
-  ExternalEmbed,
   Tweet,
-  tweetConverter,
   TweetResponse,
-  TweetWithUsers
+  TweetWithUsers,
+  tweetConverter
 } from '../../../../lib/types/tweet';
 import { resolveUsersMap } from '../../../../lib/user/resolve-user';
 
@@ -85,9 +84,10 @@ export default async function tweetIdEndpoint(
   }
 
   let tweet: Tweet = tweetConverter.toTweet(cast);
+  const [tweetWithEmbeds] = await populateEmbedsForTweets([tweet]);
 
   const tweetWithUsers: TweetWithUsers = {
-    ...tweet,
+    ...tweetWithEmbeds,
     topic: topic,
     userLikes: reactions[ReactionType.LIKE] || [],
     userRetweets: reactions[ReactionType.RECAST] || [],

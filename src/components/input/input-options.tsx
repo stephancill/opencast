@@ -1,18 +1,23 @@
-import { useRef } from 'react';
-import { motion } from 'framer-motion';
 import { Button } from '@components/ui/button';
+import type { IconName } from '@components/ui/hero-icon';
 import { HeroIcon } from '@components/ui/hero-icon';
 import { ToolTip } from '@components/ui/tooltip';
+import { motion } from 'framer-motion';
+import type { ChangeEvent, ClipboardEvent } from 'react';
+import { useRef, useState } from 'react';
+import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 import { variants } from './input';
 import { ProgressBar } from './progress-bar';
-import type { ChangeEvent, ClipboardEvent } from 'react';
-import type { IconName } from '@components/ui/hero-icon';
 
 type Options = {
   name: string;
   iconName: IconName;
   disabled: boolean;
   onClick?: () => void;
+  popoverContent?: (
+    open: boolean,
+    setOpen: (val: boolean) => void
+  ) => JSX.Element;
 }[];
 
 type InputOptionsProps = {
@@ -38,6 +43,10 @@ export function InputOptions({
   handleImageUpload,
   options
 }: InputOptionsProps): JSX.Element {
+  const [open, setOpen] = useState<boolean[]>(
+    new Array(options.length).fill(false)
+  );
+
   const inputFileRef = useRef<HTMLInputElement>(null);
 
   const imgOnClick = (): void => inputFileRef.current?.click();
@@ -58,18 +67,44 @@ export function InputOptions({
           ref={inputFileRef}
           multiple
         />
-        {filteredOptions.map(({ name, iconName, disabled, onClick }, index) => (
-          <Button
-            className='accent-tab accent-bg-tab group relative rounded-full p-2 
+        {filteredOptions.map(
+          ({ name, iconName, disabled, onClick, popoverContent }, index) => (
+            <Popover
+              open={open[index]}
+              onOpenChange={(value) =>
+                setOpen((prev) => {
+                  const newOpen = [...prev];
+                  newOpen[index] = value;
+                  return newOpen;
+                })
+              }
+            >
+              <PopoverTrigger asChild>
+                <Button
+                  className='accent-tab accent-bg-tab group relative rounded-full p-2 
                        hover:bg-main-accent/10 active:bg-main-accent/20'
-            onClick={onClick ? onClick : imgOnClick}
-            disabled={disabled}
-            key={name}
-          >
-            <HeroIcon className='h-5 w-5' iconName={iconName} />
-            <ToolTip tip={name} modal={modal} />
-          </Button>
-        ))}
+                  aria-expanded={open[index]}
+                  type='button'
+                  disabled={disabled}
+                  key={name}
+                >
+                  <HeroIcon className='h-5 w-5' iconName={iconName} />
+                  <ToolTip tip={name} modal={modal} />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className='w-[400px] p-0' align='start'>
+                <div className='mb-2 text-lg font-bold'>{name}</div>
+                {popoverContent?.(open[index], (val) =>
+                  setOpen((prev) => {
+                    const newOpen = [...prev];
+                    newOpen[index] = val;
+                    return newOpen;
+                  })
+                )}
+              </PopoverContent>
+            </Popover>
+          )
+        )}
       </div>
       <div className='flex items-center gap-4'>
         <motion.div

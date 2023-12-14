@@ -1,0 +1,50 @@
+diff --git a/node_modules/@mod-protocol/react-ui-shadcn/dist/lib/embeds.js b/node_modules/@mod-protocol/react-ui-shadcn/dist/lib/embeds.js
+index 0f0fbe1..d8d13ad 100644
+--- a/node_modules/@mod-protocol/react-ui-shadcn/dist/lib/embeds.js
++++ b/node_modules/@mod-protocol/react-ui-shadcn/dist/lib/embeds.js
+@@ -140,7 +140,7 @@ function Skeleton(_a) {
+ // src/renderers/video.tsx
+ var import_react = __toESM(require("react"));
+ var import_video = __toESM(require("video.js"));
+-var import_video_js = require("video.js/dist/video-js.css");
++// var import_video_js = require("video.js/dist/video-js.css")
+ var import_jsx_runtime3 = require("react/jsx-runtime");
+ var videoJSoptions = {
+   fluid: true,
+diff --git a/node_modules/@mod-protocol/react-ui-shadcn/dist/renderers/index.js b/node_modules/@mod-protocol/react-ui-shadcn/dist/renderers/index.js
+index b9de31c..2a19a18 100644
+--- a/node_modules/@mod-protocol/react-ui-shadcn/dist/renderers/index.js
++++ b/node_modules/@mod-protocol/react-ui-shadcn/dist/renderers/index.js
+@@ -670,7 +670,7 @@ var AlertRenderer = (props) => {
+ // src/renderers/video.tsx
+ var import_react2 = __toESM(require("react"));
+ var import_video = __toESM(require("video.js"));
+-var import_video_js = require("video.js/dist/video-js.css");
++// var import_video_js = require("video.js/dist/video-js.css");
+ var import_jsx_runtime21 = require("react/jsx-runtime");
+ var videoJSoptions = {
+   fluid: true,
+diff --git a/node_modules/@mod-protocol/react-ui-shadcn/dist/renderers/video.js b/node_modules/@mod-protocol/react-ui-shadcn/dist/renderers/video.js
+index 911443c..b3ff104 100644
+--- a/node_modules/@mod-protocol/react-ui-shadcn/dist/renderers/video.js
++++ b/node_modules/@mod-protocol/react-ui-shadcn/dist/renderers/video.js
+@@ -53,7 +53,7 @@ __export(video_exports, {
+ module.exports = __toCommonJS(video_exports);
+ var import_react = __toESM(require("react"));
+ var import_video = __toESM(require("video.js"));
+-var import_video_js = require("video.js/dist/video-js.css");
++// var import_video_js = require("video.js/dist/video-js.css");
+ var import_jsx_runtime = require("react/jsx-runtime");
+ var videoJSoptions = {
+   fluid: true,
+diff --git a/node_modules/@mod-protocol/react-ui-shadcn/tailwind.config.js b/node_modules/@mod-protocol/react-ui-shadcn/tailwind.config.js
+index 17412de..625a627 100644
+--- a/node_modules/@mod-protocol/react-ui-shadcn/tailwind.config.js
++++ b/node_modules/@mod-protocol/react-ui-shadcn/tailwind.config.js
+@@ -67,5 +67,5 @@ module.exports = {
+       },
+     },
+   },
+-  plugins: [require("@tailwindcss/typography"), require("tailwindcss-animate")],
++  // plugins: [require("@tailwindcss/typography"), require("tailwindcss-animate")],
+ };

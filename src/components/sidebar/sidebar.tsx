@@ -29,7 +29,7 @@ export const navLinks: Readonly<NavLink[]> = [
   {
     href: '/trends',
     linkName: 'Topics',
-    iconName: 'ChatBubbleBottomCenterTextIcon'
+    iconName: 'HashtagIcon'
   }
 ];
 
@@ -53,7 +53,7 @@ export function Sidebar(): JSX.Element {
         open={open}
         closeModal={closeModal}
       >
-        <Input modal closeModal={closeModal} />
+        <Input isModal closeModal={closeModal} />
       </Modal>
       <div
         className='fixed bottom-0 z-10 flex w-full flex-col justify-between border-t border-light-border 
