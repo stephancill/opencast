@@ -44,6 +44,9 @@ import { InputOptions } from './input-options';
 import { defaultRichEmbedMod } from '@mod-protocol/mod-registry';
 import { useAccount } from 'wagmi';
 import { Loading } from '../ui/loading';
+// import { FarcasterMention as ModMention } from '@mod-protocol/farcaster';
+// import { BaseResponse } from '../../lib/types/responses';
+// import { User } from '../../lib/types/user';
 
 type InputProps = {
   isModal?: boolean;
@@ -68,6 +71,8 @@ const API_URL = process.env.NEXT_PUBLIC_MOD_API_URL!;
 // const getMentions: (query: string) => Promise<ModMention[]> = async (
 //   query: string
 // ) => {
+//   if (!query.length) return [];
+
 //   const { result } = await fetchJSON<BaseResponse<User[]>>(
 //     `/api/search?q=${query}`
 //   );
@@ -79,7 +84,7 @@ const API_URL = process.env.NEXT_PUBLIC_MOD_API_URL!;
 //       username: user.username
 //     })) || [];
 
-//   console.log(modMentions);
+//   if (modMentions) console.log(modMentions);
 
 //   return modMentions;
 // };
