@@ -116,7 +116,8 @@ function calculateRelativeTime(date: Date): string {
 }
 
 function isToday(date: Date): boolean {
-  return new Date().toDateString() === date.toDateString();
+  // Less than 24 hours ago
+  return new Date().getTime() - date.getTime() < UNITS.day!;
 }
 
 function isYesterday(date: Date): boolean {
