@@ -30,6 +30,11 @@ export const navLinks: Readonly<NavLink[]> = [
     href: '/trends',
     linkName: 'Topics',
     iconName: 'HashtagIcon'
+  },
+  {
+    href: '/settings',
+    linkName: 'Settings',
+    iconName: 'Cog6ToothIcon'
   }
 ];
 
