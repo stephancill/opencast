@@ -146,7 +146,6 @@ export function Input({
   }, [topicResult]);
 
   const handleFocus = (): void => {
-    console.log('focused');
     setVisited(!loading);
   };
 
@@ -180,7 +179,7 @@ export function Input({
 
     // submit the cast to a hub
     const castMessage = await createCastMessage({
-      text: text,
+      text: formattedCast.text,
       fid: parseInt(currentUser?.id),
       embeds: formattedCast.embeds,
       mentions: formattedCast.mentions,
