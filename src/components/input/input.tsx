@@ -16,9 +16,13 @@ import {
   getFarcasterMentions,
   getMentionFidsByUsernames
 } from '@mod-protocol/farcaster';
-import { creationMods, richEmbedMods } from '@mod-protocol/mod-registry';
+import { creationMods, defaultRichEmbedMod } from '@mod-protocol/mod-registry';
 import { CreationMod, RichEmbed } from '@mod-protocol/react';
-import { EditorContent, useEditor } from '@mod-protocol/react-editor';
+import {
+  EditorContent,
+  useEditor,
+  useTextLength
+} from '@mod-protocol/react-editor';
 import {
   Popover,
   PopoverContent,
@@ -34,16 +38,15 @@ import type { ReactNode } from 'react';
 import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { toast } from 'react-hot-toast';
 import useSWR from 'swr';
+import { useAccount } from 'wagmi';
 import { createCastMessage, submitHubMessage } from '../../lib/farcaster/utils';
 import { fetchJSON } from '../../lib/fetch';
 import { TopicResponse, TopicType } from '../../lib/types/topic';
 import { CreationModsSearch } from '../search/creation-mods-search';
 import { SearchTopics } from '../search/search-topics';
 import { TopicView, TweetTopicSkeleton } from '../tweet/tweet-topic';
-import { InputOptions } from './input-options';
-import { defaultRichEmbedMod } from '@mod-protocol/mod-registry';
-import { useAccount } from 'wagmi';
 import { Loading } from '../ui/loading';
+import { InputOptions } from './input-options';
 // import { FarcasterMention as ModMention } from '@mod-protocol/farcaster';
 // import { BaseResponse } from '../../lib/types/responses';
 // import { User } from '../../lib/types/user';
@@ -261,6 +264,8 @@ export function Input({
     }
   });
 
+  const textLength = useTextLength({ getText, maxByteLength: 320 });
+
   useEffect(() => {
     setModPopoverEnabled(false);
   }, [currentMod]);
@@ -442,14 +447,13 @@ export function Input({
             <div className='mt-2'>
               {(isReply ? isReply && visited && !loading : !loading) && (
                 <InputOptions
-                  inputLength={Buffer.from(getText()).length}
+                  inputLength={textLength.length}
                   isValidTweet={
-                    (Buffer.from(getText()).length > 0 &&
-                      Buffer.from(getText()).length < 320) ||
-                    getEmbeds().length > 0
+                    textLength.isValid &&
+                    (textLength.length > 0 || getEmbeds().length > 0)
                   }
                   inputLimit={320}
-                  isCharLimitExceeded={Buffer.from(getText()).length > 320}
+                  isCharLimitExceeded={textLength.length > 320}
                   handleImageUpload={() => {}}
                   options={
                     [
