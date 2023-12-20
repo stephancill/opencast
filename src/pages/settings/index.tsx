@@ -17,7 +17,7 @@ const menuLinks: MenuLinkProps[] = [
   }
 ];
 
-export default function Home(): JSX.Element {
+export default function Settings(): JSX.Element {
   const { user, userNotifications } = useAuth();
 
   const { back } = useRouter();
@@ -46,7 +46,7 @@ export default function Home(): JSX.Element {
   );
 }
 
-Home.getLayout = (page: ReactElement): ReactNode => (
+Settings.getLayout = (page: ReactElement): ReactNode => (
   <ProtectedLayout>
     <MainLayout>
       <HomeLayout>{page}</HomeLayout>

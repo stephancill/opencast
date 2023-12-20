@@ -1,11 +1,20 @@
+import { Message } from '@farcaster/hub-web';
 import { BaseResponse } from './responses';
 
-export type Signer = {
+export type SignerDetail = {
+  name: string | null;
   pubKey: string;
   messageCount: number;
   createdAtTimestamp: string;
   lastMessageTimestamp: string;
-  name: string | null;
 };
 
-export type SignersResponse = BaseResponse<Signer[]>;
+export type SignersResponse = BaseResponse<SignerDetail[]>;
+export type SignerResponse = BaseResponse<SignerDetail>;
+
+export type MessagesArchive = {
+  messages: Message[];
+  signer: SignerDetail;
+};
+
+export type MessagesArchiveResponse = BaseResponse<MessagesArchive>;

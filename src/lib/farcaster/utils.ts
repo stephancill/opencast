@@ -1,6 +1,7 @@
 import {
   Embed,
   FarcasterNetwork,
+  HashScheme,
   makeCastAdd,
   makeCastRemove,
   makeLinkAdd,
@@ -8,9 +9,12 @@ import {
   makeReactionAdd,
   makeReactionRemove,
   Message,
+  MessageData,
   NobleEd25519Signer,
-  ReactionType
+  ReactionType,
+  Signer
 } from '@farcaster/hub-web';
+import { blake3 } from '@noble/hashes/blake3';
 
 function getSigner(privateKey: string): NobleEd25519Signer {
   const ed25519Signer = new NobleEd25519Signer(Buffer.from(privateKey, 'hex'));
@@ -166,6 +170,31 @@ export async function createFollowMessage({
   return message.unwrapOr(null);
 }
 
+export async function makeMessage(messageData: MessageData) {
+  const signer = getSignerFromStorage();
+
+  const dataBytes = MessageData.encode(messageData).finish();
+
+  const hash = blake3(dataBytes, { dkLen: 20 });
+
+  const signature = await signer.signMessageHash(hash);
+  if (signature.isErr()) return null;
+
+  const signerKey = await signer.getSignerKey();
+  if (signerKey.isErr()) return null;
+
+  const message = Message.create({
+    data: messageData,
+    hash,
+    hashScheme: HashScheme.BLAKE3,
+    signature: signature.value,
+    signatureScheme: signer.scheme,
+    signer: signerKey.value
+  });
+
+  return message;
+}
+
 export async function submitHubMessage(message: Message) {
   const res = await fetch('/api/hub', {
     method: 'POST',
@@ -176,4 +205,15 @@ export async function submitHubMessage(message: Message) {
   });
   const { result: hubResult } = await res.json();
   return hubResult;
+}
+
+export async function batchSubmitHubMessages(messages: Message[]) {
+  const res = await fetch('/api/hub/batch', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ messages: messages.map(Message.toJSON) })
+  });
+  return res.ok;
 }

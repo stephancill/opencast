@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { prisma } from '../../../../lib/prisma';
-import { SignersResponse } from '../../../../lib/types/signer';
-import { serialize } from '../../../../lib/utils';
+import { prisma } from '../../../../../lib/prisma';
+import { SignersResponse } from '../../../../../lib/types/signer';
+import { serialize } from '../../../../../lib/utils';
 
 export default async function handle(
   req: NextApiRequest,
@@ -29,11 +29,11 @@ export default async function handle(
         LEFT JOIN 
             signers s ON m.signer = s.signer
         WHERE 
-            m.fid = 1689
+            m.fid = ${fid}
         GROUP BY 
             m.signer, s.name
         ORDER BY 
-        message_count DESC;
+            message_count DESC;
       `;
 
       const signers = signersRaw.map((signer: any) => ({

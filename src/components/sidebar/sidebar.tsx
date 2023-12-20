@@ -30,11 +30,6 @@ export const navLinks: Readonly<NavLink[]> = [
     href: '/trends',
     linkName: 'Topics',
     iconName: 'HashtagIcon'
-  },
-  {
-    href: '/settings',
-    linkName: 'Settings',
-    iconName: 'Cog6ToothIcon'
   }
 ];
 
@@ -107,6 +102,11 @@ export function Sidebar(): JSX.Element {
                   username={username}
                   linkName='Profile'
                   iconName='UserIcon'
+                />
+                <SidebarLink
+                  href='/settings'
+                  linkName='Settings'
+                  iconName='Cog6ToothIcon'
                 />
               </>
             )}

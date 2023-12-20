@@ -15,8 +15,8 @@ import { fetchJSON } from '../../../lib/fetch';
 import { SignersResponse } from '../../../lib/types/signer';
 import { truncateAddress } from '../../../lib/utils';
 
-export default function Home(): JSX.Element {
-  const { user, userNotifications } = useAuth();
+export default function ManageSigners(): JSX.Element {
+  const { user } = useAuth();
 
   const { back } = useRouter();
 
@@ -27,6 +27,9 @@ export default function Home(): JSX.Element {
       revalidateOnFocus: false
     }
   );
+
+  const matchesCurrentSigner = (pubKey: string) =>
+    user?.keyPair?.publicKey.toLowerCase() === pubKey.toLowerCase();
 
   return (
     <MainContainer>
@@ -43,22 +46,39 @@ export default function Home(): JSX.Element {
         ) : loading ? (
           <Loading />
         ) : signers ? (
-          signers.map((signer) => (
-            <MenuRow
-              href={`/settings/manage-signers/${signer.pubKey}`}
-              title={signer.name || truncateAddress(`0x${signer.pubKey}`)}
-              description={`${formatNumber(
-                signer.messageCount
-              )} messages • Last used ${formatDate(
-                new Date(signer.lastMessageTimestamp),
-                'tweet'
-              )} • Created ${formatDate(
-                new Date(signer.createdAtTimestamp),
-                'tweet'
-              )}`}
-              iconName='KeyIcon'
+          // Show current signer first
+          [
+            signers.find((s) => matchesCurrentSigner(s.pubKey))!,
+            ...signers.filter((s) => !matchesCurrentSigner(s.pubKey))
+          ].map((signer) => (
+            <div
               key={signer.pubKey}
-            ></MenuRow>
+              title={
+                matchesCurrentSigner(signer.pubKey)
+                  ? 'Signer currently used by this app'
+                  : undefined
+              }
+            >
+              <MenuRow
+                href={`/settings/manage-signers/${signer.pubKey}`}
+                title={`${
+                  signer.name || truncateAddress(`0x${signer.pubKey}`)
+                }`}
+                description={`${formatNumber(
+                  signer.messageCount
+                )} messages • Last used ${formatDate(
+                  new Date(signer.lastMessageTimestamp),
+                  'tweet'
+                )} • Created ${formatDate(
+                  new Date(signer.createdAtTimestamp),
+                  'tweet'
+                )}`}
+                iconName='KeyIcon'
+                variant={
+                  matchesCurrentSigner(signer.pubKey) ? 'primary' : undefined
+                }
+              ></MenuRow>
+            </div>
           ))
         ) : (
           <Error />
@@ -68,7 +88,7 @@ export default function Home(): JSX.Element {
   );
 }
 
-Home.getLayout = (page: ReactElement): ReactNode => (
+ManageSigners.getLayout = (page: ReactElement): ReactNode => (
   <ProtectedLayout>
     <MainLayout>
       <HomeLayout>{page}</HomeLayout>
