@@ -69,10 +69,13 @@ export default function ManageSigners(): JSX.Element {
                 )} messages • Last used ${formatDate(
                   new Date(signer.lastMessageTimestamp),
                   'tweet'
-                )} • Created ${formatDate(
+                )}`}
+                /**
+                 • Created ${formatDate(
                   new Date(signer.createdAtTimestamp),
                   'tweet'
-                )}`}
+                )}
+                 */
                 iconName='KeyIcon'
                 variant={
                   matchesCurrentSigner(signer.pubKey) ? 'primary' : undefined

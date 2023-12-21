@@ -10,7 +10,8 @@ export async function getSignerDetail(
     SELECT
       COUNT(DISTINCT m.hash) AS message_count,
       MAX(m.timestamp) AS last_message_timestamp,
-      MAX(s.timestamp) as signer_created_timestamp,
+      MAX(s.created_at) AS signer_created_at,
+      MAX(s.timestamp) AS signer_timestamp,
       MAX(s.name) as signer_name,
       s.signer as pubkey,
       COUNT(DISTINCT CASE WHEN m.message_type = 0 THEN m.hash ELSE NULL END) AS none_count,
@@ -35,7 +36,7 @@ export async function getSignerDetail(
   const [signer] = signersRaw.map((signer: any) => ({
     pubKey: signer.pubkey,
     messageCount: signer.message_count,
-    createdAtTimestamp: signer.signer_created_timestamp,
+    createdAtTimestamp: signer.signer_timestamp || signer.signer_created_at,
     lastMessageTimestamp: signer.last_message_timestamp,
     name: signer.signer_name,
     noneCount: signer.none_count,
