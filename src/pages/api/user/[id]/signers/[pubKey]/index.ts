@@ -1,7 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { prisma } from '../../../../../../lib/prisma';
-import { serialize } from '../../../../../../lib/utils';
 import { getSignerDetail } from '../../../../../../lib/signers';
+import { serialize } from '../../../../../../lib/utils';
 
 type SignerEndpointQuery = {
   pubKey: string;

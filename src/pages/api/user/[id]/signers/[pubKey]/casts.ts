@@ -73,6 +73,7 @@ export default async function handle(
           tweets: tweetsWithEmbeds
         }
       });
+      break;
     default:
       res.setHeader('Allow', ['GET']);
       res.status(405).end(`Method ${method} Not Allowed`);

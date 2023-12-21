@@ -7,6 +7,15 @@ export type SignerDetail = {
   messageCount: number;
   createdAtTimestamp: string;
   lastMessageTimestamp: string;
+  noneCount: number;
+  castAddCount: number;
+  castRemoveCount: number;
+  reactionAddCount: number;
+  reactionRemoveCount: number;
+  linkAddCount: number;
+  linkRemoveCount: number;
+  verificationAddEthAddressCount: number;
+  verificationRemoveCount: number;
 };
 
 export type SignersResponse = BaseResponse<SignerDetail[]>;

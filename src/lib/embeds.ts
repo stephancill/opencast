@@ -94,7 +94,7 @@ export async function populateEmbedsForTweets(
 
   const merged = await Promise.all(
     tweets.map(async (tweet) => {
-      const embeds = tweetEmbeds[`0x${tweet.id}`];
+      const embeds = tweetEmbeds[`0x${tweet.id}`] || [];
 
       // Resolve users in embeds
       const embedsWithUsers: ModEmbed[] = await Promise.all(

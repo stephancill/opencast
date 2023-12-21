@@ -27,7 +27,8 @@ export default async function handler(
   const messageRows = await prisma.messages.findMany({
     where: {
       signer: pubKeyBytes
-    }
+    },
+    distinct: ['hash']
   });
 
   const messages = messageRows.map((m) =>
