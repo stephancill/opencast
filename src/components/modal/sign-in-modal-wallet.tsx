@@ -27,6 +27,7 @@ import { Loading } from '../ui/loading';
 import { UserAvatar } from '../user/user-avatar';
 import { UserName } from '../user/user-name';
 import { UserUsername } from '../user/user-username';
+import useFid from '../../lib/hooks/useConnectedWalletFid';
 
 const KEY_METADATA_TYPE_1 = [
   {
@@ -69,12 +70,7 @@ const WalletSignInModal = ({
   const { chain } = useNetwork();
   const { switchNetwork } = useSwitchNetwork();
   const { address } = useAccount();
-  const { data: idOf } = useContractRead({
-    ...ID_REGISTRY,
-    chainId: 10,
-    functionName: address ? 'idOf' : undefined,
-    args: address ? [address] : undefined
-  });
+  const { data: idOf } = useFid();
   const { data: user, isValidating: loadingUser } = useSWR<User | null>(
     idOf ? `/api/user/${idOf}` : null,
     async (url) => (await fetchJSON<UserResponse>(url)).result || null,

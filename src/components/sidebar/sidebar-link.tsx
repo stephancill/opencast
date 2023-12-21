@@ -19,7 +19,12 @@ export function SidebarLink({
   newTab
 }: SidebarLinkProps): JSX.Element {
   const { asPath } = useRouter();
-  const isActive = username ? asPath.includes(username) : asPath === href;
+  const isActive = username
+    ? asPath.includes(username)
+    : asPath
+        .split('/')
+        .slice(1, 2)
+        .includes(href.split('/')[1] || 'home');
 
   return (
     <Link href={href}>
@@ -42,12 +47,7 @@ export function SidebarLink({
           )}
         >
           <HeroIcon
-            className={cn(
-              'h-7 w-7',
-              isActive &&
-                ['Explore', 'Lists'].includes(linkName) &&
-                'stroke-white'
-            )}
+            className={cn('h-7 w-7')}
             iconName={iconName}
             solid={isActive}
           />

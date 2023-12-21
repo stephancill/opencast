@@ -103,6 +103,11 @@ export function Sidebar(): JSX.Element {
                   linkName='Profile'
                   iconName='UserIcon'
                 />
+                <SidebarLink
+                  href='/settings'
+                  linkName='Settings'
+                  iconName='Cog6ToothIcon'
+                />
               </>
             )}
             {!isMobile && <MoreSettings />}

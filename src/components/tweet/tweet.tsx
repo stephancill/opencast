@@ -49,6 +49,7 @@ export function Tweet(tweet: TweetProps): JSX.Element {
     userLikes,
     createdBy,
     createdAt,
+    deletedAt,
     parentTweet,
     userReplies,
     userRetweets,
@@ -136,6 +137,11 @@ export function Tweet(tweet: TweetProps): JSX.Element {
                   <UserUsername username={username} />
                 </UserTooltip>
                 <TweetDate tweetLink={tweetLink} createdAt={createdAt} />
+                {deletedAt && (
+                  <span className='text-light-secondary dark:text-dark-secondary'>
+                    · Deleted
+                  </span>
+                )}
               </div>
               <div className='px-4'>
                 {!modal && (
@@ -166,7 +172,14 @@ export function Tweet(tweet: TweetProps): JSX.Element {
                 </Link>
               </p>
             )}
-            <div className='whitespace-pre-line break-words'>
+            <div
+              className={cn(
+                'whitespace-pre-line break-words',
+                deletedAt
+                  ? 'text-light-secondary dark:text-dark-secondary'
+                  : undefined
+              )}
+            >
               <TweetText
                 text={text || ''}
                 images={images}

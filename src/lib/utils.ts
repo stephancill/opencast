@@ -123,8 +123,22 @@ export const truncateAddress = (address: string): string => {
   return `${address.slice(0, 6)}...${address.slice(-4)}`;
 };
 
-const replacer = (_: any, value: any) =>
-  typeof value === 'bigint' ? value.toString() : value;
+const replacer = (key: any, value: any) => {
+  if (
+    value !== null &&
+    typeof value === 'object' &&
+    'type' in value &&
+    value.type === 'Buffer' &&
+    'data' in value
+  ) {
+    // Convert Buffer to a hex string
+    return Buffer.from(value).toString('hex');
+  } else if (typeof value === 'bigint') {
+    // Convert bigint to string
+    return value.toString();
+  }
+  return value;
+};
 
 export function JSONStringify<T>(data: T): string {
   return JSON.stringify(data, replacer);
