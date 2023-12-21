@@ -35,6 +35,7 @@ export type Tweet = {
   user: User | null;
   createdAt: Date;
   updatedAt: Date | null;
+  deletedAt: Date | null;
   userReplies: number;
   userRetweets: string[];
   mentions: Mention[];
@@ -168,6 +169,7 @@ export const tweetConverter = {
       user: null,
       createdAt: cast.timestamp,
       updatedAt: null,
+      deletedAt: cast.deleted_at,
       userReplies: 0,
       userRetweets: [],
       mentions,
