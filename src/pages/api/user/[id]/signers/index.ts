@@ -33,7 +33,7 @@ export default async function handle(
         GROUP BY 
             m.signer, s.name
         ORDER BY 
-            message_count DESC;
+            last_message_timestamp DESC;
       `;
 
       const signers = signersRaw.map((signer: any) => ({

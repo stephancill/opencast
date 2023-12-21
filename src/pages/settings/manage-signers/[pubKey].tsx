@@ -24,6 +24,7 @@ import {
   makeMessage
 } from '../../../lib/farcaster/utils';
 import { Message } from '@farcaster/hub-web';
+import { TweetFeed } from '../../../components/feed/tweet-feed';
 
 function getSignerDescription(signer: SignerDetail) {
   return `${formatNumber(
@@ -222,6 +223,10 @@ export default function SignerDetailPage(): JSX.Element {
               iconName='TrashIcon'
               variant='destructive'
               isLoading={isDeleteLoading}
+            />
+            <TweetFeed
+              apiEndpoint={`/api/user/${user?.id}/signers/${pubKey}/casts?fid=${user.id}`}
+              feedOrdering='latest'
             />
           </div>
         ) : (
