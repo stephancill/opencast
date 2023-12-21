@@ -14,6 +14,7 @@ import { formatDate, formatNumber } from '../../../lib/date';
 import { fetchJSON } from '../../../lib/fetch';
 import { SignersResponse } from '../../../lib/types/signer';
 import { truncateAddress } from '../../../lib/utils';
+import { CautionWarn } from '../../../components/ui/caution-warn';
 
 export default function ManageSigners(): JSX.Element {
   const { user } = useAuth();
@@ -46,43 +47,50 @@ export default function ManageSigners(): JSX.Element {
         ) : loading ? (
           <Loading />
         ) : signers ? (
-          // Show current signer first
-          [
-            signers.find((s) => matchesCurrentSigner(s.pubKey))!,
-            ...signers.filter((s) => !matchesCurrentSigner(s.pubKey))
-          ].map((signer) => (
-            <div
-              key={signer.pubKey}
-              title={
-                matchesCurrentSigner(signer.pubKey)
-                  ? 'Signer currently used by this app'
-                  : undefined
-              }
-            >
-              <MenuRow
-                href={`/settings/manage-signers/${signer.pubKey}`}
-                title={`${
-                  signer.name || truncateAddress(`0x${signer.pubKey}`)
-                }`}
-                description={`${formatNumber(
-                  signer.messageCount
-                )} messages • Last used ${formatDate(
-                  new Date(signer.lastMessageTimestamp),
-                  'tweet'
-                )}`}
-                /**
+          <div>
+            <CautionWarn></CautionWarn>
+            {
+              // Show current signer first
+              [
+                signers.find((s) => matchesCurrentSigner(s.pubKey))!,
+                ...signers.filter((s) => !matchesCurrentSigner(s.pubKey))
+              ].map((signer) => (
+                <div
+                  key={signer.pubKey}
+                  title={
+                    matchesCurrentSigner(signer.pubKey)
+                      ? 'Signer currently used by this app'
+                      : undefined
+                  }
+                >
+                  <MenuRow
+                    href={`/settings/manage-signers/${signer.pubKey}`}
+                    title={`${
+                      signer.name || truncateAddress(`0x${signer.pubKey}`)
+                    }`}
+                    description={`${formatNumber(
+                      signer.messageCount
+                    )} messages • Last used ${formatDate(
+                      new Date(signer.lastMessageTimestamp),
+                      'tweet'
+                    )}`}
+                    /**
                  • Created ${formatDate(
                   new Date(signer.createdAtTimestamp),
                   'tweet'
                 )}
                  */
-                iconName='KeyIcon'
-                variant={
-                  matchesCurrentSigner(signer.pubKey) ? 'primary' : undefined
-                }
-              ></MenuRow>
-            </div>
-          ))
+                    iconName='KeyIcon'
+                    variant={
+                      matchesCurrentSigner(signer.pubKey)
+                        ? 'primary'
+                        : undefined
+                    }
+                  ></MenuRow>
+                </div>
+              ))
+            }
+          </div>
         ) : (
           <Error />
         )}

@@ -35,6 +35,7 @@ import {
   SignerResponse
 } from '../../../lib/types/signer';
 import { truncateAddress } from '../../../lib/utils';
+import { CautionWarn } from '../../../components/ui/caution-warn';
 
 function getSignerDescription(signer: SignerDetail) {
   return `${formatNumber(
@@ -180,6 +181,7 @@ export default function SignerDetailPage(): JSX.Element {
           <Loading />
         ) : signer ? (
           <div>
+            <CautionWarn />
             <input
               type='file'
               id='file'
