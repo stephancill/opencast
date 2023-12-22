@@ -59,7 +59,7 @@ export function SidebarProfile(): JSX.Element {
             >
               <div className='flex gap-3 truncate'>
                 <UserAvatar src={photoURL} alt={name} size={40} />
-                <div className='hidden truncate text-start leading-5 xl:block'>
+                <div className='block truncate text-start leading-5 xs:hidden xl:block'>
                   <UserName name={name} className='start' verified={verified} />
                   <UserUsername username={username} disableLink />
                 </div>
@@ -77,7 +77,6 @@ export function SidebarProfile(): JSX.Element {
                   {...variants}
                   static
                 >
-                  {/* TODO: Mobile */}
                   {users.map((menuUser) => {
                     const { name, username, verified, photoURL, id } = menuUser;
                     return (

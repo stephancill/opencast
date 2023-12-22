@@ -3,7 +3,7 @@ import Link from 'next/link';
 import cn from 'clsx';
 import { preventBubbling } from '@lib/utils';
 import { HeroIcon } from '@components/ui/hero-icon';
-import type { NavLink } from './sidebar';
+import { NavLink } from './sidebar-content';
 
 type SidebarLinkProps = NavLink & {
   username?: string;
@@ -39,10 +39,10 @@ export function SidebarLink({
       >
         <div
           className={cn(
-            `custom-button flex items-center justify-center gap-4 self-start p-2 text-xl transition 
-             duration-200 group-hover:bg-light-primary/10 group-focus-visible:ring-2 
-             group-focus-visible:ring-[#878a8c] dark:group-hover:bg-dark-primary/10 
-             dark:group-focus-visible:ring-white xs:p-3 xl:pr-5`,
+            `custom-button flex items-center justify-center gap-4 self-start p-3 text-xl 
+             transition duration-200 group-hover:bg-light-primary/10 
+             group-focus-visible:ring-2 group-focus-visible:ring-[#878a8c] 
+             dark:group-hover:bg-dark-primary/10 dark:group-focus-visible:ring-white`,
             isActive && 'font-bold'
           )}
         >
@@ -51,7 +51,7 @@ export function SidebarLink({
             iconName={iconName}
             solid={isActive}
           />
-          <p className='hidden xl:block'>{linkName}</p>
+          <p className='block xs:hidden xl:block'>{linkName}</p>
         </div>
       </a>
     </Link>
