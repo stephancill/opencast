@@ -83,10 +83,10 @@ export async function resolveUserFullFromFid(
       deleted_at: null
     }
   });
-  const verificationClaim = verification?.claim as
-    | { address: string }
-    | undefined;
-  const userAddress = verificationClaim?.address;
+  const signerAddressBuffer = verification?.signer_address;
+  const userAddress = signerAddressBuffer
+    ? `0x${signerAddressBuffer?.toString('hex')}`
+    : null;
 
   const user = userConverter.toUserFull({ ...userDataRaw, fid });
 
@@ -95,7 +95,7 @@ export async function resolveUserFullFromFid(
     followers: followers.map((f) => f.fid!.toString()),
     following: following.map((f) => f.target_fid!.toString()),
     totalTweets: castCount._count,
-    address: userAddress || null,
+    address: userAddress,
     interests
   };
 }
@@ -169,7 +169,7 @@ export async function userInterests(fid: bigint): Promise<TopicType[]> {
         FROM 
             reactions r
         INNER JOIN 
-            casts c ON r.target_hash = c.hash 
+            casts c ON r.target_cast_hash = c.hash 
         WHERE 
             r.fid = ${fid}  
             AND c.deleted_at IS NULL 

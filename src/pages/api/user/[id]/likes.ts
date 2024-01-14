@@ -46,7 +46,7 @@ export default async function handle(
           },
           fid: BigInt(id as string),
           deleted_at: null,
-          reaction_type: ReactionType.LIKE
+          type: ReactionType.LIKE
         },
         take: limit,
         orderBy: {
@@ -58,7 +58,7 @@ export default async function handle(
         where: {
           hash: {
             in: reactions
-              .map((reaction) => reaction.target_hash)
+              .map((reaction) => reaction.target_cast_hash)
               .filter((hash) => hash !== null) as Buffer[]
           },
           deleted_at: null

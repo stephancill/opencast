@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import {
-  getUsersPaginated,
+  getReactionUsersPaginated,
   PaginatedUsersResponse
 } from '../../../../lib/paginated-reactions';
 
@@ -21,14 +21,14 @@ export default async function handle(
           : 10;
       const type = parseInt(req.query.type as string);
 
-      const { users, nextPageCursor } = await getUsersPaginated({
+      const { users, nextPageCursor } = await getReactionUsersPaginated({
         where: {
           timestamp: {
             lt: cursor || undefined
           },
-          target_hash: Buffer.from(id as string, 'hex'),
+          target_cast_hash: Buffer.from(id as string, 'hex'),
           deleted_at: null,
-          reaction_type: type
+          type: type
         },
         take: limit,
         orderBy: {

@@ -145,10 +145,10 @@ export const tweetConverter = {
             }))
         : [];
 
-    const mentions = cast.mentions.map(
+    const mentions = (cast.mentions as number[])?.map(
       (userId, index): Mention => ({
         userId: userId.toString(),
-        position: cast.mentions_positions[index]
+        position: (cast.mentions_positions as number[])[index]
       })
     );
 

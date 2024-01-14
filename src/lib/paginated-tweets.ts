@@ -1,11 +1,11 @@
 import { ReactionType } from '@farcaster/hub-web';
 import { casts, Prisma } from '@prisma/client';
+import { Sql } from '@prisma/client/runtime/library';
 import { prisma } from './prisma';
 import { BaseResponse } from './types/responses';
 import { Tweet, tweetConverter } from './types/tweet';
 import { User, UserFull, UsersMapType } from './types/user';
 import { resolveUsersMap } from './user/resolve-user';
-import { Sql } from '@prisma/client/runtime/library';
 
 export type PaginatedTweetsType = {
   tweets: Tweet[];
@@ -56,7 +56,7 @@ export async function convertAndCalculateCursor(
   const fids: Set<bigint> = casts.reduce((acc: Set<bigint>, cur) => {
     acc.add(cur.fid);
     if (cur.parent_fid) acc.add(cur.parent_fid);
-    cur.mentions.forEach((mention) => acc.add(mention));
+    (cur.mentions as number[])?.forEach((mention) => acc.add(BigInt(mention)));
     return acc;
   }, new Set<bigint>());
 
@@ -94,7 +94,7 @@ export async function castsToTweets(
 
   const engagements = await prisma.reactions.findMany({
     where: {
-      target_hash: {
+      target_cast_hash: {
         in: castHashes
       },
       deleted_at: null,
@@ -104,8 +104,8 @@ export async function castsToTweets(
     },
     select: {
       fid: true,
-      reaction_type: true,
-      target_hash: true
+      type: true,
+      target_cast_hash: true
     }
   });
 
@@ -139,22 +139,19 @@ export async function castsToTweets(
   // Group reactions by reaction_type for each target_hash
   const reactionsMap = engagements.reduce(
     (acc: { [key: string]: { [key: number]: string[] } }, cur) => {
-      const key = cur.target_hash!.toString('hex');
+      const key = cur.target_cast_hash!.toString('hex');
       if (!key) {
         return acc;
       }
       if (acc[key]) {
-        if (acc[key][cur.reaction_type]) {
-          acc[key][cur.reaction_type] = [
-            ...acc[key][cur.reaction_type],
-            cur.fid.toString()
-          ];
+        if (acc[key][cur.type]) {
+          acc[key][cur.type] = [...acc[key][cur.type], cur.fid.toString()];
         } else {
-          acc[key][cur.reaction_type] = [cur.fid.toString()];
+          acc[key][cur.type] = [cur.fid.toString()];
         }
       } else {
         acc[key] = {
-          [cur.reaction_type]: [cur.fid.toString()]
+          [cur.type]: [cur.fid.toString()]
         };
       }
       return acc;

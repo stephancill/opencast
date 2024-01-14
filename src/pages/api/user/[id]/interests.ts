@@ -43,7 +43,7 @@ export default async function handle(
         FROM 
             reactions r
         INNER JOIN 
-            casts c ON r.target_hash = c.hash 
+            casts c ON r.target_cast_hash = c.hash 
         WHERE 
             r.fid = ${fid}  
             AND c.deleted_at IS NULL 
