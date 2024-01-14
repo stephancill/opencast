@@ -140,7 +140,7 @@ export default async function handle(
         resolveUsersMap([...fids]),
         resolveTopicsMap(
           casts
-            .map((cast) => cast.parent_url)
+            .map((cast) => cast.root_parent_url)
             .filter((url) => url !== null) as string[]
         )
       ]);

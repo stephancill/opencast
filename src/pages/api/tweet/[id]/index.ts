@@ -92,8 +92,8 @@ export default async function tweetIdEndpoint(
   const users = await resolveUsersMap([...fids]);
 
   let topic: TopicType | null = null;
-  if (cast.parent_url) {
-    topic = await resolveTopic(cast.parent_url);
+  if (cast.root_parent_url) {
+    topic = await resolveTopic(cast.root_parent_url);
   }
 
   let tweet: Tweet = tweetConverter.toTweet(cast);
