@@ -1265,7 +1265,7 @@
     "@tiptap/suggestion" "^2.0.4"
     prosemirror-model "^1.19.3"
 
-"@mod-protocol/react-ui-shadcn@^0.1.0":
+"@mod-protocol/react-ui-shadcn@0.1.0":
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/@mod-protocol/react-ui-shadcn/-/react-ui-shadcn-0.1.0.tgz#b5cf795977e66992e0be37d7dd5374dbb801f684"
   integrity sha512-jmHvkQYzdCmuYULB8Bls0HKz4mNdp7ZNgAqE8lntzAeWON3QgsA7hBMg0JMlD0LmaSMicEb5thplcyZ1NLrOyA==

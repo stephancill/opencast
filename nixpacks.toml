@@ -1,2 +1,5 @@
 [phases.setup]
 nixPkgs = ['...', 'python3', 'gcc']
+
+[phases.install]
+cmds = ['yarn global add node-gyp', '...']
