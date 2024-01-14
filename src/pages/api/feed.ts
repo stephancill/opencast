@@ -46,7 +46,6 @@ export default async function handle(
         const links = await prisma.links.findMany({
           where: {
             fid: userFid,
-            target_fid: { not: null },
             deleted_at: null
           },
           select: {
@@ -95,7 +94,7 @@ export default async function handle(
           FROM 
               casts
           LEFT JOIN 
-              reactions ON casts.hash = reactions.target_hash AND reactions.reaction_type = 1
+              reactions ON casts.hash = reactions.target_cast_hash AND reactions.type = 1
           WHERE 
             casts.parent_hash is null  
             AND casts.deleted_at is null
@@ -147,7 +146,9 @@ export default async function handle(
           FROM 
               casts
           LEFT JOIN 
-              reactions ON casts.hash = reactions.target_hash AND reactions.reaction_type = 1
+              reactions ON casts.hash = reactions.target_cast_hash AND reactions.type = 1
+          LEFT JOIN
+              signers ON casts.signer = signers.id
           WHERE 
             casts.parent_hash is null  
             AND casts.deleted_at is null

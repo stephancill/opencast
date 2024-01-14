@@ -32,7 +32,7 @@ export default async function handle(
       // Get all the target_fids (people that the user follows)
       const links = await prisma.links.findMany({
         where: {
-          AND: [{ fid: userFid }, { target_fid: { not: null } }]
+          fid: userFid
         },
         select: {
           target_fid: true
@@ -48,7 +48,7 @@ export default async function handle(
           fid: {
             in: targetFids
           },
-          message_type: {
+          type: {
             in: [MessageType.REACTION_ADD, MessageType.CAST_ADD]
           },
           timestamp: {
@@ -89,10 +89,10 @@ export default async function handle(
       const castRecastInfo = messages
         .filter((message) => message.casts?.parent_hash == null)
         .map((message) =>
-          message.message_type === MessageType.CAST_ADD
+          message.type === MessageType.CAST_ADD
             ? { castHash: message.casts?.hash, recast: null }
             : {
-                castHash: message.reactions?.target_hash,
+                castHash: message.reactions?.target_cast_hash,
                 recast: message.fid
               }
         );
@@ -129,7 +129,9 @@ export default async function handle(
         if (cur.parent_fid) acc.add(cur.parent_fid);
 
         // Mentions
-        cur.mentions.forEach((mention) => acc.add(mention));
+        (cur.mentions as number[]).forEach((mention) =>
+          acc.add(BigInt(mention))
+        );
 
         return acc;
       }, new Set<bigint>());
