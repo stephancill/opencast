@@ -25,7 +25,7 @@ export default async function handle(
       let id = req.query.id;
       if (isNaN(Number(id))) {
         const username = (id as string).toLowerCase();
-        const userData = await prisma.user_data.findFirst({
+        const userData = await prisma.userData.findFirst({
           where: {
             type: UserDataType.USERNAME,
             value: username
@@ -39,7 +39,7 @@ export default async function handle(
         }
       }
 
-      const reactions = await prisma.reactions.findMany({
+      const reactions = await prisma.reaction.findMany({
         where: {
           timestamp: {
             lt: cursor || undefined

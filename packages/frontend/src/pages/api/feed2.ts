@@ -27,7 +27,7 @@ export default async function handle(
       let startTime = Date.now();
 
       // Get all the target_fids (people that the user follows)
-      const links = await prisma.links.findMany({
+      const links = await prisma.link.findMany({
         where: {
           AND: [{ fid: userFid }, { target_fid: { not: null } }]
         },
@@ -40,7 +40,7 @@ export default async function handle(
       console.log(`Got links in ${Date.now() - startTime}ms`);
       startTime = Date.now();
 
-      const messages = await prisma.messages.findMany({
+      const messages = await prisma.message.findMany({
         where: {
           fid: {
             in: targetFids
@@ -55,16 +55,13 @@ export default async function handle(
           // deleted_at: null
         },
         include: {
-          casts: {
-            // where: {
-            //   parent_hash: null
-            // },
+          cast: {
             select: {
               hash: true,
               parent_hash: true
             }
           },
-          reactions: true
+          reaction: true
         },
         take: limit,
         orderBy: {
@@ -78,18 +75,17 @@ export default async function handle(
       console.log(`Messages count: ${messages.length}`);
       console.log(
         `Messages without parent hash: ${
-          messages.filter((message) => message.casts?.parent_hash == null)
-            .length
+          messages.filter((message) => message.cast?.parent_hash == null).length
         }`
       );
 
       const castRecastInfo = messages
-        .filter((message) => message.casts?.parent_hash == null)
+        .filter((message) => message.cast?.parent_hash == null)
         .map((message) =>
           message.message_type === MessageType.CAST_ADD
-            ? { castHash: message.casts?.hash, recast: null }
+            ? { castHash: message.cast?.hash, recast: null }
             : {
-                castHash: message.reactions?.target_hash,
+                castHash: message.reaction?.target_hash,
                 recast: message.fid
               }
         );
@@ -151,8 +147,6 @@ export default async function handle(
         result: {
           tweets,
           users: usersMap,
-          // topics: topicsMap,
-          // recasts: recastMap,
           nextPageCursor
         }
       });

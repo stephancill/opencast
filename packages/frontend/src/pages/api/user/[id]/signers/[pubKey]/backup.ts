@@ -24,7 +24,7 @@ export default async function handler(
     });
 
   const pubKeyBytes = Buffer.from(pubKey, 'hex');
-  const messageRows = await prisma.messages.findMany({
+  const messageRows = await prisma.message.findMany({
     where: {
       signer: pubKeyBytes
     },

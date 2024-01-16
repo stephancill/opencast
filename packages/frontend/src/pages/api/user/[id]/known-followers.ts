@@ -14,7 +14,7 @@ export default async function handle(
       const contextFid = parseInt(req.query.context_id as string);
 
       // Get all the target_fids (people that the user follows)
-      const contextFollowing = await prisma.links.findMany({
+      const contextFollowing = await prisma.link.findMany({
         where: {
           fid: contextFid,
           target_fid: { not: null },
@@ -25,7 +25,7 @@ export default async function handle(
         }
       });
 
-      const links = await prisma.links.findMany({
+      const links = await prisma.link.findMany({
         where: {
           deleted_at: null,
           type: 'follow',

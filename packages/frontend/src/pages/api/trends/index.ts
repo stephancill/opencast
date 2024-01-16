@@ -17,7 +17,7 @@ export default async function handle(
 
       // Get casts in the last 4 hours and group by parent_url
       const cutoffTime = new Date(new Date().getTime() - 24 * 60 * 60 * 1000);
-      const results = await prisma.casts.groupBy({
+      const results = await prisma.cast.groupBy({
         by: ['parent_url'],
         where: {
           timestamp: {

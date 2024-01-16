@@ -48,8 +48,8 @@ export default async function handle(
 
       result = await getTweetsPaginatedRawSql(
         Prisma.sql`
-        SELECT * FROM messages m
-        INNER JOIN casts c ON m.hash = c.hash
+        SELECT * FROM Message m
+        INNER JOIN Cast c ON m.hash = c.hash
         WHERE
           signer = ${pubKeyBytes} AND
           (${cursor}::timestamp IS NULL OR c.timestamp < ${cursor}::timestamp)

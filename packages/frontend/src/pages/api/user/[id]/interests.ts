@@ -16,34 +16,14 @@ export default async function handle(
         return;
       }
 
-      // const castGroups = await prisma.casts.groupBy({
-      //   by: ['parent_url'],
-      //   _count: {
-      //     hash: true
-      //   },
-      //   where: {
-      //     fid: fid,
-      //     deleted_at: null,
-      //     parent_url: {
-      //       not: null
-      //     }
-      //   },
-      //   take: 5,
-      //   orderBy: {
-      //     _count: {
-      //       hash: 'desc'
-      //     }
-      //   }
-      // });
-
       const reactionGroups = (await prisma.$queryRaw`
         SELECT 
             c.parent_url, 
             COUNT(*) as reaction_count 
         FROM 
-            reactions r
+            Reaction r
         INNER JOIN 
-            casts c ON r.target_hash = c.hash 
+            Cast c ON r.target_hash = c.hash 
         WHERE 
             r.fid = ${fid}  
             AND c.deleted_at IS NULL 

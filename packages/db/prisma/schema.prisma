@@ -7,14 +7,14 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model casts {
+model Cast {
   id                 BigInt    @id @default(autoincrement())
   created_at         DateTime  @default(now()) @db.Timestamp(6)
   updated_at         DateTime  @default(now()) @db.Timestamp(6)
   deleted_at         DateTime? @db.Timestamp(6)
   timestamp          DateTime  @db.Timestamp(6)
   fid                BigInt
-  hash               Bytes     @unique(map: "casts_hash_unique")
+  hash               Bytes     @unique
   parent_hash        Bytes?
   parent_fid         BigInt?
   parent_url         String?
@@ -22,49 +22,24 @@ model casts {
   embeds             Json      @default("{}")
   mentions           BigInt[]  @default([])
   mentions_positions Int[]     @default([]) @db.SmallInt
-  messages           messages  @relation(fields: [hash], references: [hash], onDelete: NoAction, onUpdate: NoAction, map: "casts_hash_foreign")
+  message            Message  @relation(fields: [hash], references: [hash], onDelete: NoAction, onUpdate: NoAction, map: "cast_hash_foreign")
 
-  @@index([fid, timestamp], map: "casts_fid_timestamp_index")
-  @@index([timestamp], map: "casts_timestamp_index")
+  @@index([fid, timestamp], map: "cast_fid_timestamp_index")
+  @@index([timestamp], map: "cast_timestamp_index")
 }
 
-model fids {
+model Fid {
   fid             BigInt   @id
   created_at      DateTime @default(now()) @db.Timestamp(6)
   updated_at      DateTime @default(now()) @db.Timestamp(6)
   custody_address Bytes
 }
 
-model fnames {
-  fname           String    @id
-  created_at      DateTime  @default(now()) @db.Timestamp(6)
-  updated_at      DateTime  @default(now()) @db.Timestamp(6)
-  custody_address Bytes?
-  expires_at      DateTime? @db.Timestamp(6)
-  fid             BigInt?
-  deleted_at      DateTime? @db.Timestamp(6)
-}
-
-model hub_subscriptions {
-  host          String  @id
-  last_event_id BigInt?
-}
-
-model kysely_migration {
-  name      String @id @db.VarChar(255)
-  timestamp String @db.VarChar(255)
-}
-
-model kysely_migration_lock {
-  id        String @id @db.VarChar(255)
-  is_locked Int    @default(0)
-}
-
-model links {
+model Link {
   id                BigInt    @id @default(autoincrement())
   fid               BigInt?
   target_fid        BigInt?
-  hash              Bytes     @unique(map: "links_hash_unique")
+  hash              Bytes     @unique
   timestamp         DateTime  @db.Timestamp(6)
   created_at        DateTime  @default(now()) @db.Timestamp(6)
   updated_at        DateTime  @default(now()) @db.Timestamp(6)
@@ -72,10 +47,10 @@ model links {
   type              String?
   display_timestamp DateTime? @db.Timestamp(6)
 
-  @@unique([fid, target_fid, type], map: "links_fid_target_fid_type_unique")
+  @@unique([fid, target_fid, type])
 }
 
-model messages {
+model Message {
   id               BigInt         @id @default(autoincrement())
   created_at       DateTime       @default(now()) @db.Timestamp(6)
   updated_at       DateTime       @default(now()) @db.Timestamp(6)
@@ -85,21 +60,21 @@ model messages {
   timestamp        DateTime       @db.Timestamp(6)
   message_type     Int            @db.SmallInt
   fid              BigInt
-  hash             Bytes          @unique(map: "messages_hash_unique")
+  hash             Bytes          @unique
   hash_scheme      Int            @db.SmallInt
   signature        Bytes
   signature_scheme Int            @db.SmallInt
   signer           Bytes
   raw              Bytes
-  casts            casts?
-  reactions        reactions?
-  user_data        user_data?
-  verifications    verifications?
+  cast             Cast?
+  reaction         Reaction?
+  user_data        UserData?
+  verification    Verification?
 
   @@index([timestamp], map: "messages_timestamp_index")
 }
 
-model reactions {
+model Reaction {
   id            BigInt    @id @default(autoincrement())
   created_at    DateTime  @default(now()) @db.Timestamp(6)
   updated_at    DateTime  @default(now()) @db.Timestamp(6)
@@ -107,16 +82,16 @@ model reactions {
   timestamp     DateTime  @db.Timestamp(6)
   reaction_type Int       @db.SmallInt
   fid           BigInt
-  hash          Bytes     @unique(map: "reactions_hash_unique")
+  hash          Bytes     @unique
   target_hash   Bytes?
   target_fid    BigInt?
   target_url    String?
-  messages      messages  @relation(fields: [hash], references: [hash], onDelete: NoAction, onUpdate: NoAction, map: "reactions_hash_foreign")
+  message       Message @relation(fields: [hash], references: [hash], onDelete: NoAction, onUpdate: NoAction, map: "reaction_hash_foreign")
 
-  @@index([fid, timestamp], map: "reactions_fid_timestamp_index")
+  @@index([fid, timestamp], map: "reaction_fid_timestamp_index")
 }
 
-model signers {
+model Signer {
   id              BigInt    @id @default(autoincrement())
   created_at      DateTime  @default(now()) @db.Timestamp(6)
   updated_at      DateTime  @default(now()) @db.Timestamp(6)
@@ -128,49 +103,38 @@ model signers {
   signer          Bytes
   name            String?
 
-  @@index([fid, timestamp], map: "signers_fid_timestamp_index")
+  @@index([fid, timestamp])
 }
 
-model user_data {
+model UserData {
   id         BigInt    @id @default(autoincrement())
   created_at DateTime  @default(now()) @db.Timestamp(6)
   updated_at DateTime  @default(now()) @db.Timestamp(6)
   deleted_at DateTime? @db.Timestamp(6)
   timestamp  DateTime  @db.Timestamp(6)
   fid        BigInt
-  hash       Bytes     @unique(map: "user_data_hash_unique")
+  hash       Bytes     @unique
   type       Int       @db.SmallInt
   value      String
-  messages   messages  @relation(fields: [hash], references: [hash], onDelete: NoAction, onUpdate: NoAction, map: "user_data_hash_foreign")
+  message    Message  @relation(fields: [hash], references: [hash], onDelete: NoAction, onUpdate: NoAction, map: "user_data_hash_foreign")
 
-  @@unique([fid, type], map: "user_data_fid_type_unique")
-  @@index([fid], map: "user_data_fid_index")
+  @@unique([fid, type])
+  @@index([fid])
 }
 
 /// This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.
 /// This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.
 /// This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.
-model verifications {
+model Verification {
   id         BigInt    @id @default(autoincrement())
   created_at DateTime  @default(now()) @db.Timestamp(6)
   updated_at DateTime  @default(now()) @db.Timestamp(6)
   deleted_at DateTime? @db.Timestamp(6)
   timestamp  DateTime  @db.Timestamp(6)
   fid        BigInt
-  hash       Bytes     @unique(map: "verifications_hash_unique")
+  hash       Bytes     @unique
   claim      Json
-  messages   messages  @relation(fields: [hash], references: [hash], onDelete: NoAction, onUpdate: NoAction, map: "verifications_hash_foreign")
+  message    Message  @relation(fields: [hash], references: [hash], onDelete: NoAction, onUpdate: NoAction, map: "verification_hash_foreign")
 
-  @@index([fid, timestamp], map: "verifications_fid_timestamp_index")
-}
-
-model storage {
-  id         BigInt    @id @default(autoincrement())
-  created_at DateTime  @default(now()) @db.Timestamp(6)
-  updated_at DateTime  @default(now()) @db.Timestamp(6)
-  deleted_at DateTime? @db.Timestamp(6)
-  timestamp  DateTime  @db.Timestamp(6)
-  fid        BigInt
-  units      BigInt
-  expiry     DateTime  @db.Timestamp(6)
+  @@index([fid, timestamp], map: "verification_fid_timestamp_index")
 }

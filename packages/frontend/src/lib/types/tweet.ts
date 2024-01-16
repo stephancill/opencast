@@ -1,6 +1,6 @@
 import { Embed as FarcasterEmbed } from '@farcaster/hub-web';
 import { Embed as ModEmbed } from '@mod-protocol/core';
-import { casts } from '@selekt/db';
+import { Cast } from '@selekt/db';
 import { TopicsMapType } from '../topics/resolve-topic';
 import { TopicType } from './topic';
 import { isValidImageExtension } from '../validation';
@@ -112,7 +112,7 @@ export const populateTweetTopic = (
 };
 
 export const tweetConverter = {
-  toTweet(cast: casts & { client?: string }): Tweet {
+  toTweet(cast: Cast & { client?: string }): Tweet {
     // Check if cast.hash is a buffer
     const isBuffer = Buffer.isBuffer(cast.hash);
 

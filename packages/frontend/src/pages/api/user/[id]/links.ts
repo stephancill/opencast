@@ -20,7 +20,7 @@ export default async function handle(
           : 10;
       const type = req.query.type as 'following' | 'followers';
 
-      const links = await prisma.links.findMany({
+      const links = await prisma.link.findMany({
         where: {
           timestamp: {
             lt: cursor || undefined

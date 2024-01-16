@@ -5,7 +5,7 @@ import { TopicType } from '../types/topic';
 import { resolveTopic } from '../topics/resolve-topic';
 
 export async function resolveUserFromFid(fid: bigint): Promise<User | null> {
-  const userData = await prisma.user_data.findMany({
+  const userData = await prisma.userData.findMany({
     where: {
       fid: fid
     }
@@ -31,7 +31,7 @@ export async function resolveUserFromFid(fid: bigint): Promise<User | null> {
 export async function resolveUserFullFromFid(
   fid: bigint
 ): Promise<UserFull | null> {
-  const userData = await prisma.user_data.findMany({
+  const userData = await prisma.userData.findMany({
     where: {
       fid: fid
     }
@@ -49,7 +49,7 @@ export async function resolveUserFullFromFid(
     return acc;
   }, {});
 
-  const followers = await prisma.links.findMany({
+  const followers = await prisma.link.findMany({
     where: {
       target_fid: fid,
       type: 'follow',
@@ -58,7 +58,7 @@ export async function resolveUserFullFromFid(
     distinct: ['target_fid', 'fid']
   });
 
-  const following = await prisma.links.findMany({
+  const following = await prisma.link.findMany({
     where: {
       fid: fid,
       type: 'follow',
@@ -67,7 +67,7 @@ export async function resolveUserFullFromFid(
     distinct: ['target_fid', 'fid']
   });
 
-  const castCount = await prisma.casts.aggregate({
+  const castCount = await prisma.cast.aggregate({
     where: {
       fid: fid,
       deleted_at: null
@@ -77,7 +77,7 @@ export async function resolveUserFullFromFid(
 
   const interests = await userInterests(fid);
 
-  const verification = await prisma.verifications.findFirst({
+  const verification = await prisma.verification.findFirst({
     where: {
       fid: fid,
       deleted_at: null
@@ -107,7 +107,7 @@ export async function resolveUserAmbiguous(
   let fid = Number(idOrUsername);
   if (isNaN(fid)) {
     const username = (idOrUsername as string).toLowerCase();
-    const usernameData = await prisma.user_data.findFirst({
+    const usernameData = await prisma.userData.findFirst({
       where: {
         type: UserDataType.USERNAME,
         value: username
@@ -166,9 +166,9 @@ export async function userInterests(fid: bigint): Promise<TopicType[]> {
             c.parent_url, 
             COUNT(*) as reaction_count 
         FROM 
-            reactions r
+            Reaction r
         INNER JOIN 
-            casts c ON r.target_hash = c.hash 
+            Cast c ON r.target_hash = c.hash 
         WHERE 
             r.fid = ${fid}  
             AND c.deleted_at IS NULL 

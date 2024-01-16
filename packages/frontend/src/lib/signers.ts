@@ -24,9 +24,9 @@ export async function getSignerDetail(
       COUNT(DISTINCT CASE WHEN m.message_type = 7 THEN m.hash ELSE NULL END) AS verification_add_eth_address_count,
       COUNT(DISTINCT CASE WHEN m.message_type = 8 THEN m.hash ELSE NULL END) AS verification_remove_count
     FROM 
-      messages m
+      Message m
     INNER JOIN 
-      signers s ON m.signer = s.signer
+      Signer s ON m.signer = s.signer
     WHERE 
       m.signer = ${pubKeyBytes}
     GROUP BY

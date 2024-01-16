@@ -61,37 +61,37 @@ export default async function handle(
 
       const userPostsReactions = (await prisma.$queryRaw`
         SELECT 
-          casts.*, 
-          reactions.reaction_type as reaction_type, 
-          messages.fid as message_fid, 
-          messages.hash as message_hash, 
-          messages.timestamp as message_timestamp,
-          messages.message_type as message_type
-        FROM casts 
-        JOIN reactions ON casts.hash = reactions.target_hash 
-        JOIN messages ON reactions.hash = messages.hash
+          Cast.*, 
+          Reaction.reaction_type as reaction_type, 
+          Message.fid as message_fid, 
+          Message.hash as message_hash, 
+          Message.timestamp as message_timestamp,
+          Message.message_type as message_type
+        FROM Cast 
+        JOIN Reaction ON Cast.hash = Reaction.target_hash 
+        JOIN Message ON Reaction.hash = Message.hash
         WHERE
-            casts.fid = ${fid} AND
-            messages.message_type = 3 AND
-            reactions.deleted_at IS NULL AND
-            messages.timestamp > ${afterTime}
-        ORDER BY reactions.timestamp DESC;
+            Cast.fid = ${fid} AND
+            Message.message_type = 3 AND
+            Reaction.deleted_at IS NULL AND
+            Message.timestamp > ${afterTime}
+        ORDER BY Reaction.timestamp DESC;
       `) as ReactionQueryResult[];
 
       const userNewFollowers = (await prisma.$queryRaw`
         SELECT 
-          messages.fid as message_fid, 
-          messages.hash as message_hash, 
-          messages.message_type as message_type,
-          messages.timestamp as message_timestamp
-        FROM links
-        JOIN messages ON links.hash = messages.hash
+          Message.fid as message_fid, 
+          Message.hash as message_hash, 
+          Message.message_type as message_type,
+          Message.timestamp as message_timestamp
+        FROM Link
+        JOIN Message ON Link.hash = Message.hash
         WHERE
-            links.target_fid = ${fid} AND
-            messages.message_type = 5 AND
-            links.type = 'follow' AND
-            links.deleted_at IS NULL AND
-            messages.timestamp > ${afterTime};
+            Link.target_fid = ${fid} AND
+            Message.message_type = 5 AND
+            Link.type = 'follow' AND
+            Link.deleted_at IS NULL AND
+            Message.timestamp > ${afterTime};
       `) as FollowerQueryResult[];
 
       const userPostsReplies = (await prisma.$queryRaw`
@@ -99,29 +99,29 @@ export default async function handle(
         replies.fid as message_fid, 
         replies.hash as message_hash, 
         replies.timestamp as message_timestamp,
-        messages.message_type as message_type,
-        casts.fid as parent_fid 
-        FROM casts as replies
-        JOIN casts ON casts.hash = replies.parent_hash
-        JOIN messages ON replies.hash = messages.hash
+        Message.message_type as message_type,
+        Cast.fid as parent_fid 
+        FROM Cast as replies
+        JOIN Cast ON Cast.hash = replies.parent_hash
+        JOIN Message ON replies.hash = Message.hash
         WHERE 
-            casts.fid = ${fid} AND
+            Cast.fid = ${fid} AND
             replies.deleted_at IS NULL AND
-            casts.deleted_at IS NULL AND
+            Cast.deleted_at IS NULL AND
             replies.timestamp > ${afterTime};
       `) as RepliesQueryResult[];
 
       const userMentions = (await prisma.$queryRaw`
-        SELECT casts.*, 
-        casts.fid as message_fid, 
-        casts.hash as message_hash, 
-        casts.timestamp as message_timestamp,
-        messages.message_type as message_type
-        FROM casts
-        JOIN messages ON casts.hash = messages.hash
+        SELECT Cast.*, 
+        Cast.fid as message_fid, 
+        Cast.hash as message_hash, 
+        Cast.timestamp as message_timestamp,
+        Message.message_type as message_type
+        FROM Cast
+        JOIN Message ON Cast.hash = Message.hash
         WHERE
-            casts.deleted_at IS NULL AND
-            casts.timestamp > ${afterTime} AND
+            Cast.deleted_at IS NULL AND
+            Cast.timestamp > ${afterTime} AND
             ${fid} = ANY(casts.mentions);`) as MentionsQueryResult[];
 
       const badgeCount =

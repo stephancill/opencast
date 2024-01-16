@@ -12,7 +12,7 @@ export default async function handle(
     case 'GET':
       let usernames = (req.query.usernames as string).split(',');
 
-      const userData = await prisma.user_data.findMany({
+      const userData = await prisma.userData.findMany({
         where: {
           type: UserDataType.USERNAME,
           value: {

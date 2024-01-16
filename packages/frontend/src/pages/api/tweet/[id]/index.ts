@@ -22,16 +22,16 @@ export default async function tweetIdEndpoint(
 ): Promise<void> {
   const { id } = req.query as TweetEndpointQuery;
 
-  const cast = await prisma.casts.findUnique({
+  const cast = await prisma.cast.findUnique({
     where: {
       hash: Buffer.from(id, 'hex'),
       deleted_at: null,
-      messages: {
+      message: {
         deleted_at: null
       }
     },
     include: {
-      messages: true
+      message: true
     }
   });
 
@@ -42,13 +42,13 @@ export default async function tweetIdEndpoint(
     return;
   }
 
-  const signer = await prisma.signers.findFirst({
+  const signer = await prisma.signer.findFirst({
     where: {
-      signer: cast.messages.signer
+      signer: cast.message.signer
     }
   });
 
-  const engagements = await prisma.reactions.findMany({
+  const engagements = await prisma.reaction.findMany({
     where: {
       target_hash: cast.hash,
       deleted_at: null

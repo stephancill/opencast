@@ -1,5 +1,5 @@
 import { ReactionType } from '@farcaster/hub-web';
-import { casts, Prisma } from '@selekt/db';
+import { Cast, Prisma } from '@selekt/db';
 import { prisma } from './prisma';
 import { BaseResponse } from './types/responses';
 import { Tweet, tweetConverter } from './types/tweet';
@@ -20,24 +20,24 @@ export interface TweetsResponse extends BaseResponse<{ tweets: Tweet[] }> {}
 
 /**
  *
- * @param sql Sql query which uses the returned cursor and returns all the fields of casts table
+ * @param sql Sql query which uses the returned cursor and returns all the fields of Cast table
  * @returns Promise<PaginatedTweets>
  */
 export async function getTweetsPaginatedRawSql(sql: Sql, ...args: any[]) {
-  const casts = await prisma.$queryRaw<casts[]>(sql);
+  const casts = await prisma.$queryRaw<Cast[]>(sql);
   return convertAndCalculateCursor(casts, ...args);
 }
 
 /**
  *
- * @param findManyArgs Prisma.castsFindManyArgs
+ * @param findManyArgs prisma.castFindManyArgs
  * @returns Promise<PaginatedTweets>
  */
 export async function getTweetsPaginatedPrismaArgs(
-  findManyArgs: Prisma.castsFindManyArgs,
+  findManyArgs: Prisma.CastFindManyArgs,
   ...args: any[]
 ) {
-  const casts = await prisma.casts.findMany(findManyArgs);
+  const casts = await prisma.cast.findMany(findManyArgs);
   return await convertAndCalculateCursor(casts, ...args);
 }
 
@@ -48,8 +48,8 @@ export async function getTweetsPaginatedPrismaArgs(
  * @returns PaginatedTweets
  */
 export async function convertAndCalculateCursor(
-  casts: casts[],
-  calculateNextPageCursor?: (casts: casts[]) => string | null
+  casts: Cast[],
+  calculateNextPageCursor?: (casts: Cast[]) => string | null
 ): Promise<PaginatedTweetsType> {
   let { tweets } = await castsToTweets(casts);
 
@@ -74,31 +74,31 @@ export async function convertAndCalculateCursor(
 }
 
 export async function castsToTweets(
-  castsOrHashes: Buffer[] | casts[]
-): Promise<{ tweets: Tweet[]; casts: casts[]; castHashes: Buffer[] }> {
+  castsOrHashes: Buffer[] | Cast[]
+): Promise<{ tweets: Tweet[]; casts: Cast[]; castHashes: Buffer[] }> {
   const casts =
     castsOrHashes[0] instanceof Buffer
-      ? await prisma.casts.findMany({
+      ? await prisma.cast.findMany({
           where: {
             hash: {
               in: castsOrHashes as Buffer[]
             }
           }
         })
-      : (castsOrHashes as casts[]);
+      : (castsOrHashes as Cast[]);
 
   const castHashes =
     castsOrHashes[0] instanceof Buffer
       ? (castsOrHashes as Buffer[])
       : casts.map((cast) => cast.hash);
 
-  const engagements = await prisma.reactions.findMany({
+  const engagements = await prisma.reaction.findMany({
     where: {
       target_hash: {
         in: castHashes
       },
       deleted_at: null,
-      messages: {
+      message: {
         deleted_at: null
       }
     },
@@ -109,14 +109,14 @@ export async function castsToTweets(
     }
   });
 
-  const replyCount = await prisma.casts.groupBy({
+  const replyCount = await prisma.cast.groupBy({
     by: ['parent_hash'],
     where: {
       parent_hash: {
         in: castHashes
       },
       deleted_at: null,
-      messages: {
+      message: {
         deleted_at: null
       }
     },

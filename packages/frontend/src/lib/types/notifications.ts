@@ -1,4 +1,4 @@
-import { casts } from '@selekt/db';
+import { Cast } from '@selekt/db';
 import { BaseResponse } from './responses';
 import { Tweet } from './tweet';
 import { User, UsersMapType } from './user';
@@ -10,17 +10,17 @@ export type MessageMetadata = {
   message_timestamp: Date;
 };
 
-export type ReactionQueryResult = casts &
+export type ReactionQueryResult = Cast &
   MessageMetadata & {
     reaction_type: number;
   };
 
 export type FollowerQueryResult = MessageMetadata;
 
-export type RepliesQueryResult = casts &
+export type RepliesQueryResult = Cast &
   MessageMetadata & { parent_fid: bigint };
 
-export type MentionsQueryResult = casts &
+export type MentionsQueryResult = Cast &
   MessageMetadata & {
     parent_fid: bigint | null;
   };

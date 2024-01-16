@@ -1,7 +1,7 @@
 import { UserDataType } from '@farcaster/hub-nodejs';
 import { Embed as ModEmbed } from '@mod-protocol/core';
 import { isFarcasterUrlEmbed } from '@mod-protocol/farcaster';
-import { casts } from '@selekt/db';
+import { Cast } from '@selekt/db';
 import getMetaData from 'metadata-scraper';
 import { LRU } from './lru-cache';
 import { prisma } from './prisma';
@@ -54,12 +54,12 @@ async function processWarpcastEmbed(embed: ModEmbed): Promise<ModEmbed> {
     const hashLength = match[2].length;
     const [cast] = (await prisma.$queryRaw`
         select c.*, ud.value from casts c 
-        inner join user_data ud on c.fid = ud.fid 
+        inner join UserData ud on c.fid = ud.fid 
         where 
           ud."type" = ${UserDataType.USERNAME} 
           and SUBSTRING(encode(c.hash, 'hex'), 1, ${hashLength}::integer) = ${match[2].toLowerCase()} 
           and ud.value = ${match[1].toLowerCase()}
-      `) as casts[];
+      `) as Cast[];
     if (cast) {
       const user = await resolveUserFromFid(cast.fid);
       const images = (cast.embeds as { url?: string; cast?: string }[]).filter(

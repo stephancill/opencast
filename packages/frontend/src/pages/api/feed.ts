@@ -1,5 +1,5 @@
 import { populateEmbedsForTweets } from '@lib/embeds';
-import { Prisma, casts } from '@selekt/db';
+import { Prisma, Cast } from '@selekt/db';
 import { NextApiRequest, NextApiResponse } from 'next';
 import {
   PaginatedTweetsResponse,
@@ -39,7 +39,7 @@ export default async function handle(
       // Get all the target_fids (people that the user follows)
       let targetFids: bigint[] | null = null;
       if (userFid != null) {
-        const links = await prisma.links.findMany({
+        const links = await prisma.link.findMany({
           where: {
             fid: userFid,
             target_fid: { not: null },
@@ -87,11 +87,11 @@ export default async function handle(
         topQuery = Prisma.sql`
           SELECT 
               casts.*,
-              COUNT(reactions.id) AS like_count
+              COUNT(Reaction.id) AS like_count
           FROM 
               casts
           LEFT JOIN 
-              reactions ON casts.hash = reactions.target_hash AND reactions.reaction_type = 1
+              Reaction ON casts.hash = Reaction.target_hash AND Reaction.reaction_type = 1
           WHERE 
             casts.parent_hash is null  
             AND casts.deleted_at is null
@@ -115,7 +115,7 @@ export default async function handle(
         `;
       } else {
         reverseChronologicalQuery = Prisma.sql`
-          SELECT * FROM casts
+          SELECT * FROM Cast
           WHERE
             (
               ${cursor}::timestamp IS NULL
@@ -130,7 +130,7 @@ export default async function handle(
               (${topicUrl}::text IS NOT NULL AND parent_url = ${topicUrl}::text)
             )
             AND parent_hash IS NULL
-            AND casts.deleted_at IS NULL
+            AND Cast.deleted_at IS NULL
           ORDER BY timestamp DESC
           LIMIT ${limit}
           OFFSET ${skip}
@@ -138,16 +138,16 @@ export default async function handle(
 
         topQuery = Prisma.sql`
           SELECT 
-              casts.*,
-              COUNT(reactions.id) AS like_count
+              Cast.*,
+              COUNT(Reaction.id) AS like_count
           FROM 
-              casts
+              Cast
           LEFT JOIN 
-              reactions ON casts.hash = reactions.target_hash AND reactions.reaction_type = 1
+              Reaction ON Cast.hash = Reaction.target_hash AND Reaction.reaction_type = 1
           WHERE 
-            casts.parent_hash is null  
-            AND casts.deleted_at is null
-            AND casts.timestamp > ${new Date(
+              Cast.parent_hash is null  
+            AND Cast.deleted_at is null
+            AND Cast.timestamp > ${new Date(
               (cursor || new Date()).getTime() - 1000 * 60 * 60 * 24
             )}
             AND (
@@ -156,7 +156,7 @@ export default async function handle(
               (${topicUrl}::text IS NOT NULL AND parent_url = ${topicUrl}::text)
             )
           GROUP BY 
-              casts.id
+            Cast.id
           ORDER BY 
               like_count DESC
           LIMIT ${limit}
@@ -165,9 +165,7 @@ export default async function handle(
       }
 
       if (!full) {
-        const casts = await prisma.$queryRaw<casts[]>(
-          reverseChronologicalQuery
-        );
+        const casts = await prisma.$queryRaw<Cast[]>(reverseChronologicalQuery);
         const tweets = casts.map(tweetConverter.toTweet);
         res.json({
           result: { tweets }
