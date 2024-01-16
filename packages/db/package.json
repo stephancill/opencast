@@ -6,7 +6,8 @@
   "types": "prisma/index.ts",
   "scripts": {
     "db:generate": "prisma generate",
-    "db:push": "prisma db push --skip-generate"
+    "db:push": "prisma db push --skip-generate",
+    "docker:build": "docker-compose down && docker-compose build --progress plain && docker-compose up"
   },
   "keywords": [],
   "author": "",
