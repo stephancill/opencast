@@ -24,7 +24,6 @@ export function UserKnownFollowersLazy({
 
   return !knownFollowersResponse ? (
     loadingKnownFollowers ? (
-      // <UserKnownFollowersSkeleton />
       <></>
     ) : (
       <></>

@@ -191,8 +191,6 @@ export function TweetActions({
     );
   };
 
-  // const userIsFollowed = following.includes(createdBy);
-
   const handleOpenInWarpcast = (closeMenu: () => void) => {
     closeMenu();
     window.open(

@@ -187,7 +187,6 @@ export async function populateEmbed(
     }
   } catch (e) {
     console.log(`Error fetching embed for ${url}`);
-    // console.error(e);
   }
 
   // If we get an error, cache the error for an hour

@@ -55,10 +55,6 @@ export function SearchBar({
         placeholder='Search'
         ref={inputRef}
         value={inputValue}
-        // onChange={(e) => {
-        //   handleChange(e);
-        //   handleChangeDebounced(e);
-        // }}
         onKeyUp={handleEscape}
         {...inputProps}
       />

@@ -106,8 +106,6 @@ export function InputForm({
     closeModal();
   };
 
-  // const isVisibilityShown = visited && !reply && !replyModal && !loading;
-
   return (
     <div className='flex min-h-[48px] w-full flex-col justify-center gap-4'>
       <Modal

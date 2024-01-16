@@ -37,7 +37,7 @@ export function splitAndInsert(
       Buffer.from(input).slice(lastIndex).toString(),
       `el-${indices.length}`
     )
-  ); // get remaining part of string
+  );
 
   return result;
 }

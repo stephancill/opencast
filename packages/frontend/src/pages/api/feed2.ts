@@ -52,7 +52,6 @@ export default async function handle(
             lt: cursor || undefined
           },
           deleted_at: null
-          // deleted_at: null
         },
         include: {
           cast: {

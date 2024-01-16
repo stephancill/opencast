@@ -14,7 +14,6 @@ export function FeedOrderingSelector({
   const { setTimelineCursor } = useAuth();
 
   return (
-    // <div className='flex justify-between'>
     <div
       className='hover-animation flex justify-between overflow-y-auto
     border-b border-light-border dark:border-dark-border'

@@ -65,7 +65,6 @@ export function UserCards({
       {loading ? (
         <Loading className={modal ? 'mt-[52px]' : 'mt-5'} />
       ) : (
-        // <AnimatePresence mode='popLayout'>
         <div className='mt-10'>
           {data?.length ? (
             data.map((userData) => (
@@ -78,7 +77,6 @@ export function UserCards({
           )}
           {LoadMore && <LoadMore />}
         </div>
-        // </AnimatePresence>
       )}
     </section>
   );

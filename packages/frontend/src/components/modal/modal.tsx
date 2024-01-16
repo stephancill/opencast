@@ -54,7 +54,6 @@ export function Modal({
           <motion.div
             className='hover-animation override-nav fixed inset-0 bg-black/40 dark:bg-[#5B7083]/40'
             aria-hidden='true'
-            // {...backdrop}
           />
           <div
             className={cn(

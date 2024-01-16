@@ -91,7 +91,6 @@ export function Sidebar(): JSX.Element {
                     </div>
                   )}
                   <SidebarLink
-                    // href='https://warpcast.com/~/notifications'
                     href='/notifications'
                     iconName='BellIcon'
                     linkName={`Notifications`}

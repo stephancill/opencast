@@ -46,7 +46,6 @@ export function UserDetails({
   const detailIcons: Readonly<DetailIcon[]> = [
     [location, 'MapPinIcon'],
     [website, 'LinkIcon']
-    // [`Joined ${formatDate(new Date(createdAt), 'joined')}`, 'CalendarDaysIcon']
   ];
   const { user: currentUser } = useAuth();
 

@@ -69,9 +69,6 @@ export function ViewTweet(tweet: ViewTweetProps): JSX.Element {
          border-light-border px-4 py-3 outline-none dark:border-dark-border`,
         reply && 'scroll-m-[3.25rem] pt-0'
       )}
-      // {...variants}
-      // animate={{ ...variants.animate, transition: { duration: 0.2 } }}
-      // exit={undefined}
       ref={viewTweetRef}
     >
       <Modal

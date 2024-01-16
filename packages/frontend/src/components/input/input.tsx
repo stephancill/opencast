@@ -142,11 +142,6 @@ export function Input({
 
     setLoading?.(true);
 
-    // if (!inputValue && selectedImages.length === 0) {
-    //   setLoading?.(false);
-    //   return;
-    // }
-
     const formattedCast = await formatPlaintextToHubCastMessage({
       text,
       embeds,
@@ -175,10 +170,7 @@ export function Input({
       const res = await submitHubMessage(castMessage);
       const message = Message.fromJSON(res);
 
-      // await sleep(500);
-
       if (!isModal && !replyModal) {
-        // discardTweet();
         setLoading(false);
       }
 

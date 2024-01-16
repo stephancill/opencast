@@ -12,7 +12,6 @@ const allNavs = [
   [
     { name: 'Casts', path: '' },
     { name: 'Casts & replies', path: '/with_replies' },
-    // { name: 'Media', path: 'media' },
     { name: 'Likes', path: '/likes' }
   ],
   [

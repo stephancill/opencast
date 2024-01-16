@@ -30,7 +30,6 @@ export function UserHeader(): JSX.Element {
   const isInFollowPage = ['following', 'followers'].includes(currentPage);
 
   return (
-    // <AnimatePresence mode='popLayout'>
     <div>
       {loading ? (
         <div
