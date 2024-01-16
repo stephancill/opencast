@@ -1,0 +1,12 @@
+version: "3.8"
+services:
+  db:
+    image: "postgres:13.4"
+    ports:
+      - "54320:5432"
+    volumes:
+      - ../pgdata:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=vitalik
+      - POSTGRES_PASSWORD=buterin
+      - POSTGRES_DB=selekt_db
