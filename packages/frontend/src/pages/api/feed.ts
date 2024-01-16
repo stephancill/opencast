@@ -1,5 +1,5 @@
 import { populateEmbedsForTweets } from '@lib/embeds';
-import { Prisma, casts } from '@prisma/client';
+import { Prisma, casts } from '@selekt/db';
 import { NextApiRequest, NextApiResponse } from 'next';
 import {
   PaginatedTweetsResponse,

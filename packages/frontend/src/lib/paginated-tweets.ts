@@ -1,5 +1,5 @@
 import { ReactionType } from '@farcaster/hub-web';
-import { casts, Prisma } from '@prisma/client';
+import { casts, Prisma } from '@selekt/db';
 import { prisma } from './prisma';
 import { BaseResponse } from './types/responses';
 import { Tweet, tweetConverter } from './types/tweet';

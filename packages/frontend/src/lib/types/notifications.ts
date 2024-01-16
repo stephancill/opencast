@@ -1,4 +1,4 @@
-import { casts } from '@prisma/client';
+import { casts } from '@selekt/db';
 import { BaseResponse } from './responses';
 import { Tweet } from './tweet';
 import { User, UsersMapType } from './user';

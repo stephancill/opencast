@@ -28,7 +28,8 @@ const nextConfig = {
       'i.imgur.com',
       'i.seadn.io'
     ]
-  }
+  },
+  transpilePackages: ['@selekt/db']
 };
 
 module.exports = nextConfig;

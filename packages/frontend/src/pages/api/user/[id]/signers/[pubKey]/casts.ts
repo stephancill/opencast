@@ -1,4 +1,4 @@
-import { Prisma } from '@prisma/client';
+import { Prisma } from '@selekt/db';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { populateEmbedsForTweets } from '../../../../../../lib/embeds';
 import {

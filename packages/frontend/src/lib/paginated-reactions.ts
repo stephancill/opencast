@@ -1,4 +1,4 @@
-import { Prisma } from '@prisma/client';
+import { Prisma } from '@selekt/db';
 import { prisma } from './prisma';
 import { BaseResponse } from './types/responses';
 import { User } from './types/user';

@@ -96,12 +96,12 @@ importers:
       '@noble/ed25519':
         specifier: ^2.0.0
         version: 2.0.0
-      '@prisma/client':
-        specifier: ^5.8.1
-        version: 5.8.1(prisma@5.8.1)
       '@rainbow-me/rainbowkit':
         specifier: 1.0.9
         version: 1.0.9(@types/react@18.2.34)(react-dom@18.2.0)(react@18.2.0)(viem@1.21.4)(wagmi@1.4.13)
+      '@selekt/db':
+        specifier: workspace:*
+        version: link:../db
       clsx:
         specifier: ^1.2.1
         version: 1.2.1

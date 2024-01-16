@@ -1,6 +1,6 @@
 import { Embed as FarcasterEmbed } from '@farcaster/hub-web';
 import { Embed as ModEmbed } from '@mod-protocol/core';
-import { casts } from '@prisma/client';
+import { casts } from '@selekt/db';
 import { TopicsMapType } from '../topics/resolve-topic';
 import { TopicType } from './topic';
 import { isValidImageExtension } from '../validation';

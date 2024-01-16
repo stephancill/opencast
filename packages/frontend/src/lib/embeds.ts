@@ -1,7 +1,7 @@
 import { UserDataType } from '@farcaster/hub-nodejs';
 import { Embed as ModEmbed } from '@mod-protocol/core';
 import { isFarcasterUrlEmbed } from '@mod-protocol/farcaster';
-import { casts } from '@prisma/client';
+import { casts } from '@selekt/db';
 import getMetaData from 'metadata-scraper';
 import { LRU } from './lru-cache';
 import { prisma } from './prisma';
