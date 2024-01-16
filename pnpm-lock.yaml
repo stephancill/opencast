@@ -21,49 +21,6 @@ importers:
         specifier: latest
         version: 1.11.3
 
-  apps/docs:
-    dependencies:
-      '@repo/ui':
-        specifier: workspace:*
-        version: link:../../packages/ui
-      next:
-        specifier: ^14.0.4
-        version: 14.0.4(react-dom@18.2.0)(react@18.2.0)
-      react:
-        specifier: ^18.2.0
-        version: 18.2.0
-      react-dom:
-        specifier: ^18.2.0
-        version: 18.2.0(react@18.2.0)
-    devDependencies:
-      '@next/eslint-plugin-next':
-        specifier: ^14.0.4
-        version: 14.0.4
-      '@repo/eslint-config':
-        specifier: workspace:*
-        version: link:../../packages/eslint-config
-      '@repo/typescript-config':
-        specifier: workspace:*
-        version: link:../../packages/typescript-config
-      '@types/eslint':
-        specifier: ^8.56.1
-        version: 8.56.1
-      '@types/node':
-        specifier: ^20.10.6
-        version: 20.10.6
-      '@types/react':
-        specifier: ^18.2.46
-        version: 18.2.46
-      '@types/react-dom':
-        specifier: ^18.2.18
-        version: 18.2.18
-      eslint:
-        specifier: ^8.56.0
-        version: 8.56.0
-      typescript:
-        specifier: ^5.3.3
-        version: 5.3.3
-
   apps/web:
     dependencies:
       '@repo/ui':
@@ -1816,6 +1773,7 @@ packages:
 
   /eslint-config-prettier@9.1.0(eslint@8.56.0):
     resolution: {integrity: sha512-NSWl5BFQWEPi1j4TjVNItzYV7dZXZ+wP6I6ZhrBGpChQhZRUaElihE9uRRkcbRnNb76UMKDF3r+WTmNcGPKsqw==}
+    hasBin: true
     peerDependencies:
       eslint: '>=7.0.0'
     dependencies:
@@ -3270,6 +3228,7 @@ packages:
   /next@14.0.4(react-dom@18.2.0)(react@18.2.0):
     resolution: {integrity: sha512-qbwypnM7327SadwFtxXnQdGiKpkuhaRLE2uq62/nRul9cj9KhQ5LhHmlziTNqUidZotw/Q1I9OjirBROdUJNgA==}
     engines: {node: '>=18.17.0'}
+    hasBin: true
     peerDependencies:
       '@opentelemetry/api': ^1.1.0
       react: ^18.2.0
@@ -4299,6 +4258,7 @@ packages:
 
   /ts-node@10.9.1(@types/node@20.10.6)(typescript@5.3.3):
     resolution: {integrity: sha512-NtVysVPkxxrwFGUUxGYhfux8k78pQB3JqYBXlLRZgdGUqTO5wU/UyHop5p70iEbGhB7q5KmiZiU0Y3KlJrScEw==}
+    hasBin: true
     peerDependencies:
       '@swc/core': '>=1.2.50'
       '@swc/wasm': '>=1.2.50'
@@ -4520,6 +4480,7 @@ packages:
 
   /update-browserslist-db@1.0.13(browserslist@4.22.1):
     resolution: {integrity: sha512-xebP81SNcPuNpPP3uzeW1NYXxI3rxyJzF3pD6sH4jE7o/IX+WtSpwnVU+qIsDPyk0d3hmFQ7mjqc6AtV604hbg==}
+    hasBin: true
     peerDependencies:
       browserslist: '>= 4.21.0'
     dependencies:
