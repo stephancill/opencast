@@ -1,0 +1,17 @@
+# testing
+/coverage
+
+# next.js
+/.next/
+/.vercel/
+/out/
+
+# production
+/build
+
+# compiled js functions
+/functions/lib/
+
+# python
+*.py
+.mypy_cache/

@@ -1,0 +1,27 @@
+{
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "project": "tsconfig.json"
+  },
+  "settings": {
+    "import/resolver": {
+      "typescript": true,
+      "node": true
+    }
+  },
+  "plugins": ["react-hooks"],
+  "extends": ["react-app"],
+  "overrides": [
+    {
+      "files": [
+        "**/*.ts?(x)"
+      ],
+      "rules": {
+        "jsx-a11y/anchor-is-valid": "off",
+        "react/jsx-no-target-blank": "off",
+        "@typescript-eslint/no-redeclare": "off",
+        "@typescript-eslint/no-unused-vars": ["error", { "destructuredArrayIgnorePattern": "^_", "argsIgnorePattern": "^_" }]
+      }
+    }
+  ]
+}

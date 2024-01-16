@@ -1,0 +1,22 @@
+{
+  "name": "Opencast - Open Source Farcaster Client",
+  "short_name": "Opencast",
+  "description": "Fully open source Twitter flavoured Farcaster client",
+  "display": "standalone",
+  "start_url": "/",
+  "theme_color": "#fff",
+  "background_color": "#000000",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/logo192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/logo512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ]
+}

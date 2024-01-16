@@ -1,0 +1,174 @@
+@use 'fonts';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --main-background: var(--dark-background);
+    --main-search-background: var(--dark-search-background);
+    --main-sidebar-background: var(--dark-sidebar-background);
+    --main-accent: var(--accent-blue);
+
+    --dark-background: 0 0 0;
+    --dim-background: 22 33 44;
+    --light-background: 255 255 255;
+
+    --dark-search-background: 32 35 39;
+    --dim-search-background: 39 51 64;
+    --light-search-background: 239 243 244;
+
+    --dark-sidebar-background: 22 24 28;
+    --dim-sidebar-background: 30 39 50;
+    --light-sidebar-background: 247 249 249;
+
+    --accent-yellow: 255 213 0;
+    --accent-blue: 29 155 240;
+    --accent-pink: 249 26 130;
+    --accent-purple: 120 87 255;
+    --accent-orange: 255 122 0;
+    --accent-green: 0 184 122;
+
+    // Mod
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222.2 84% 4.9%;
+
+    --radius: 1rem;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 42.8% 40.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: hsl(212.7, 26.8%, 83.9);
+  }
+
+  a,
+  input,
+  button,
+  textarea {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    @apply hover-animation bg-main-background font-twitter-chirp text-light-primary dark:text-dark-primary;
+  }
+
+  // Mod Embed border colour
+  *,
+  ::before,
+  ::after {
+    @apply dark:border-dark-border;
+  }
+
+  // Handle broken images
+  img:before {
+    content: ' ';
+    display: block;
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    @apply dark:bg-dark-secondary;
+    @apply bg-light-secondary;
+  }
+}
+
+@layer components {
+  .hover-animation {
+    @apply transition-colors duration-200;
+  }
+
+  .custom-button {
+    @apply hover-animation rounded-full p-3 disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .custom-underline {
+    @apply hover-animation underline decoration-transparent outline-none transition [text-decoration-thickness:1px] 
+           hover:decoration-inherit focus-visible:decoration-inherit;
+  }
+
+  .main-tab {
+    @apply outline-none focus-visible:ring-2 focus-visible:ring-[#878a8c] focus-visible:transition-shadow 
+           focus-visible:duration-200 dark:focus-visible:ring-white;
+  }
+
+  .accent-tab {
+    @apply main-tab #{'focus-visible:!ring-main-accent/80'};
+  }
+
+  .accent-bg-tab {
+    @apply focus-visible:bg-main-accent/10;
+  }
+
+  .dark-bg-tab {
+    @apply focus-visible:bg-light-primary/10 dark:focus-visible:bg-dark-primary/10;
+  }
+
+  .blur-picture {
+    @apply hover-animation accent-tab rounded-full transition hover:brightness-75 active:brightness-100;
+  }
+
+  .trim-alt {
+    @apply overflow-hidden text-ellipsis break-all [-webkit-box-orient:vertical] [-webkit-line-clamp:1] [display:-webkit-box];
+  }
+
+  .hover-card {
+    @apply hover:bg-black/[0.03] focus-visible:bg-black/[0.03] dark:hover:bg-white/[0.03]
+           dark:focus-visible:bg-white/[0.03];
+  }
+
+  .menu-container {
+    @apply z-10 rounded-md bg-main-background outline-none 
+           [box-shadow:#65778633_0px_0px_15px,_#65778626_0px_0px_3px_1px] 
+           dark:[box-shadow:#ffffff33_0px_0px_15px,_#ffffff26_0px_0px_3px_1px];
+  }
+}
