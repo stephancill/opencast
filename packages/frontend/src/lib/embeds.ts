@@ -9,6 +9,7 @@ import { ExternalEmbed, Tweet } from './types/tweet';
 import { User, UsersMapType } from './types/user';
 import { resolveUserFromFid } from './user/resolve-user';
 import { isValidImageExtension } from './validation';
+import { NEXT_PUBLIC_MOD_API_URL } from './env';
 
 const KNOWN_HOSTS_MAP: {
   [key: string]: { urlBuilder?: (url: string) => string; userAgent?: string };
@@ -29,7 +30,7 @@ const KNOWN_HOSTS_MAP: {
 
 async function getEmbedsForTweetIds(ids: string[]) {
   const request = await fetch(
-    `${process.env.NEXT_PUBLIC_MOD_API_URL}/cast-embeds-metadata`,
+    `${NEXT_PUBLIC_MOD_API_URL}/cast-embeds-metadata`,
     {
       body: JSON.stringify(ids),
       method: 'POST',

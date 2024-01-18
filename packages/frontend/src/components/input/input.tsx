@@ -46,6 +46,7 @@ import { SearchTopics } from '../search/search-topics';
 import { TopicView, TweetTopicSkeleton } from '../tweet/tweet-topic';
 import { Loading } from '../ui/loading';
 import { InputOptions } from './input-options';
+import { NEXT_PUBLIC_MOD_API_URL } from '@lib/env';
 
 type InputProps = {
   isModal?: boolean;
@@ -63,15 +64,12 @@ export const variants: Variants = {
   animate: { opacity: 1 }
 };
 
-// Optionally replace with your API_URL here
-const API_URL = process.env.NEXT_PUBLIC_MOD_API_URL!;
-
 // TODO: Implement independent mentions
 
-const getMentions = getFarcasterMentions(API_URL);
+const getMentions = getFarcasterMentions(NEXT_PUBLIC_MOD_API_URL);
 
-const getMentionFids = getMentionFidsByUsernames(API_URL);
-const getUrlMetadata = fetchUrlMetadata(API_URL);
+const getMentionFids = getMentionFidsByUsernames(NEXT_PUBLIC_MOD_API_URL);
+const getUrlMetadata = fetchUrlMetadata(NEXT_PUBLIC_MOD_API_URL);
 const onError = (err: any) => console.error(err.message);
 
 export function Input({
@@ -275,13 +273,10 @@ export function Input({
         imageFiles.map(async (file) => {
           const formData = new FormData();
           formData.append('file', file.blob);
-          const res = await fetch(
-            `${process.env.NEXT_PUBLIC_MOD_API_URL}/imgur-upload`,
-            {
-              method: 'POST',
-              body: formData
-            }
-          );
+          const res = await fetch(`${NEXT_PUBLIC_MOD_API_URL}/imgur-upload`, {
+            method: 'POST',
+            body: formData
+          });
 
           const { url } = await res.json();
           if (!url) return;
@@ -380,7 +375,7 @@ export function Input({
                   setEmbeds={setEmbeds}
                   RichEmbed={({ embed }) => (
                     <RichEmbed
-                      api={API_URL}
+                      api={NEXT_PUBLIC_MOD_API_URL}
                       defaultRichEmbedMod={defaultRichEmbedMod}
                       mods={[defaultRichEmbedMod]}
                       embed={embed}
@@ -497,7 +492,7 @@ export function Input({
                           fid: currentUser?.id
                         }
                       }}
-                      api={API_URL}
+                      api={NEXT_PUBLIC_MOD_API_URL}
                       variant='creation'
                       manifest={currentMod}
                       renderers={renderers}

@@ -84,11 +84,9 @@ async function _resolveTopic(url: string): Promise<TopicType | null> {
       return null;
     }
 
-    const rpcUrl = process.env[`CHAIN_RPC_URL_${chainId}`];
-
     const client = createPublicClient({
       chain: chainById[chainId],
-      transport: http(rpcUrl)
+      transport: http()
     });
 
     let uri: string;

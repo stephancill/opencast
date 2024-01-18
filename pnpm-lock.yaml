@@ -147,6 +147,9 @@ importers:
       react-textarea-autosize:
         specifier: ^8.3.4
         version: 8.5.3(@types/react@18.2.34)(react@18.2.0)
+      require-env-variable:
+        specifier: ^4.0.2
+        version: 4.0.2
       swr:
         specifier: ^1.3.0
         version: 1.3.0(react@18.2.0)
@@ -11823,6 +11826,10 @@ packages:
   /require-directory@2.1.1:
     resolution: {integrity: sha512-fGxEI7+wsG9xrvdjsrlmL22OMTTiHRwAMroiEeMgq8gzoLC/PQr7RsRDSTLUg/bZAZtF+TVIkHc6/4RIKrui+Q==}
     engines: {node: '>=0.10.0'}
+
+  /require-env-variable@4.0.2:
+    resolution: {integrity: sha512-gdVmg7tVno0u5MokVSVeuRDSez1XyktsGaNCJfdEqrU40OUXw1oG7MWVPr8PLC7UJul6L98hjULh1e2pmGwdPg==}
+    dev: false
 
   /require-main-filename@2.0.0:
     resolution: {integrity: sha512-NKN5kMDylKuldxYLSUfrbo5Tuzh4hd+2E8NPPX02mZtn1VuREQToYe/ZdlJy+J3uCpfaiGF05e7B8W0iXbQHmg==}

@@ -1,5 +1,6 @@
 'use client';
 
+import { NEXT_PUBLIC_MOD_API_URL } from '@lib/env';
 import { Embed } from '@mod-protocol/core';
 import {
   richEmbedModsExperimental as richEmbedMods,
@@ -23,7 +24,7 @@ export function ModEmbeds(props: { embeds: Array<Embed> }) {
       {props.embeds.map((embed, i) =>
         embed.metadata && Object.keys(embed.metadata).length > 0 ? (
           <RichEmbed
-            api={process.env.NEXT_PUBLIC_MOD_API_URL!}
+            api={NEXT_PUBLIC_MOD_API_URL}
             embed={{
               ...embed,
               metadata: {

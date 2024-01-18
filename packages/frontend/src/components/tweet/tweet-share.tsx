@@ -3,7 +3,7 @@ import { Popover } from '@headlessui/react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { toast } from 'react-hot-toast';
 import { preventBubbling } from '@lib/utils';
-import { siteURL } from '@lib/env';
+import { NEXT_PUBLIC_URL } from '@lib/env';
 import { Button } from '@components/ui/button';
 import { HeroIcon } from '@components/ui/hero-icon';
 import { ToolTip } from '@components/ui/tooltip';
@@ -21,7 +21,7 @@ export function TweetShare({
 }: TweetShareProps): JSX.Element {
   const handleCopy = (closeMenu: () => void) => async (): Promise<void> => {
     closeMenu();
-    await navigator.clipboard.writeText(`${siteURL}/tweet/${tweetId}`);
+    await navigator.clipboard.writeText(`${NEXT_PUBLIC_URL}/tweet/${tweetId}`);
     toast.success('Copied to clipboard');
   };
 

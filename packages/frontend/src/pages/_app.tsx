@@ -12,6 +12,10 @@ import { QueryClient, QueryClientProvider } from 'react-query';
 import { WagmiConfig, configureChains, createConfig } from 'wagmi';
 import { arbitrum, base, mainnet, optimism, polygon, zora } from 'wagmi/chains';
 import { publicProvider } from 'wagmi/providers/public';
+import {
+  NEXT_PUBLIC_FC_CLIENT_NAME,
+  NEXT_PUBLIC_WALLETCONNECT_ID
+} from '@lib/env';
 
 const queryClient = new QueryClient();
 
@@ -29,8 +33,8 @@ const { chains, publicClient } = configureChains(
 );
 
 const { connectors } = getDefaultWallets({
-  appName: process.env.NEXT_PUBLIC_FC_CLIENT_NAME!,
-  projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_ID!, // TODO: Make this optional
+  appName: NEXT_PUBLIC_FC_CLIENT_NAME!,
+  projectId: NEXT_PUBLIC_WALLETCONNECT_ID!, // TODO: Make this optional
   chains
 });
 

@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { privateKeyToAccount } from 'viem/accounts';
 import { AppAuthResponse } from '../../../../lib/types/app-auth';
 import { Hex } from 'viem';
+import { NEXT_PUBLIC_APP_FID, NEXT_PUBLIC_APP_SIGNER_PK } from '@lib/env';
 
 // https://warpcast.notion.site/Signer-Request-API-Migration-Guide-Public-9e74827f9070442fb6f2a7ffe7226b3c
 
@@ -28,8 +29,8 @@ export default async function handle(
 ): Promise<void> {
   const { pubKey } = req.query as SignerEndpointQuery;
 
-  const appFid = process.env.APP_FID!;
-  const account = privateKeyToAccount(process.env.APP_SIGNER_PK as Hex);
+  const appFid = NEXT_PUBLIC_APP_FID!;
+  const account = privateKeyToAccount(NEXT_PUBLIC_APP_SIGNER_PK as Hex);
 
   const deadline = Math.floor(Date.now() / 1000) + 86400; // signature is valid for 1 day
   const signature = await account.signTypedData({

@@ -1,4 +1,5 @@
 import { PrismaClient } from '@selekt/db';
+import { isProduction } from './env';
 
 const globalForPrisma = global as unknown as {
   prisma: PrismaClient | undefined;
@@ -10,4 +11,4 @@ export const prisma =
     log: ['query', 'info', 'warn']
   });
 
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
+if (isProduction) globalForPrisma.prisma = prisma;

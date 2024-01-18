@@ -3,6 +3,11 @@ import {
   getSSLHubRpcClient,
   HubRpcClient
 } from '@farcaster/hub-nodejs';
+import {
+  NEXT_PUBLIC_FC_HUB_URL,
+  NEXT_PUBLIC_FC_HUB_USE_TLS,
+  isProduction
+} from '@lib/env';
 
 const globalForFarcaster = global as unknown as {
   hubClient: HubRpcClient | undefined;
@@ -10,9 +15,8 @@ const globalForFarcaster = global as unknown as {
 
 export const hubClient =
   globalForFarcaster.hubClient ??
-  (process.env.FC_HUB_USE_TLS && process.env.FC_HUB_USE_TLS !== 'false'
-    ? getSSLHubRpcClient(process.env.FC_HUB_URL!)
-    : getInsecureHubRpcClient(process.env.FC_HUB_URL!));
+  (NEXT_PUBLIC_FC_HUB_USE_TLS && NEXT_PUBLIC_FC_HUB_USE_TLS !== 'false'
+    ? getSSLHubRpcClient(NEXT_PUBLIC_FC_HUB_URL)
+    : getInsecureHubRpcClient(NEXT_PUBLIC_FC_HUB_URL));
 
-if (process.env.NODE_ENV !== 'production')
-  globalForFarcaster.hubClient = hubClient;
+if (!isProduction) globalForFarcaster.hubClient = hubClient;

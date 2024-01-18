@@ -3,7 +3,7 @@ import { Popover } from '@headlessui/react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { toast } from 'react-hot-toast';
 import { preventBubbling } from '@lib/utils';
-import { siteURL } from '@lib/env';
+import { NEXT_PUBLIC_URL } from '@lib/env';
 import { Button } from '@components/ui/button';
 import { HeroIcon } from '@components/ui/hero-icon';
 import { ToolTip } from '@components/ui/tooltip';
@@ -16,7 +16,7 @@ type UserShareProps = {
 export function UserShare({ username }: UserShareProps): JSX.Element {
   const handleCopy = (closeMenu: () => void) => async (): Promise<void> => {
     closeMenu();
-    await navigator.clipboard.writeText(`${siteURL}/user/${username}`);
+    await navigator.clipboard.writeText(`${NEXT_PUBLIC_URL}/user/${username}`);
     toast.success('Copied to clipboard');
   };
 
