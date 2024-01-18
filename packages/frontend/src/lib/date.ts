@@ -98,7 +98,7 @@ function getRelativeTime(date: Date): string {
 
   const [number, unit] = relativeTime.split(' ');
 
-  return `${number}${unit[0]}`;
+  return `${number}${unit ? unit[0] : ''}`;
 }
 
 function calculateRelativeTime(date: Date): string {

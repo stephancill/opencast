@@ -22,7 +22,7 @@ export async function getUsersPaginated(
 
   const nextPageCursor =
     reactions.length > 0
-      ? reactions[reactions.length - 1].timestamp.toISOString()
+      ? reactions[reactions.length - 1]!.timestamp.toISOString()
       : null;
 
   return {

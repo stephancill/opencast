@@ -90,6 +90,10 @@ export function parseChainURL(url: string): ParsedChainURL | null {
 
   const [_, scheme, , chainId, contractType, contractAddress] = matches;
 
+  if (!scheme || !chainId || !contractType || !contractAddress) {
+    throw new Error(`Invalid chain URL.`);
+  }
+
   return {
     scheme,
     chainId,

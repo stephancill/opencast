@@ -34,7 +34,7 @@ export function UsernameModal({
   changeUsername,
   cancelUpdateUsername
 }: UsernameModalProps): JSX.Element {
-  const { title, description, cancelLabel } = usernameModalData[+alreadySet];
+  const { title, description, cancelLabel } = usernameModalData[+alreadySet]!;
 
   return (
     <form

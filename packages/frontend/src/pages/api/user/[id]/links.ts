@@ -45,7 +45,7 @@ export default async function handle(
 
       const nextPageCursor =
         links.length > 0
-          ? links[links.length - 1].timestamp.toISOString()
+          ? links[links.length - 1]!.timestamp.toISOString()
           : null;
 
       res.json({

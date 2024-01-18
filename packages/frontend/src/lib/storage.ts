@@ -48,8 +48,8 @@ export function getKeyPair() {
   if (!keyPair) {
     const keyPairs = getKeyPairs();
     if (keyPairs.length > 0) {
-      setKeyPair(keyPairs[0]);
-      return keyPairs[0];
+      setKeyPair(keyPairs[0]!);
+      return keyPairs[0]!;
     }
   }
 

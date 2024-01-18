@@ -84,7 +84,7 @@ export function UserEditProfile({ hide }: UserEditProfileProps): JSX.Element {
       const { imagesPreviewData, selectedImagesData } = imagesData;
 
       const targetKey = type === 'cover' ? 'coverPhotoURL' : 'photoURL';
-      const newImage = imagesPreviewData[0].src;
+      const newImage = imagesPreviewData[0]!.src;
 
       setEditUserData({
         ...editUserData,

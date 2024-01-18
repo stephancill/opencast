@@ -91,7 +91,7 @@ export const populateTweetUsers = (
     mentions: resolvedMentions,
     parent: resolvedParent,
     retweet: resolvedRetweet,
-    user: resolvedUser
+    user: resolvedUser || null
   };
 };
 
@@ -150,7 +150,7 @@ export const tweetConverter = {
     const mentions = cast.mentions.map(
       (userId, index): Mention => ({
         userId: userId.toString(),
-        position: cast.mentions_positions[index]
+        position: cast.mentions_positions[index]!
       })
     );
 

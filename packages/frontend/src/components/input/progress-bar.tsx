@@ -32,7 +32,7 @@ export function ProgressBar({
   isCharLimitExceeded
 }: ProgressBarProps): JSX.Element {
   const isCloseToLimit = inputLength >= inputLimit - 20;
-  const baseCircle = baseOffset[+isCloseToLimit];
+  const baseCircle = baseOffset[+isCloseToLimit]!;
 
   const inputPercentage = (inputLength / inputLimit) * 100;
   const circleLength = baseCircle - (baseCircle * inputPercentage) / 100;
@@ -40,7 +40,7 @@ export function ProgressBar({
   const remainingCharacters = inputLimit - inputLength;
   const isHittingCharLimit = remainingCharacters <= 0;
 
-  const { container, viewBox, stroke, r } = circleStyles[+isCloseToLimit];
+  const { container, viewBox, stroke, r } = circleStyles[+isCloseToLimit]!;
 
   return (
     <button

@@ -51,14 +51,14 @@ async function processWarpcastEmbed(embed: ModEmbed): Promise<ModEmbed> {
 
   if (match && match.length === 3) {
     // Select cast
-    const hashLength = match[2].length;
+    const hashLength = match[2]!.length;
     const [cast] = (await prisma.$queryRaw`
         select c.*, ud.value from casts c 
         inner join UserData ud on c.fid = ud.fid 
         where 
           ud."type" = ${UserDataType.USERNAME} 
-          and SUBSTRING(encode(c.hash, 'hex'), 1, ${hashLength}::integer) = ${match[2].toLowerCase()} 
-          and ud.value = ${match[1].toLowerCase()}
+          and SUBSTRING(encode(c.hash, 'hex'), 1, ${hashLength}::integer) = ${match[2]!.toLowerCase()} 
+          and ud.value = ${match[1]!.toLowerCase()}
       `) as Cast[];
     if (cast) {
       const user = await resolveUserFromFid(cast.fid);
@@ -70,7 +70,7 @@ async function processWarpcastEmbed(embed: ModEmbed): Promise<ModEmbed> {
         metadata: {
           title: `${user?.name} (@${user?.username})`,
           publisher: `Farcaster`,
-          image: images.length > 0 ? { url: images[0].url } : undefined,
+          image: images.length > 0 ? { url: images[0]!.url } : undefined,
           // Hacky way to get full cast text
           description: embed.metadata?.description,
           logo: user?.photoURL

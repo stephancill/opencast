@@ -1,5 +1,5 @@
 {
-  "name": "opencast",
+  "name": "frontend",
   "version": "1.0.0",
   "private": true,
   "scripts": {
@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "format": "prettier --check .",
-    "lint": "next lint",
+    "lint": "next lint && tsc",
     "test": "jest --watch",
     "test:ci": "jest --ci",
     "postinstall": "patch-package"

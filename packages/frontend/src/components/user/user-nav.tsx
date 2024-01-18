@@ -35,7 +35,7 @@ export function UserNav({ follow, userId }: UserNavProps): JSX.Element {
       {...variants}
       exit={undefined}
     >
-      {userNav.map(({ name, path }) => (
+      {userNav!.map(({ name, path }) => (
         <SegmentedNavLink name={name} path={`${userPath}${path}`} key={name} />
       ))}
     </motion.nav>

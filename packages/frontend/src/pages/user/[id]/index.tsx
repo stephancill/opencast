@@ -56,7 +56,7 @@ export default function UserTweets() {
               return (
                 <Tweet
                   {...populateTweetUsers(tweet, users)}
-                  user={users[tweet.createdBy]}
+                  user={users[tweet.createdBy]!}
                   key={tweet.id}
                 />
               );

@@ -93,7 +93,7 @@ export default function NotificationsPage(): JSX.Element {
                               case MessageType.REACTION_ADD:
                                 const reaction = item as AccumulatedReaction;
                                 const cast = populateTweetUsers(
-                                  data.tweetsMap[reaction.castId],
+                                  data.tweetsMap[reaction.castId]!,
                                   data.usersMap
                                 );
                                 return (
@@ -119,7 +119,7 @@ export default function NotificationsPage(): JSX.Element {
                                               key={reaction.userId}
                                               {...data.usersMap[
                                                 reaction.userId
-                                              ]}
+                                              ]!}
                                             >
                                               {data.usersMap[
                                                 reaction.userId
@@ -128,17 +128,17 @@ export default function NotificationsPage(): JSX.Element {
                                                   src={
                                                     data.usersMap[
                                                       reaction.userId
-                                                    ].photoURL
+                                                    ]!.photoURL
                                                   }
                                                   alt={
                                                     data.usersMap[
                                                       reaction.userId
-                                                    ].name
+                                                    ]!.name
                                                   }
                                                   username={
                                                     data.usersMap[
                                                       reaction.userId
-                                                    ].username
+                                                    ]!.username
                                                   }
                                                   className='h-8 w-8'
                                                 />
@@ -153,12 +153,13 @@ export default function NotificationsPage(): JSX.Element {
                                               key={reaction.userId}
                                               {...data.usersMap[
                                                 reaction.userId
-                                              ]}
+                                              ]!}
                                             >
                                               <UserName
                                                 name={
-                                                  data.usersMap[reaction.userId]
-                                                    .name
+                                                  data.usersMap[
+                                                    reaction.userId
+                                                  ]!.name
                                                 }
                                                 verified={false}
                                               />
@@ -220,21 +221,24 @@ export default function NotificationsPage(): JSX.Element {
                                           .map((follow) => (
                                             <UserTooltip
                                               key={follow.userId}
-                                              {...data.usersMap[follow.userId]}
+                                              {...data.usersMap[follow.userId]!}
                                             >
                                               {data.usersMap[follow.userId] && (
                                                 <UserAvatar
                                                   src={
-                                                    data.usersMap[follow.userId]
-                                                      .photoURL
+                                                    data.usersMap[
+                                                      follow.userId
+                                                    ]!.photoURL
                                                   }
                                                   alt={
-                                                    data.usersMap[follow.userId]
-                                                      .name
+                                                    data.usersMap[
+                                                      follow.userId
+                                                    ]!.name
                                                   }
                                                   username={
-                                                    data.usersMap[follow.userId]
-                                                      .username
+                                                    data.usersMap[
+                                                      follow.userId
+                                                    ]!.username
                                                   }
                                                   className='h-8 w-8'
                                                 />
@@ -248,11 +252,11 @@ export default function NotificationsPage(): JSX.Element {
                                           {data.usersMap[item.userId] && (
                                             <UserTooltip
                                               key={item.userId}
-                                              {...data.usersMap[item.userId]}
+                                              {...data.usersMap[item.userId]!}
                                             >
                                               <UserName
                                                 name={
-                                                  data.usersMap[item.userId]
+                                                  data.usersMap[item.userId]!
                                                     .name
                                                 }
                                                 verified={false}
@@ -280,10 +284,10 @@ export default function NotificationsPage(): JSX.Element {
                                     <div key={index}>
                                       <TweetView
                                         {...populateTweetUsers(
-                                          data.tweetsMap[reply.castId],
+                                          data.tweetsMap[reply.castId]!,
                                           data.usersMap
                                         )}
-                                        user={data.usersMap[reply.userId]}
+                                        user={data.usersMap[reply.userId]!}
                                       />
                                     </div>
                                   );
@@ -294,10 +298,10 @@ export default function NotificationsPage(): JSX.Element {
                                     <div key={index}>
                                       <TweetView
                                         {...populateTweetUsers(
-                                          data.tweetsMap[mention.castId],
+                                          data.tweetsMap[mention.castId]!,
                                           data.usersMap
                                         )}
-                                        user={data.usersMap[mention.userId]}
+                                        user={data.usersMap[mention.userId]!}
                                       />
                                     </div>
                                   );

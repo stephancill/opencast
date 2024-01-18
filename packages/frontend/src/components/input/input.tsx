@@ -206,7 +206,7 @@ export function Input({
     getEmbeds,
     setEmbeds,
     setText,
-    setChannel,
+    // setChannel, // TODO: remove
     addEmbed,
     handleSubmit
   } = useEditor({
@@ -239,13 +239,14 @@ export function Input({
     setModPopoverEnabled(false);
   }, [currentMod]);
   useEffect(() => {
-    topic &&
-      setChannel({
-        parent_url: topic.url,
-        image: topic.image || null,
-        channel_id: topic.url,
-        name: topic.name
-      });
+    // TODO: This was creating an error. Not sure if its needed.
+    // topic &&
+    //   setChannel({
+    //     parent_url: topic.url,
+    //     image: topic.image || null,
+    //     channel_id: topic.url,
+    //     name: topic.name
+    //   });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [topic]);
 

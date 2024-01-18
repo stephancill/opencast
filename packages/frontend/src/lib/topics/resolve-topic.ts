@@ -129,7 +129,9 @@ async function _resolveTopic(url: string): Promise<TopicType | null> {
 
         return {
           name: `${truncatedAddress}`,
-          description: `NFT on ${chainById[chainId].name} at ${parsed.contractAddress}`,
+          description: `NFT on ${chainById[chainId]!.name} at ${
+            parsed.contractAddress
+          }`,
           image: chainIcon,
           url
         };
@@ -139,7 +141,7 @@ async function _resolveTopic(url: string): Promise<TopicType | null> {
     }
 
     if (uri.startsWith('data:application/json;base64,')) {
-      const jsonString = Buffer.from(uri.split(',')[1], 'base64').toString();
+      const jsonString = Buffer.from(uri.split(',')[1]!, 'base64').toString();
 
       let json: any;
       try {

@@ -64,7 +64,9 @@ export async function convertAndCalculateCursor(
 
   const nextPageCursor =
     calculateNextPageCursor?.(casts) ||
-    (casts.length > 0 ? casts[casts.length - 1].timestamp.toISOString() : null);
+    (casts.length > 0
+      ? casts[casts.length - 1]!.timestamp.toISOString()
+      : null);
 
   return {
     tweets,
@@ -144,13 +146,13 @@ export async function castsToTweets(
         return acc;
       }
       if (acc[key]) {
-        if (acc[key][cur.reaction_type]) {
-          acc[key][cur.reaction_type] = [
-            ...acc[key][cur.reaction_type],
+        if (acc[key]![cur.reaction_type]) {
+          acc[key]![cur.reaction_type] = [
+            ...acc[key]![cur.reaction_type]!,
             cur.fid.toString()
           ];
         } else {
-          acc[key][cur.reaction_type] = [cur.fid.toString()];
+          acc[key]![cur.reaction_type] = [cur.fid.toString()];
         }
       } else {
         acc[key] = {
@@ -168,10 +170,10 @@ export async function castsToTweets(
     return {
       ...tweetConverter.toTweet(cast),
       userLikes: reactionsMap[id]
-        ? reactionsMap[id][ReactionType.LIKE] || []
+        ? reactionsMap[id]![ReactionType.LIKE] || []
         : [],
       userRetweets: reactionsMap[id]
-        ? reactionsMap[id][ReactionType.RECAST] || []
+        ? reactionsMap[id]![ReactionType.RECAST] || []
         : [],
       userReplies: replyCountMap[id] || 0
     };

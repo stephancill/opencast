@@ -75,13 +75,13 @@ export function getImagesData(
   });
 
   const imagesPreviewData = rawImages.map((image, index) => ({
-    id: imagesId[index].id,
+    id: imagesId[index]!.id,
     src: URL.createObjectURL(image),
-    alt: imagesId[index].name ?? image.name
+    alt: imagesId[index]!.name ?? image.name
   }));
 
   const selectedImagesData = rawImages.map((image, index) =>
-    renameFile(image, imagesId[index].id, imagesId[index].name)
+    renameFile(image, imagesId[index]!.id, imagesId[index]!.name)
   );
 
   return { imagesPreviewData, selectedImagesData };

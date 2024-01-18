@@ -96,7 +96,7 @@ export function ImageModal({
           <motion.div
             className='mx-auto'
             {...backdrop}
-            exit={tweet ? (backdrop.exit as VariantLabels) : undefined}
+            exit={tweet ? (backdrop!.exit as VariantLabels) : undefined}
             transition={{ duration: 0.15 }}
           >
             <Loading iconClassName='w-20 h-20' />

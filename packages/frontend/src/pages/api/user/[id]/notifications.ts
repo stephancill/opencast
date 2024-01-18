@@ -122,7 +122,8 @@ export default async function handle(
         WHERE
             Cast.deleted_at IS NULL AND
             Cast.timestamp > ${afterTime} AND
-            ${fid} = ANY(casts.mentions);`) as MentionsQueryResult[];
+            ${fid} = ANY(casts.mentions);
+      `) as MentionsQueryResult[];
 
       const badgeCount =
         userNewFollowers.length +
@@ -220,10 +221,10 @@ export default async function handle(
               reactions: [],
               ...item
             };
-          acc[key].reactions.push(item);
-          if (item.timestamp > acc[key].timestamp) {
-            acc[key].timestamp = item.timestamp;
-            acc[key].userId = item.userId;
+          acc[key]!.reactions.push(item);
+          if (item.timestamp > acc[key]!.timestamp) {
+            acc[key]!.timestamp = item.timestamp;
+            acc[key]!.userId = item.userId;
           }
           return acc;
         },
@@ -236,7 +237,7 @@ export default async function handle(
         );
       });
       const accumulatedFollow: AccumulatedFollow = {
-        ...(sortedFollows[0] || {}),
+        ...(sortedFollows[0]! || {}),
         follows: sortedFollows
       };
 

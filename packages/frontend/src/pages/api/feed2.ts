@@ -100,8 +100,8 @@ export default async function handle(
       let { tweets, casts } = await castsToTweets(castHashes);
       tweets = tweets.map((tweet, index) => ({
         ...tweet,
-        retweet: castRecastInfo[index].recast
-          ? { userId: castRecastInfo[index].recast!.toString() }
+        retweet: castRecastInfo[index]!.recast
+          ? { userId: castRecastInfo[index]!.recast!.toString() }
           : null
       }));
 
@@ -139,7 +139,7 @@ export default async function handle(
 
       const nextPageCursor =
         casts.length > 0
-          ? casts[casts.length - 1].timestamp.toISOString()
+          ? casts[casts.length - 1]!.timestamp.toISOString()
           : null;
 
       res.json({

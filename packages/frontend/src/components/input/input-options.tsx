@@ -92,7 +92,7 @@ export function InputOptions({
               </PopoverTrigger>
               <PopoverContent className='w-[400px] p-0' align='start'>
                 <div className='mb-2 text-lg font-bold'>{name}</div>
-                {popoverContent?.(open[index], (val) =>
+                {popoverContent?.(open[index]!, (val) =>
                   setOpen((prev) => {
                     const newOpen = [...prev];
                     newOpen[index] = val;

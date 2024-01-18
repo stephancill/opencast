@@ -114,7 +114,7 @@ export function AuthContextProvider({
     const keyPairs = getKeyPairs();
 
     if (!keyPair && keyPairs.length > 0) {
-      keyPair = keyPairs[0];
+      keyPair = keyPairs[0]!;
     }
 
     if (keyPair) {
@@ -159,7 +159,7 @@ export function AuthContextProvider({
   }, [user]);
 
   useEffect(() => {
-    handleUserAuth();
+    // handleUserAuth();
     setLastCheckedNotifications(
       new Date(localStorage.getItem('lastChecked') || new Date().toISOString())
     );

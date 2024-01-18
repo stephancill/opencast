@@ -13,7 +13,7 @@ export function LoadMoreSentinel({
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting && !isLoading) {
+        if (entry?.isIntersecting && !isLoading) {
           loadMore();
         }
       },

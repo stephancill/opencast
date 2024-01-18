@@ -40,7 +40,7 @@ export function ImagePreview({
   const { open, openModal, closeModal } = useModal();
 
   useEffect(() => {
-    const imageData = imagesPreview[selectedIndex];
+    const imageData = imagesPreview[selectedIndex]!;
     setSelectedImage(imageData);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedIndex]);
@@ -97,7 +97,7 @@ export function ImagePreview({
           className={cn(
             'accent-tab relative transition-shadow',
             isTweet
-              ? postImageBorderRadius[previewCount][index]
+              ? postImageBorderRadius[previewCount]![index]
               : 'rounded-2xl',
             {
               'col-span-2 row-span-2': previewCount === 1,

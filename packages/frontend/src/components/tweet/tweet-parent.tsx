@@ -48,7 +48,7 @@ export function TweetParent({
     <Tweet
       parentTweet
       {...populateTweetUsers(data, data.users)}
-      user={data.users[data.createdBy]}
+      user={data.users[data.createdBy]!}
     />
   );
 }

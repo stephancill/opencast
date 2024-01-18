@@ -98,7 +98,7 @@ export default function TweetId(): JSX.Element {
             <ViewTweet
               viewTweetRef={viewTweetRef}
               {...tweetWithPopulatedUsers}
-              user={tweetData.users[tweetData.createdBy]}
+              user={tweetData.users[tweetData.createdBy]!}
             />
             {tweetData &&
               (repliesLoading ? (
@@ -118,7 +118,7 @@ export default function TweetId(): JSX.Element {
                       return (
                         <Tweet
                           {...populateTweetUsers(tweet, users)}
-                          user={users[tweet.createdBy]}
+                          user={users[tweet.createdBy]!}
                           key={tweet.id}
                         />
                       );

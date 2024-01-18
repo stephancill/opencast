@@ -64,7 +64,7 @@ export function ViewParentTweet({
         parentTweet
         {...data}
         mentions={mentions || []}
-        user={data.users[data.createdBy]}
+        user={data.users[data.createdBy]!}
       />
     </>
   ) : (
