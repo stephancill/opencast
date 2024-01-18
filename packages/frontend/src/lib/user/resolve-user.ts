@@ -5,7 +5,7 @@ import { TopicType } from '../types/topic';
 import { resolveTopic } from '../topics/resolve-topic';
 
 export async function resolveUserFromFid(fid: bigint): Promise<User | null> {
-  const userData = await prisma.userData.findMany({
+  const userData = await prisma.user.findMany({
     where: {
       fid: fid
     }
@@ -31,7 +31,7 @@ export async function resolveUserFromFid(fid: bigint): Promise<User | null> {
 export async function resolveUserFullFromFid(
   fid: bigint
 ): Promise<UserFull | null> {
-  const userData = await prisma.userData.findMany({
+  const userData = await prisma.user.findMany({
     where: {
       fid: fid
     }
@@ -107,7 +107,7 @@ export async function resolveUserAmbiguous(
   let fid = Number(idOrUsername);
   if (isNaN(fid)) {
     const username = (idOrUsername as string).toLowerCase();
-    const usernameData = await prisma.userData.findFirst({
+    const usernameData = await prisma.user.findFirst({
       where: {
         type: UserDataType.USERNAME,
         value: username

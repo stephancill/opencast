@@ -99,7 +99,7 @@ CREATE TABLE "Signer" (
 );
 
 -- CreateTable
-CREATE TABLE "UserData" (
+CREATE TABLE "User" (
     "id" BIGSERIAL NOT NULL,
     "created_at" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -110,7 +110,7 @@ CREATE TABLE "UserData" (
     "type" SMALLINT NOT NULL,
     "value" TEXT NOT NULL,
 
-    CONSTRAINT "UserData_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -158,13 +158,13 @@ CREATE INDEX "reaction_fid_timestamp_index" ON "Reaction"("fid", "timestamp");
 CREATE INDEX "Signer_fid_timestamp_idx" ON "Signer"("fid", "timestamp");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "UserData_hash_key" ON "UserData"("hash");
+CREATE UNIQUE INDEX "User_hash_key" ON "User"("hash");
 
 -- CreateIndex
-CREATE INDEX "UserData_fid_idx" ON "UserData"("fid");
+CREATE INDEX "User_fid_idx" ON "User"("fid");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "UserData_fid_type_key" ON "UserData"("fid", "type");
+CREATE UNIQUE INDEX "User_fid_type_key" ON "User"("fid", "type");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Verification_hash_key" ON "Verification"("hash");
@@ -179,7 +179,7 @@ ALTER TABLE "Cast" ADD CONSTRAINT "cast_hash_foreign" FOREIGN KEY ("hash") REFER
 ALTER TABLE "Reaction" ADD CONSTRAINT "reaction_hash_foreign" FOREIGN KEY ("hash") REFERENCES "Message"("hash") ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 -- AddForeignKey
-ALTER TABLE "UserData" ADD CONSTRAINT "user_data_hash_foreign" FOREIGN KEY ("hash") REFERENCES "Message"("hash") ON DELETE NO ACTION ON UPDATE NO ACTION;
+ALTER TABLE "User" ADD CONSTRAINT "user_hash_foreign" FOREIGN KEY ("hash") REFERENCES "Message"("hash") ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 -- AddForeignKey
 ALTER TABLE "Verification" ADD CONSTRAINT "verification_hash_foreign" FOREIGN KEY ("hash") REFERENCES "Message"("hash") ON DELETE NO ACTION ON UPDATE NO ACTION;

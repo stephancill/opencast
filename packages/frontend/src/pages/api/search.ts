@@ -19,7 +19,7 @@ export default async function handle(
       }
 
       // Get users that match query
-      const userData = await prisma.userData.findMany({
+      const userData = await prisma.user.findMany({
         where: {
           type: {
             in: [UserDataType.USERNAME, UserDataType.DISPLAY]
