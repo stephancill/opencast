@@ -13,8 +13,12 @@ import { tweetConverter } from '../../lib/types/tweet';
 
 export default async function handle(
   req: NextApiRequest,
-  res: NextApiResponse<PaginatedTweetsResponse | TweetsResponse>
+  res: NextApiResponse<PaginatedTweetsResponse | TweetsResponse | string>
 ) {
+  if (req.method === 'OPTIONS') {
+    return res.status(200).send('Ok');
+  }
+
   const { method } = req;
   switch (method) {
     case 'GET':
