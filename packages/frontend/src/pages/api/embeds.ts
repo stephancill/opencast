@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { populateEmbed } from '../../lib/embeds';
-import { ExternalEmbed } from '../../lib/types/tweet';
+import { populateEmbed } from '@lib/embeds';
+import { ExternalEmbed } from '@lib/types/tweet';
 
 export default async function handle(
   req: NextApiRequest,

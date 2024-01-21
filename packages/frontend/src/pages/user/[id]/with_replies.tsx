@@ -10,8 +10,8 @@ import { useUser } from '@lib/context/user-context';
 import { useEffect, useState, type ReactElement, type ReactNode } from 'react';
 import { Tweet } from '../../../components/tweet/tweet';
 import { TweetParent } from '../../../components/tweet/tweet-parent';
-import { useInfiniteScroll } from '../../../lib/hooks/useInfiniteScroll';
-import { populateTweetUsers } from '../../../lib/types/tweet';
+import { useInfiniteScroll } from '@lib/hooks/useInfiniteScroll';
+import { populateTweetUsers } from '@lib/types/tweet';
 
 export default function UserWithReplies(): JSX.Element {
   const { user } = useUser();

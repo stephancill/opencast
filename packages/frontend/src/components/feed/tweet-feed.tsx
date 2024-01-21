@@ -1,13 +1,10 @@
 import useSWR from 'swr';
 import useSWRInfinite from 'swr/infinite';
-import { useAuth } from '../../lib/context/auth-context';
-import {
-  PaginatedTweetsResponse,
-  TweetsResponse
-} from '../../lib/paginated-tweets';
-import { FeedOrderingType } from '../../lib/types/feed';
-import { populateTweetUsers } from '../../lib/types/tweet';
-import { isPlural } from '../../lib/utils';
+import { useAuth } from '@lib/context/auth-context';
+import { PaginatedTweetsResponse, TweetsResponse } from '@lib/paginated-tweets';
+import { FeedOrderingType } from '@lib/types/feed';
+import { populateTweetUsers } from '@lib/types/tweet';
+import { isPlural } from '@lib/utils';
 import { LoadMoreSentinel } from '../common/load-more';
 import { Tweet } from '../tweet/tweet';
 import { Error } from '../ui/error';

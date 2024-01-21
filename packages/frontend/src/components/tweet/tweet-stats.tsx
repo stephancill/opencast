@@ -4,14 +4,11 @@ import cn from 'clsx';
 import { useEffect, useMemo, useState } from 'react';
 import { ViewTweetStats } from '@components/view/view-tweet-stats';
 import type { Tweet } from '@lib/types/tweet';
-import {
-  createReactionMessage,
-  submitHubMessage
-} from '../../lib/farcaster/utils';
+import { createReactionMessage, submitHubMessage } from '@lib/farcaster/utils';
 import { TweetOption } from './tweet-option';
 import { TweetShare } from './tweet-share';
 import { ReactionType } from '@farcaster/hub-web';
-import { useAuth } from '../../lib/context/auth-context';
+import { useAuth } from '@lib/context/auth-context';
 
 type TweetStatsProps = Pick<
   Tweet,

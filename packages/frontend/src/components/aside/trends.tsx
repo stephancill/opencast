@@ -6,8 +6,8 @@ import type { MotionProps } from 'framer-motion';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import useSWR from 'swr';
-import { fetchJSON } from '../../lib/fetch';
-import { TrendsResponse } from '../../lib/types/trends';
+import { fetchJSON } from '@lib/fetch';
+import { TrendsResponse } from '@lib/types/trends';
 import { NextImage } from '../ui/next-image';
 
 const variants: MotionProps = {

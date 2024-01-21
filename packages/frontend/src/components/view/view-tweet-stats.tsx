@@ -7,8 +7,8 @@ import { useModal } from '@lib/hooks/useModal';
 import type { Tweet } from '@lib/types/tweet';
 import cn from 'clsx';
 import { useState } from 'react';
-import { useInfiniteScrollUsers } from '../../lib/hooks/useInfiniteScrollUsers';
-import { User } from '../../lib/types/user';
+import { useInfiniteScrollUsers } from '@lib/hooks/useInfiniteScrollUsers';
+import { User } from '@lib/types/user';
 
 type viewTweetStats = Pick<Tweet, 'userRetweets' | 'userLikes'> & {
   likeMove: number;

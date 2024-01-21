@@ -1,12 +1,9 @@
 import { MessageType } from '@farcaster/hub-web';
 import { NextApiRequest, NextApiResponse } from 'next';
-import {
-  castsToTweets,
-  PaginatedTweetsResponse
-} from '../../lib/paginated-tweets';
-import { prisma } from '../../lib/prisma';
-import { resolveTopicsMap } from '../../lib/topics/resolve-topic';
-import { resolveUsersMap } from '../../lib/user/resolve-user';
+import { castsToTweets, PaginatedTweetsResponse } from '@lib/paginated-tweets';
+import { prisma } from '@lib/prisma';
+import { resolveTopicsMap } from '@lib/topics/resolve-topic';
+import { resolveUsersMap } from '@lib/user/resolve-user';
 
 export default async function handle(
   req: NextApiRequest,

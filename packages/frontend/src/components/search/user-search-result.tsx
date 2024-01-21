@@ -1,4 +1,4 @@
-import { User } from '../../lib/types/user';
+import { User } from '@lib/types/user';
 import { NextImage } from '../ui/next-image';
 
 export function UserSearchResult({

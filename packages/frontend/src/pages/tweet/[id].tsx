@@ -19,9 +19,9 @@ import {
 } from 'react';
 import useSWR from 'swr';
 import { Tweet } from '../../components/tweet/tweet';
-import { fetchJSON } from '../../lib/fetch';
-import { useInfiniteScroll } from '../../lib/hooks/useInfiniteScroll';
-import { TweetResponse, populateTweetUsers } from '../../lib/types/tweet';
+import { fetchJSON } from '@lib/fetch';
+import { useInfiniteScroll } from '@lib/hooks/useInfiniteScroll';
+import { TweetResponse, populateTweetUsers } from '@lib/types/tweet';
 
 export default function TweetId(): JSX.Element {
   const {

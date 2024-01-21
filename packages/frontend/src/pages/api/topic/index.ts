@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { resolveTopic } from '../../../lib/topics/resolve-topic';
-import { TopicResponse } from '../../../lib/types/topic';
+import { resolveTopic } from '@lib/topics/resolve-topic';
+import { TopicResponse } from '@lib/types/topic';
 
 export default async function topicIdEndpoint(
   req: NextApiRequest,

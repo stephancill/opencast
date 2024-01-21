@@ -3,8 +3,8 @@ import { getRandomId } from '@lib/random';
 import { Tweet } from './tweet';
 import type { LoadedParents } from './tweet-with-parent';
 import useSWR from 'swr';
-import { fetchJSON } from '../../lib/fetch';
-import { TweetResponse, populateTweetUsers } from '../../lib/types/tweet';
+import { fetchJSON } from '@lib/fetch';
+import { TweetResponse, populateTweetUsers } from '@lib/types/tweet';
 
 type TweetParentProps = {
   parentId: string;

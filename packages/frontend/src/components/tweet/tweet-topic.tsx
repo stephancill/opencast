@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import useSWR from 'swr';
-import { fetchJSON } from '../../lib/fetch';
-import { TopicResponse, TopicType } from '../../lib/types/topic';
+import { fetchJSON } from '@lib/fetch';
+import { TopicResponse, TopicType } from '@lib/types/topic';
 import { NextImage } from '../ui/next-image';
 
 export function TweetTopicLazy({ topicUrl }: { topicUrl: string }) {

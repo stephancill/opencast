@@ -1,8 +1,8 @@
 import Link from 'next/link';
 import { useMemo } from 'react';
-import { ImagesPreview } from '../../lib/types/file';
-import { Mention } from '../../lib/types/tweet';
-import { replaceOccurrencesMultiple } from '../../lib/utils';
+import { ImagesPreview } from '@lib/types/file';
+import { Mention } from '@lib/types/tweet';
+import { replaceOccurrencesMultiple } from '@lib/utils';
 import { UserTooltip } from '../user/user-tooltip';
 import isURL from 'validator/lib/isURL';
 

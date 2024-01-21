@@ -7,8 +7,8 @@ import { Tweet } from '@components/tweet/tweet';
 import { Loading } from '@components/ui/loading';
 import { useUser } from '@lib/context/user-context';
 import { useEffect, useState, type ReactElement, type ReactNode } from 'react';
-import { useInfiniteScroll } from '../../../lib/hooks/useInfiniteScroll';
-import { populateTweetUsers } from '../../../lib/types/tweet';
+import { useInfiniteScroll } from '@lib/hooks/useInfiniteScroll';
+import { populateTweetUsers } from '@lib/types/tweet';
 
 export default function UserTweets() {
   const { user } = useUser();

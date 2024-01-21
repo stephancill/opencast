@@ -6,7 +6,7 @@ import { MainLayout } from '@components/layout/main-layout';
 import { useRouter } from 'next/router';
 import { type ReactElement, type ReactNode } from 'react';
 import { MenuLinkProps, MenuRow } from '../../components/ui/menu-row';
-import { useAuth } from '../../lib/context/auth-context';
+import { useAuth } from '@lib/context/auth-context';
 
 const menuLinks: MenuLinkProps[] = [
   {

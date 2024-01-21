@@ -1,5 +1,5 @@
-import { useAuth } from '../../lib/context/auth-context';
-import { FeedOrderingType } from '../../lib/types/feed';
+import { useAuth } from '@lib/context/auth-context';
+import { FeedOrderingType } from '@lib/types/feed';
 import { SegmentedNavLink } from './segmented-nav-link';
 
 interface FeedOrderingSelectorProps {

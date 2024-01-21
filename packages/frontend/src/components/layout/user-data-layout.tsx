@@ -5,8 +5,8 @@ import { UserHeader } from '@components/user/user-header';
 import { UserContextProvider } from '@lib/context/user-context';
 import { useRouter } from 'next/router';
 import useSWR from 'swr';
-import { fetchJSON } from '../../lib/fetch';
-import { UserFull, UserFullResponse } from '../../lib/types/user';
+import { fetchJSON } from '@lib/fetch';
+import { UserFull, UserFullResponse } from '@lib/types/user';
 import type { LayoutProps } from './common-layout';
 
 export function UserDataLayout({ children }: LayoutProps): JSX.Element {

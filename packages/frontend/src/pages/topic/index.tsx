@@ -10,10 +10,10 @@ import { useState, type ReactElement, type ReactNode } from 'react';
 import useSWR from 'swr';
 import { TweetFeed } from '../../components/feed/tweet-feed';
 import { FeedOrderingSelector } from '../../components/ui/feed-ordering-selector';
-import { fetchJSON } from '../../lib/fetch';
-import { FeedOrderingType } from '../../lib/types/feed';
-import { TopicResponse } from '../../lib/types/topic';
-import { useAuth } from '../../lib/context/auth-context';
+import { fetchJSON } from '@lib/fetch';
+import { FeedOrderingType } from '@lib/types/feed';
+import { TopicResponse } from '@lib/types/topic';
+import { useAuth } from '@lib/context/auth-context';
 
 export default function TopicPage(): JSX.Element {
   const { user } = useAuth();

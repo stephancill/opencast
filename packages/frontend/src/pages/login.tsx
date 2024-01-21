@@ -8,7 +8,7 @@ import { Button } from '@components/ui/button';
 import React from 'react';
 
 export default function Login(): JSX.Element {
-  const { ready, authenticated, login, connectWallet } = usePrivy();
+  const { ready, authenticated, login } = usePrivy();
 
   return (
     <div className='grid min-h-screen grid-rows-[1fr,auto]'>

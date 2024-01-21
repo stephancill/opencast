@@ -6,10 +6,7 @@ import { useModal } from '@lib/hooks/useModal';
 import { preventBubbling } from '@lib/utils';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
-import {
-  createFollowMessage,
-  submitHubMessage
-} from '../../lib/farcaster/utils';
+import { createFollowMessage, submitHubMessage } from '@lib/farcaster/utils';
 
 type FollowButtonProps = {
   userTargetId: string;

@@ -13,7 +13,7 @@ import { isFarcasterUrlEmbed } from '@mod-protocol/farcaster';
 import cn from 'clsx';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { hasAncestorWithClass } from '../../lib/utils';
+import { hasAncestorWithClass } from '@lib/utils';
 import { TweetActions } from './tweet-actions';
 import { TweetDate } from './tweet-date';
 import { TweetEmbed } from './tweet-embed';

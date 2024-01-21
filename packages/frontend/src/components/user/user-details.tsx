@@ -4,7 +4,7 @@ import { ToolTip } from '@components/ui/tooltip';
 import { formatDate } from '@lib/date';
 import type { UserFull } from '@lib/types/user';
 import Link from 'next/link';
-import { useAuth } from '../../lib/context/auth-context';
+import { useAuth } from '@lib/context/auth-context';
 import { TweetText } from '../tweet/tweet-text';
 import { TopicView } from '../tweet/tweet-topic';
 import { UserFid } from './user-fid';

@@ -1,6 +1,6 @@
 import { getRandomId } from '@lib/random';
 import type { Bookmark } from '@lib/types/bookmark';
-import type { UserFull, UserFullResponse } from '@lib/types/user';
+import type { UserFull } from '@lib/types/user';
 import type { ReactNode } from 'react';
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
@@ -44,7 +44,10 @@ export function AuthContextProvider({
   const [userBookmarks] = useState<Bookmark[] | null>(null);
   const [error, setError] = useState<Error | null>(null);
   const [loading, _setLoading] = useState(true);
-  const { logout: privyLogOut, authenticated } = usePrivy();
+  const {
+    logout: privyLogOut
+    // authenticated
+  } = usePrivy();
 
   const modal = useModal();
 
@@ -101,15 +104,15 @@ export function AuthContextProvider({
       );
   }, [lastCheckedNotifications]);
 
-  useEffect(() => {
-    if (authenticated) {
-      // TODO: fetch user
+  // useEffect(() => {
+  //   if (authenticated) {
+  //     // TODO: fetch user
 
-      const { result: user } = await fetchJSON<UserFullResponse>(
-        `/api/signer/${keyPair.publicKey}/user`
-      );
-    }
-  }, [authenticated]);
+  //     const { result: user } = await fetchJSON<UserFullResponse>(
+  //       `/api/signer/${keyPair.publicKey}/user`
+  //     );
+  //   }
+  // }, [authenticated]);
 
   const value: AuthContext = {
     user,

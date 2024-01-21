@@ -2,7 +2,7 @@ import { SEO } from '@components/common/seo';
 import { UserCards } from '@components/user/user-cards';
 import { useUser } from '@lib/context/user-context';
 import type { User } from '@lib/types/user';
-import { useInfiniteScrollUsers } from '../../lib/hooks/useInfiniteScrollUsers';
+import { useInfiniteScrollUsers } from '@lib/hooks/useInfiniteScrollUsers';
 
 type UserFollowProps = {
   type: 'following' | 'followers';

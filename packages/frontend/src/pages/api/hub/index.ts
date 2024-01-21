@@ -1,7 +1,7 @@
 import { Message } from '@farcaster/hub-nodejs';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { hubClient } from '../../../lib/farcaster';
-import { BaseResponse } from '../../../lib/types/responses';
+import { hubClient } from '@lib/farcaster';
+import { BaseResponse } from '@lib/types/responses';
 
 export default async function handle(
   req: NextApiRequest,

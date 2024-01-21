@@ -20,21 +20,18 @@ import { Loading } from '../../../components/ui/loading';
 import { MenuRow } from '../../../components/ui/menu-row';
 import { SegmentedNavLink } from '../../../components/ui/segmented-nav-link';
 import { KEY_REGISTRY } from '../../../contracts';
-import { useAuth } from '../../../lib/context/auth-context';
-import { formatDate, formatNumber } from '../../../lib/date';
-import {
-  batchSubmitHubMessages,
-  makeMessage
-} from '../../../lib/farcaster/utils';
-import { fetchJSON } from '../../../lib/fetch';
-import useConnectedWalletFid from '../../../lib/hooks/useConnectedWalletFid';
+import { useAuth } from '@lib/context/auth-context';
+import { formatDate, formatNumber } from '@lib/date';
+import { batchSubmitHubMessages, makeMessage } from '@lib/farcaster/utils';
+import { fetchJSON } from '@lib/fetch';
+import useConnectedWalletFid from '@lib/hooks/useConnectedWalletFid';
 import {
   MessagesArchive,
   MessagesArchiveResponse,
   SignerDetail,
   SignerResponse
-} from '../../../lib/types/signer';
-import { truncateAddress } from '../../../lib/utils';
+} from '@lib/types/signer';
+import { truncateAddress } from '@lib/utils';
 import { CautionWarn } from '../../../components/ui/caution-warn';
 
 function getSignerDescription(signer: SignerDetail) {

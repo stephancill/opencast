@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import useSWR from 'swr';
 import isURL from 'validator/lib/isURL';
-import { fetchJSON } from '../../lib/fetch';
-import { TopicType } from '../../lib/types/topic';
-import { TrendsResponse } from '../../lib/types/trends';
+import { fetchJSON } from '@lib/fetch';
+import { TopicType } from '@lib/types/topic';
+import { TrendsResponse } from '@lib/types/trends';
 import { SearchBar } from '../input/search-bar';
 import { TopicView } from '../tweet/tweet-topic';
 import { Loading } from '../ui/loading';

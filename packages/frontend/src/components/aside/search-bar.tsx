@@ -5,8 +5,8 @@ import { debounce } from 'lodash';
 import type { ChangeEvent, FormEvent, KeyboardEvent } from 'react';
 import { useCallback, useRef, useState } from 'react';
 import useSWR from 'swr';
-import { fetchJSON } from '../../lib/fetch';
-import { BaseResponse } from '../../lib/types/responses';
+import { fetchJSON } from '@lib/fetch';
+import { BaseResponse } from '@lib/types/responses';
 import { Loading } from '../ui/loading';
 
 type SearchBarProps<T> = {

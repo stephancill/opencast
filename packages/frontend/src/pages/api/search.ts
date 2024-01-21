@@ -1,9 +1,9 @@
 import { UserDataType } from '@farcaster/hub-web';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { prisma } from '../../lib/prisma';
-import { BaseResponse } from '../../lib/types/responses';
-import { User } from '../../lib/types/user';
-import { resolveUserFromFid } from '../../lib/user/resolve-user';
+import { prisma } from '@lib/prisma';
+import { BaseResponse } from '@lib/types/responses';
+import { User } from '@lib/types/user';
+import { resolveUserFromFid } from '@lib/user/resolve-user';
 export default async function handle(
   req: NextApiRequest,
   res: NextApiResponse<BaseResponse<User[]>>

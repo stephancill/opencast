@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { BaseResponse } from '../../../lib/types/responses';
-import { prisma } from '../../../lib/prisma';
+import { BaseResponse } from '@lib/types/responses';
+import { prisma } from '@lib/prisma';
 import { UserDataType } from '@farcaster/hub-nodejs';
 
 export default async function handle(

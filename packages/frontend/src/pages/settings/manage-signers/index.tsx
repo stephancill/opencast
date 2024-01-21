@@ -9,11 +9,11 @@ import useSWR from 'swr';
 import { Error } from '../../../components/ui/error';
 import { Loading } from '../../../components/ui/loading';
 import { MenuRow } from '../../../components/ui/menu-row';
-import { useAuth } from '../../../lib/context/auth-context';
-import { formatDate, formatNumber } from '../../../lib/date';
-import { fetchJSON } from '../../../lib/fetch';
-import { SignersResponse } from '../../../lib/types/signer';
-import { truncateAddress } from '../../../lib/utils';
+import { useAuth } from '@lib/context/auth-context';
+import { formatDate, formatNumber } from '@lib/date';
+import { fetchJSON } from '@lib/fetch';
+import { SignersResponse } from '@lib/types/signer';
+import { truncateAddress } from '@lib/utils';
 import { CautionWarn } from '../../../components/ui/caution-warn';
 
 export default function ManageSigners(): JSX.Element {

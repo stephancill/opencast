@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { resolveTopic } from '../../../lib/topics/resolve-topic';
-import { prisma } from '../../../lib/prisma';
-import { TrendsResponse } from '../../../lib/types/trends';
+import { resolveTopic } from '@lib/topics/resolve-topic';
+import { prisma } from '@lib/prisma';
+import { TrendsResponse } from '@lib/types/trends';
 
 export default async function handle(
   req: NextApiRequest,

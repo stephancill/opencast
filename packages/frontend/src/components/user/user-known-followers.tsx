@@ -1,7 +1,7 @@
 import useSWR from 'swr';
-import { useAuth } from '../../lib/context/auth-context';
-import { fetchJSON } from '../../lib/fetch';
-import { KnownFollowersResponse, User } from '../../lib/types/user';
+import { useAuth } from '@lib/context/auth-context';
+import { fetchJSON } from '@lib/fetch';
+import { KnownFollowersResponse, User } from '@lib/types/user';
 import { UserAvatar } from './user-avatar';
 
 export function UserKnownFollowersLazy({

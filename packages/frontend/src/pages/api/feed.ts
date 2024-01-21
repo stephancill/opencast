@@ -6,10 +6,10 @@ import {
   PaginatedTweetsType,
   TweetsResponse,
   getTweetsPaginatedRawSql
-} from '../../lib/paginated-tweets';
-import { prisma } from '../../lib/prisma';
-import { FeedOrderingType } from '../../lib/types/feed';
-import { tweetConverter } from '../../lib/types/tweet';
+} from '@lib/paginated-tweets';
+import { prisma } from '@lib/prisma';
+import { FeedOrderingType } from '@lib/types/feed';
+import { tweetConverter } from '@lib/types/tweet';
 
 export default async function handle(
   req: NextApiRequest,

@@ -21,10 +21,10 @@ import {
   createCastMessage,
   createRemoveCastMessage,
   submitHubMessage
-} from '../../lib/farcaster/utils';
-import { fetchJSON } from '../../lib/fetch';
-import { BaseResponse } from '../../lib/types/responses';
-import { TopicResponse, TopicType } from '../../lib/types/topic';
+} from '@lib/farcaster/utils';
+import { fetchJSON } from '@lib/fetch';
+import { BaseResponse } from '@lib/types/responses';
+import { TopicResponse, TopicType } from '@lib/types/topic';
 import { SearchTopics } from '../search/search-topics';
 import { Loading } from '../ui/loading';
 import { TopicView } from './tweet-topic';

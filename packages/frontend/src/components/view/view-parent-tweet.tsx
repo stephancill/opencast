@@ -1,8 +1,8 @@
 import { Tweet } from '@components/tweet/tweet';
 import { RefObject, useEffect, useMemo } from 'react';
 import useSWR from 'swr';
-import { fetchJSON } from '../../lib/fetch';
-import { TweetResponse } from '../../lib/types/tweet';
+import { fetchJSON } from '@lib/fetch';
+import { TweetResponse } from '@lib/types/tweet';
 
 type ViewParentTweetProps = {
   parentId: string;

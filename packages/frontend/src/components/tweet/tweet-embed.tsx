@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { ExternalEmbed } from '../../lib/types/tweet';
+import { ExternalEmbed } from '@lib/types/tweet';
 import { NextImage } from '../ui/next-image';
 
 const hoverModifier =

@@ -1,7 +1,7 @@
 import { useWindow } from '@lib/context/window-context';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
-import { User } from '../../lib/types/user';
+import { User } from '@lib/types/user';
 import { UserSearchResult } from '../search/user-search-result';
 import { AsideFooter } from './aside-footer';
 import { SearchBar } from './search-bar';
