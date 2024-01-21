@@ -1,21 +1,17 @@
-import '@rainbow-me/rainbowkit/styles.css';
 import '@styles/globals.scss';
 
+import { PrivyProvider, User } from '@privy-io/react-auth';
 import { AppHead } from '@components/common/app-head';
 import { AuthContextProvider } from '@lib/context/auth-context';
 import { ThemeContextProvider } from '@lib/context/theme-context';
-import { RainbowKitProvider, getDefaultWallets } from '@rainbow-me/rainbowkit';
 import type { NextPage } from 'next';
 import type { AppProps } from 'next/app';
 import type { ReactElement, ReactNode } from 'react';
 import { QueryClient, QueryClientProvider } from 'react-query';
-import { WagmiConfig, configureChains, createConfig } from 'wagmi';
-import { arbitrum, base, mainnet, optimism, polygon, zora } from 'wagmi/chains';
+import { configureChains } from 'wagmi';
+import { mainnet, optimism, sepolia } from 'wagmi/chains';
 import { publicProvider } from 'wagmi/providers/public';
-import {
-  NEXT_PUBLIC_FC_CLIENT_NAME,
-  NEXT_PUBLIC_WALLETCONNECT_ID
-} from '@lib/env';
+import { PrivyWagmiConnector } from '@privy-io/wagmi-connector';
 
 const queryClient = new QueryClient();
 
@@ -27,22 +23,11 @@ type AppPropsWithLayout = AppProps & {
   Component: NextPageWithLayout;
 };
 
-const { chains, publicClient } = configureChains(
-  [mainnet, polygon, optimism, arbitrum, base, zora],
+const wagmiChainsConfig = configureChains(
+  [mainnet, optimism, sepolia],
+  // TODO: replace with Alchemy?
   [publicProvider()]
 );
-
-const { connectors } = getDefaultWallets({
-  appName: NEXT_PUBLIC_FC_CLIENT_NAME!,
-  projectId: NEXT_PUBLIC_WALLETCONNECT_ID!, // TODO: Make this optional
-  chains
-});
-
-const wagmiConfig = createConfig({
-  autoConnect: true,
-  connectors,
-  publicClient
-});
 
 export default function App({
   Component,
@@ -50,12 +35,22 @@ export default function App({
 }: AppPropsWithLayout): ReactNode {
   const getLayout = Component.getLayout ?? ((page): ReactNode => page);
 
+  if (!process.env.NEXT_PUBLIC_PRIVY_APP_ID) {
+    throw new Error('Missing NEXT_PUBLIC_PRIVY_APP_ID env variable');
+  }
+
+  const handleLogin = (user: User) => {
+    console.log(`User ${user.id} logged in!`);
+  };
+
   return (
     <>
       <AppHead />
-      <WagmiConfig config={wagmiConfig}>
-        {/* TODO: Theme */}
-        <RainbowKitProvider chains={chains}>
+      <PrivyProvider
+        appId={process.env.NEXT_PUBLIC_PRIVY_APP_ID}
+        onSuccess={handleLogin}
+      >
+        <PrivyWagmiConnector wagmiChainsConfig={wagmiChainsConfig}>
           <QueryClientProvider client={queryClient}>
             <AuthContextProvider>
               <ThemeContextProvider>
@@ -63,8 +58,8 @@ export default function App({
               </ThemeContextProvider>
             </AuthContextProvider>
           </QueryClientProvider>
-        </RainbowKitProvider>
-      </WagmiConfig>
+        </PrivyWagmiConnector>
+      </PrivyProvider>
     </>
   );
 }

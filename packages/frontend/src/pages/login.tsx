@@ -18,5 +18,5 @@ export default function Login(): JSX.Element {
 }
 
 Login.getLayout = (page: ReactElement): ReactNode => (
-  <AuthLayout forceLogin={true}>{page}</AuthLayout>
+  <AuthLayout>{page}</AuthLayout>
 );

@@ -4,11 +4,9 @@ import { Button } from '@components/ui/button';
 import { HeroIcon } from '@components/ui/hero-icon';
 import { Menu } from '@headlessui/react';
 import { useModal } from '@lib/hooks/useModal';
-import { ConnectButton, useConnectModal } from '@rainbow-me/rainbowkit';
 import cn from 'clsx';
 import type { Variants } from 'framer-motion';
 import { AnimatePresence, motion } from 'framer-motion';
-import { useAccount } from 'wagmi';
 
 export const variants: Variants = {
   initial: { opacity: 0, y: 50 },
@@ -22,8 +20,6 @@ export const variants: Variants = {
 
 export function MoreSettings(): JSX.Element {
   const { open, openModal, closeModal } = useModal();
-  const { address } = useAccount();
-  const { openConnectModal } = useConnectModal();
 
   return (
     <>
@@ -75,34 +71,6 @@ export function MoreSettings(): JSX.Element {
                       </Button>
                     )}
                   </Menu.Item>
-                  {address ? (
-                    <div className='align-center flex w-full items-center gap-3 rounded-none rounded-b-md p-4 '>
-                      <HeroIcon
-                        className='hidden h-6 w-6 xl:block'
-                        iconName='WalletIcon'
-                      />
-                      <ConnectButton
-                        showBalance={false}
-                        accountStatus={'address'}
-                        chainStatus={'none'}
-                      ></ConnectButton>
-                    </div>
-                  ) : (
-                    <Menu.Item>
-                      {({ active }): JSX.Element => (
-                        <Button
-                          className={cn(
-                            'flex w-full gap-3 rounded-none rounded-b-md p-4 duration-200',
-                            active && 'bg-main-sidebar-background'
-                          )}
-                          onClick={openConnectModal}
-                        >
-                          <HeroIcon iconName='WalletIcon' />
-                          Connect Wallet
-                        </Button>
-                      )}
-                    </Menu.Item>
-                  )}
                 </Menu.Items>
               )}
             </AnimatePresence>

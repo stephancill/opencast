@@ -15,13 +15,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { variants } from './more-settings';
 
 export function SidebarProfile(): JSX.Element {
-  const {
-    user,
-    usersWithKeys: users,
-    signOut,
-    setUser,
-    showAddAccountModal
-  } = useAuth();
+  const { user, signOut, showAddAccountModal } = useAuth();
   const { open, openModal, closeModal } = useModal();
 
   const { name, username, verified, photoURL } = user as User;
@@ -77,43 +71,6 @@ export function SidebarProfile(): JSX.Element {
                   {...variants}
                   static
                 >
-                  {/* TODO: Mobile */}
-                  {users.map((menuUser) => {
-                    const { name, username, verified, photoURL, id } = menuUser;
-                    return (
-                      <Menu.Item
-                        className='flex items-center justify-between gap-4 border-b 
-                               border-light-border hover:bg-light-primary/10 dark:border-dark-border'
-                        as='div'
-                      >
-                        {({ active }): JSX.Element => (
-                          <Button
-                            className={cn(
-                              'flex w-full items-center gap-3 rounded-md rounded-t-none',
-                              active && 'bg-main-sidebar-background'
-                            )}
-                            onClick={() => setUser(menuUser)}
-                          >
-                            <div className='flex flex-grow items-center gap-3 truncate'>
-                              <UserAvatar src={photoURL} alt={name} />
-                              <div className='truncate'>
-                                <UserName name={name} verified={verified} />
-                                <UserUsername username={username} disableLink />
-                              </div>
-                            </div>
-                            {user?.id === id && (
-                              <i>
-                                <HeroIcon
-                                  className='h-5 w-5 text-main-accent'
-                                  iconName='CheckIcon'
-                                />
-                              </i>
-                            )}
-                          </Button>
-                        )}
-                      </Menu.Item>
-                    );
-                  })}
                   <Menu.Item>
                     {({ active }): JSX.Element => (
                       <Button
