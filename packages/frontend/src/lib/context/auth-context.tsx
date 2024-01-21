@@ -40,10 +40,10 @@ export function AuthContextProvider({
 }: AuthContextProviderProps): JSX.Element {
   const router = useRouter();
 
-  const [user, setUser] = useState<UserWithKey | null>(null);
+  const [user, _setUser] = useState<UserWithKey | null>(null);
   const [userBookmarks] = useState<Bookmark[] | null>(null);
   const [error, setError] = useState<Error | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, _setLoading] = useState(true);
   const {
     ready: authReady,
     authenticated: userAuthenticated,
