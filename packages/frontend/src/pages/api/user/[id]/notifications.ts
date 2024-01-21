@@ -62,18 +62,18 @@ export default async function handle(
       const userPostsReactions = (await prisma.$queryRaw`
         SELECT 
           Cast.*, 
-          Reaction.reaction_type as reaction_type, 
+          Reaction.reactionType as reactionType, 
           Message.fid as message_fid, 
           Message.hash as message_hash, 
           Message.timestamp as message_timestamp,
-          Message.message_type as message_type
+          Message.messageType as messageType
         FROM Cast 
-        JOIN Reaction ON Cast.hash = Reaction.target_hash 
+        JOIN Reaction ON Cast.hash = Reaction.targetHash 
         JOIN Message ON Reaction.hash = Message.hash
         WHERE
             Cast.fid = ${fid} AND
-            Message.message_type = 3 AND
-            Reaction.deleted_at IS NULL AND
+            Message.messageType = 3 AND
+            Reaction.deletedAt IS NULL AND
             Message.timestamp > ${afterTime}
         ORDER BY Reaction.timestamp DESC;
       `) as ReactionQueryResult[];
@@ -82,15 +82,15 @@ export default async function handle(
         SELECT 
           Message.fid as message_fid, 
           Message.hash as message_hash, 
-          Message.message_type as message_type,
+          Message.messageType as messageType,
           Message.timestamp as message_timestamp
         FROM Link
         JOIN Message ON Link.hash = Message.hash
         WHERE
-            Link.target_fid = ${fid} AND
-            Message.message_type = 5 AND
+            Link.targetFid = ${fid} AND
+            Message.messageType = 5 AND
             Link.type = 'follow' AND
-            Link.deleted_at IS NULL AND
+            Link.deletedAt IS NULL AND
             Message.timestamp > ${afterTime};
       `) as FollowerQueryResult[];
 
@@ -99,15 +99,15 @@ export default async function handle(
         replies.fid as message_fid, 
         replies.hash as message_hash, 
         replies.timestamp as message_timestamp,
-        Message.message_type as message_type,
-        Cast.fid as parent_fid 
+        Message.messageType as messageType,
+        Cast.fid as parentFid 
         FROM Cast as replies
-        JOIN Cast ON Cast.hash = replies.parent_hash
+        JOIN Cast ON Cast.hash = replies.parentHash
         JOIN Message ON replies.hash = Message.hash
         WHERE 
             Cast.fid = ${fid} AND
-            replies.deleted_at IS NULL AND
-            Cast.deleted_at IS NULL AND
+            replies.deletedAt IS NULL AND
+            Cast.deletedAt IS NULL AND
             replies.timestamp > ${afterTime};
       `) as RepliesQueryResult[];
 
@@ -116,11 +116,11 @@ export default async function handle(
         Cast.fid as message_fid, 
         Cast.hash as message_hash, 
         Cast.timestamp as message_timestamp,
-        Message.message_type as message_type
+        Message.messageType as messageType
         FROM Cast
         JOIN Message ON Cast.hash = Message.hash
         WHERE
-            Cast.deleted_at IS NULL AND
+            Cast.deletedAt IS NULL AND
             Cast.timestamp > ${afterTime} AND
             ${fid} = ANY(casts.mentions);
       `) as MentionsQueryResult[];
@@ -149,7 +149,7 @@ export default async function handle(
         ...userMentions
       ].forEach((item) => {
         fids.add(item.message_fid);
-        if ((item as any).parent_fid) fids.add((item as any).parent_fid);
+        if ((item as any).parentFid) fids.add((item as any).parentFid);
         if ((item as any).mentions) {
           (item as any as RepliesQueryResult).mentions.forEach((mention) =>
             fids.add(mention)
@@ -178,30 +178,30 @@ export default async function handle(
           userId: reaction.message_fid.toString(),
           timestamp: reaction.message_timestamp,
           targetCastId: reaction.hash.toString('hex'),
-          messageType: reaction.message_type,
-          reactionType: reaction.reaction_type
+          messageType: reaction.messageType,
+          reactionType: reaction.reactionType
         })
       );
 
       const basicFollows: BasicFollow[] = userNewFollowers.map((follower) => ({
         userId: follower.message_fid.toString(),
         timestamp: follower.message_timestamp,
-        messageType: follower.message_type
+        messageType: follower.messageType
       }));
 
       const basicReplies: BasicReply[] = userPostsReplies.map((reply) => ({
         userId: reply.message_fid.toString(),
         timestamp: reply.message_timestamp,
         castId: reply.hash.toString('hex'),
-        messageType: reply.message_type,
-        parentUserId: reply.parent_fid.toString()
+        messageType: reply.messageType,
+        parentUserId: reply.parentFid.toString()
       }));
 
       const basicMentions: BasicMention[] = userMentions.map((mention) => ({
         userId: mention.message_fid.toString(),
         timestamp: mention.message_timestamp,
         castId: mention.hash.toString('hex'),
-        messageType: mention.message_type
+        messageType: mention.messageType
       }));
 
       /* Combine into notifications */

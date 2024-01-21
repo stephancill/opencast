@@ -47,10 +47,10 @@ export default async function handle(
             lt: cursor || undefined
           },
           fid: BigInt(id as string),
-          parent_hash: replies ? undefined : null,
-          deleted_at: null,
+          parentHash: replies ? undefined : null,
+          deletedAt: null,
           message: {
-            deleted_at: null
+            deletedAt: null
           }
         },
         take: limit,

@@ -18,24 +18,24 @@ export default async function handle(
 
       const reactionGroups = (await prisma.$queryRaw`
         SELECT 
-            c.parent_url, 
+            c.parentUrl, 
             COUNT(*) as reaction_count 
         FROM 
             Reaction r
         INNER JOIN 
-            Cast c ON r.target_hash = c.hash 
+            Cast c ON r.targetHash = c.hash 
         WHERE 
             r.fid = ${fid}  
-            AND c.deleted_at IS NULL 
-            AND c.parent_url IS NOT NULL 
-        GROUP BY c.parent_url
+            AND c.deletedAt IS NULL 
+            AND c.parentUrl IS NOT NULL 
+        GROUP BY c.parentUrl
         ORDER BY reaction_count DESC
         LIMIT 5;
-      `) as { parent_url: string; reaction_count: number }[];
+      `) as { parentUrl: string; reaction_count: number }[];
 
       const topics = await Promise.all(
         reactionGroups.map(async (group) => {
-          const url = group.parent_url!;
+          const url = group.parentUrl!;
           const topic = await resolveTopic(url);
           return { topic, volume: Number(group.reaction_count) };
         })

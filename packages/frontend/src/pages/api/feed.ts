@@ -36,21 +36,21 @@ export default async function handle(
         ? decodeURIComponent(req.query.topic_url as string)
         : null;
 
-      // Get all the target_fids (people that the user follows)
+      // Get all the targetFids (people that the user follows)
       let targetFids: bigint[] | null = null;
       if (userFid != null) {
         const links = await prisma.link.findMany({
           where: {
             fid: userFid,
-            target_fid: { not: null },
-            deleted_at: null
+            targetFid: { not: null },
+            deletedAt: null
           },
           select: {
-            target_fid: true
+            targetFid: true
           }
         });
         targetFids = [
-          ...(links.map((link) => link.target_fid) as bigint[]),
+          ...(links.map((link) => link.targetFid) as bigint[]),
           BigInt(userFid)
         ];
       }
@@ -75,10 +75,10 @@ export default async function handle(
             AND (
               ${topicUrl}::text IS NULL
               OR
-              (${topicUrl}::text IS NOT NULL AND parent_url = ${topicUrl}::text)
+              (${topicUrl}::text IS NOT NULL AND parentUrl = ${topicUrl}::text)
             )
-            AND parent_hash IS NULL
-            AND casts.deleted_at IS NULL
+            AND parentHash IS NULL
+            AND casts.deletedAt IS NULL
           ORDER BY timestamp DESC
           LIMIT ${limit}
           OFFSET ${skip}
@@ -91,10 +91,10 @@ export default async function handle(
           FROM 
               casts
           LEFT JOIN 
-              Reaction ON casts.hash = Reaction.target_hash AND Reaction.reaction_type = 1
+              Reaction ON casts.hash = Reaction.targetHash AND Reaction.reactionType = 1
           WHERE 
-            casts.parent_hash is null  
-            AND casts.deleted_at is null
+            casts.parentHash is null  
+            AND casts.deletedAt is null
             AND casts.fid IN (${
               targetFids ? Prisma.join(targetFids) : 'null::bigint'
             })
@@ -104,7 +104,7 @@ export default async function handle(
             AND (
               ${topicUrl}::text IS NULL
               OR
-              (${topicUrl}::text IS NOT NULL AND parent_url = ${topicUrl}::text)
+              (${topicUrl}::text IS NOT NULL AND parentUrl = ${topicUrl}::text)
             )
           GROUP BY 
               casts.id
@@ -127,10 +127,10 @@ export default async function handle(
             AND (
               ${topicUrl}::text IS NULL
               OR
-              (${topicUrl}::text IS NOT NULL AND parent_url = ${topicUrl}::text)
+              (${topicUrl}::text IS NOT NULL AND parentUrl = ${topicUrl}::text)
             )
-            AND parent_hash IS NULL
-            AND Cast.deleted_at IS NULL
+            AND parentHash IS NULL
+            AND Cast.deletedAt IS NULL
           ORDER BY timestamp DESC
           LIMIT ${limit}
           OFFSET ${skip}
@@ -143,17 +143,17 @@ export default async function handle(
           FROM 
               Cast
           LEFT JOIN 
-              Reaction ON Cast.hash = Reaction.target_hash AND Reaction.reaction_type = 1
+              Reaction ON Cast.hash = Reaction.targetHash AND Reaction.reactionType = 1
           WHERE 
-              Cast.parent_hash is null  
-            AND Cast.deleted_at is null
+              Cast.parentHash is null  
+            AND Cast.deletedAt is null
             AND Cast.timestamp > ${new Date(
               (cursor || new Date()).getTime() - 1000 * 60 * 60 * 24
             )}
             AND (
               ${topicUrl}::text IS NULL
               OR
-              (${topicUrl}::text IS NOT NULL AND parent_url = ${topicUrl}::text)
+              (${topicUrl}::text IS NOT NULL AND parentUrl = ${topicUrl}::text)
             )
           GROUP BY 
             Cast.id

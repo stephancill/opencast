@@ -26,8 +26,8 @@ export default async function handle(
           timestamp: {
             lt: cursor || undefined
           },
-          parent_hash: Buffer.from(id as string, 'hex'),
-          deleted_at: null
+          parentHash: Buffer.from(id as string, 'hex'),
+          deletedAt: null
         },
         take: limit,
         orderBy: {

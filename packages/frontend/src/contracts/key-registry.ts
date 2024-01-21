@@ -263,14 +263,14 @@ const KEY_REGISTRY_ABI = [
   },
   {
     inputs: [],
-    name: 'ADD_TYPEHASH',
+    name: 'ADDTypeHASH',
     outputs: [{ internalType: 'bytes32', name: '', type: 'bytes32' }],
     stateMutability: 'view',
     type: 'function'
   },
   {
     inputs: [],
-    name: 'REMOVE_TYPEHASH',
+    name: 'REMOVETypeHASH',
     outputs: [{ internalType: 'bytes32', name: '', type: 'bytes32' }],
     stateMutability: 'view',
     type: 'function'

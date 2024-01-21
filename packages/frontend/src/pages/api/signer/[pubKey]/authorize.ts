@@ -17,7 +17,7 @@ const SIGNED_KEY_REQUEST_VALIDATOR_EIP_712_DOMAIN = {
   verifyingContract: '0x00000000fc700472606ed4fa22623acf62c60553'
 } as const;
 
-const SIGNED_KEY_REQUEST_TYPE = [
+const SIGNED_KEY_REQUESTType = [
   { name: 'requestFid', type: 'uint256' },
   { name: 'key', type: 'bytes' },
   { name: 'deadline', type: 'uint256' }
@@ -36,7 +36,7 @@ export default async function handle(
   const signature = await account.signTypedData({
     domain: SIGNED_KEY_REQUEST_VALIDATOR_EIP_712_DOMAIN,
     types: {
-      SignedKeyRequest: SIGNED_KEY_REQUEST_TYPE
+      SignedKeyRequest: SIGNED_KEY_REQUESTType
     },
     primaryType: 'SignedKeyRequest',
     message: {

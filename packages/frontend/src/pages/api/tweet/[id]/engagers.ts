@@ -26,9 +26,9 @@ export default async function handle(
           timestamp: {
             lt: cursor || undefined
           },
-          target_hash: Buffer.from(id as string, 'hex'),
-          deleted_at: null,
-          reaction_type: type
+          targetHash: Buffer.from(id as string, 'hex'),
+          deletedAt: null,
+          reactionType: type
         },
         take: limit,
         orderBy: {

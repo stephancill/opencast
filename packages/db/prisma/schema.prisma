@@ -8,21 +8,21 @@ datasource db {
 }
 
 model Cast {
-  id                 BigInt    @id @default(autoincrement())
-  created_at         DateTime  @default(now()) @db.Timestamp(6)
-  updated_at         DateTime  @default(now()) @db.Timestamp(6)
-  deleted_at         DateTime? @db.Timestamp(6)
-  timestamp          DateTime  @db.Timestamp(6)
-  fid                BigInt
-  hash               Bytes     @unique
-  parent_hash        Bytes?
-  parent_fid         BigInt?
-  parent_url         String?
-  text               String
-  embeds             Json      @default("{}")
-  mentions           BigInt[]  @default([])
-  mentions_positions Int[]     @default([]) @db.SmallInt
-  message            Message  @relation(fields: [hash], references: [hash], onDelete: NoAction, onUpdate: NoAction, map: "cast_hash_foreign")
+  id                  BigInt    @id @default(autoincrement())
+  createdAt           DateTime  @default(now()) @db.Timestamp(6)
+  updatedAt           DateTime  @default(now()) @db.Timestamp(6)
+  deletedAt           DateTime? @db.Timestamp(6)
+  timestamp           DateTime  @db.Timestamp(6)
+  fid                 BigInt
+  hash                Bytes     @unique
+  parentHash          Bytes?
+  parentFid           BigInt?
+  parentUrl           String?
+  text                String
+  embeds              Json      @default("{}")
+  mentions            BigInt[]  @default([])
+  mentionsPositions   Int[]     @default([]) @db.SmallInt
+  message             Message  @relation(fields: [hash], references: [hash], onDelete: NoAction, onUpdate: NoAction, map: "cast_hash_foreign")
 
   @@index([fid, timestamp], map: "cast_fid_timestamp_index")
   @@index([timestamp], map: "cast_timestamp_index")
@@ -30,62 +30,62 @@ model Cast {
 
 model Fid {
   fid             BigInt   @id
-  created_at      DateTime @default(now()) @db.Timestamp(6)
-  updated_at      DateTime @default(now()) @db.Timestamp(6)
-  custody_address Bytes
+  createdAt       DateTime @default(now()) @db.Timestamp(6)
+  updatedAt       DateTime @default(now()) @db.Timestamp(6)
+  custodyAddress  Bytes
 }
 
 model Link {
   id                BigInt    @id @default(autoincrement())
   fid               BigInt?
-  target_fid        BigInt?
+  targetFid         BigInt?
   hash              Bytes     @unique
   timestamp         DateTime  @db.Timestamp(6)
-  created_at        DateTime  @default(now()) @db.Timestamp(6)
-  updated_at        DateTime  @default(now()) @db.Timestamp(6)
-  deleted_at        DateTime? @db.Timestamp(6)
+  createdAt         DateTime  @default(now()) @db.Timestamp(6)
+  updatedAt         DateTime  @default(now()) @db.Timestamp(6)
+  deletedAt         DateTime? @db.Timestamp(6)
   type              String?
-  display_timestamp DateTime? @db.Timestamp(6)
+  displayTimestamp  DateTime? @db.Timestamp(6)
 
-  @@unique([fid, target_fid, type])
+  @@unique([fid, targetFid, type])
 }
 
 model Message {
-  id               BigInt         @id @default(autoincrement())
-  created_at       DateTime       @default(now()) @db.Timestamp(6)
-  updated_at       DateTime       @default(now()) @db.Timestamp(6)
-  deleted_at       DateTime?      @db.Timestamp(6)
-  pruned_at        DateTime?      @db.Timestamp(6)
-  revoked_at       DateTime?      @db.Timestamp(6)
-  timestamp        DateTime       @db.Timestamp(6)
-  message_type     Int            @db.SmallInt
-  fid              BigInt
-  hash             Bytes          @unique
-  hash_scheme      Int            @db.SmallInt
-  signature        Bytes
-  signature_scheme Int            @db.SmallInt
-  signer           Bytes
-  raw              Bytes
-  cast             Cast?
-  reaction         Reaction?
-  user             User?
-  verification     Verification?
+  id                BigInt         @id @default(autoincrement())
+  createdAt         DateTime       @default(now()) @db.Timestamp(6)
+  updatedAt         DateTime       @default(now()) @db.Timestamp(6)
+  deletedAt         DateTime?      @db.Timestamp(6)
+  prunedAt          DateTime?      @db.Timestamp(6)
+  revokedAt         DateTime?      @db.Timestamp(6)
+  timestamp         DateTime       @db.Timestamp(6)
+  messageType       Int            @db.SmallInt
+  fid               BigInt
+  hash              Bytes          @unique
+  hashScheme        Int            @db.SmallInt
+  signature         Bytes
+  signatureScheme   Int            @db.SmallInt
+  signer            Bytes
+  raw               Bytes
+  cast              Cast?
+  reaction          Reaction?
+  user              User?
+  verification      Verification?
 
   @@index([timestamp], map: "messages_timestamp_index")
 }
 
 model Reaction {
   id            BigInt    @id @default(autoincrement())
-  created_at    DateTime  @default(now()) @db.Timestamp(6)
-  updated_at    DateTime  @default(now()) @db.Timestamp(6)
-  deleted_at    DateTime? @db.Timestamp(6)
+  createdAt     DateTime  @default(now()) @db.Timestamp(6)
+  updatedAt     DateTime  @default(now()) @db.Timestamp(6)
+  deletedAt     DateTime? @db.Timestamp(6)
   timestamp     DateTime  @db.Timestamp(6)
-  reaction_type Int       @db.SmallInt
+  reactionType  Int       @db.SmallInt
   fid           BigInt
   hash          Bytes     @unique
-  target_hash   Bytes?
-  target_fid    BigInt?
-  target_url    String?
+  targetHash    Bytes?
+  targetFid     BigInt?
+  targetUrl     String?
   message       Message @relation(fields: [hash], references: [hash], onDelete: NoAction, onUpdate: NoAction, map: "reaction_hash_foreign")
 
   @@index([fid, timestamp], map: "reaction_fid_timestamp_index")
@@ -93,13 +93,13 @@ model Reaction {
 
 model Signer {
   id              BigInt    @id @default(autoincrement())
-  created_at      DateTime  @default(now()) @db.Timestamp(6)
-  updated_at      DateTime  @default(now()) @db.Timestamp(6)
-  deleted_at      DateTime? @db.Timestamp(6)
+  createdAt       DateTime  @default(now()) @db.Timestamp(6)
+  updatedAt       DateTime  @default(now()) @db.Timestamp(6)
+  deletedAt       DateTime? @db.Timestamp(6)
   timestamp       DateTime  @db.Timestamp(6)
   fid             BigInt
   hash            Bytes?
-  custody_address Bytes?
+  custodyAddress  Bytes?
   signer          Bytes
   name            String?
 
@@ -108,9 +108,9 @@ model Signer {
 
 model User {
   id         BigInt    @id @default(autoincrement())
-  created_at DateTime  @default(now()) @db.Timestamp(6)
-  updated_at DateTime  @default(now()) @db.Timestamp(6)
-  deleted_at DateTime? @db.Timestamp(6)
+  createdAt  DateTime  @default(now()) @db.Timestamp(6)
+  updatedAt  DateTime  @default(now()) @db.Timestamp(6)
+  deletedAt  DateTime? @db.Timestamp(6)
   timestamp  DateTime  @db.Timestamp(6)
   fid        BigInt
   hash       Bytes     @unique
@@ -123,15 +123,15 @@ model User {
 }
 
 model Verification {
-  id         BigInt    @id @default(autoincrement())
-  created_at DateTime  @default(now()) @db.Timestamp(6)
-  updated_at DateTime  @default(now()) @db.Timestamp(6)
-  deleted_at DateTime? @db.Timestamp(6)
-  timestamp  DateTime  @db.Timestamp(6)
-  fid        BigInt
-  hash       Bytes     @unique
-  claim      Json
-  message    Message  @relation(fields: [hash], references: [hash], onDelete: NoAction, onUpdate: NoAction, map: "verification_hash_foreign")
+  id          BigInt    @id @default(autoincrement())
+  createdAt   DateTime  @default(now()) @db.Timestamp(6)
+  updatedAt   DateTime  @default(now()) @db.Timestamp(6)
+  deletedAt   DateTime? @db.Timestamp(6)
+  timestamp   DateTime  @db.Timestamp(6)
+  fid         BigInt
+  hash        Bytes     @unique
+  claim       Json
+  message     Message  @relation(fields: [hash], references: [hash], onDelete: NoAction, onUpdate: NoAction, map: "verification_hash_foreign")
 
   @@index([fid, timestamp], map: "verification_fid_timestamp_index")
 }

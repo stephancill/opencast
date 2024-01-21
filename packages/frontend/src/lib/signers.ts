@@ -10,19 +10,19 @@ export async function getSignerDetail(
     SELECT
       COUNT(DISTINCT m.hash) AS message_count,
       MAX(m.timestamp) AS last_message_timestamp,
-      MAX(s.created_at) AS signer_created_at,
+      MAX(s.createdAt) AS signer_createdAt,
       MAX(s.timestamp) AS signer_timestamp,
       MAX(s.name) as signer_name,
       s.signer as pubkey,
-      COUNT(DISTINCT CASE WHEN m.message_type = 0 THEN m.hash ELSE NULL END) AS none_count,
-      COUNT(DISTINCT CASE WHEN m.message_type = 1 THEN m.hash ELSE NULL END) AS cast_add_count,
-      COUNT(DISTINCT CASE WHEN m.message_type = 2 THEN m.hash ELSE NULL END) AS cast_remove_count,
-      COUNT(DISTINCT CASE WHEN m.message_type = 3 THEN m.hash ELSE NULL END) AS reaction_add_count,
-      COUNT(DISTINCT CASE WHEN m.message_type = 4 THEN m.hash ELSE NULL END) AS reaction_remove_count,
-      COUNT(DISTINCT CASE WHEN m.message_type = 5 THEN m.hash ELSE NULL END) AS link_add_count,
-      COUNT(DISTINCT CASE WHEN m.message_type = 6 THEN m.hash ELSE NULL END) AS link_remove_count,
-      COUNT(DISTINCT CASE WHEN m.message_type = 7 THEN m.hash ELSE NULL END) AS verification_add_eth_address_count,
-      COUNT(DISTINCT CASE WHEN m.message_type = 8 THEN m.hash ELSE NULL END) AS verification_remove_count
+      COUNT(DISTINCT CASE WHEN m.messageType = 0 THEN m.hash ELSE NULL END) AS none_count,
+      COUNT(DISTINCT CASE WHEN m.messageType = 1 THEN m.hash ELSE NULL END) AS cast_add_count,
+      COUNT(DISTINCT CASE WHEN m.messageType = 2 THEN m.hash ELSE NULL END) AS cast_remove_count,
+      COUNT(DISTINCT CASE WHEN m.messageType = 3 THEN m.hash ELSE NULL END) AS reaction_add_count,
+      COUNT(DISTINCT CASE WHEN m.messageType = 4 THEN m.hash ELSE NULL END) AS reaction_remove_count,
+      COUNT(DISTINCT CASE WHEN m.messageType = 5 THEN m.hash ELSE NULL END) AS link_add_count,
+      COUNT(DISTINCT CASE WHEN m.messageType = 6 THEN m.hash ELSE NULL END) AS link_remove_count,
+      COUNT(DISTINCT CASE WHEN m.messageType = 7 THEN m.hash ELSE NULL END) AS verification_add_eth_address_count,
+      COUNT(DISTINCT CASE WHEN m.messageType = 8 THEN m.hash ELSE NULL END) AS verification_remove_count
     FROM 
       Message m
     INNER JOIN 
@@ -36,7 +36,7 @@ export async function getSignerDetail(
   const [signer] = signersRaw.map((signer: any) => ({
     pubKey: signer.pubkey,
     messageCount: signer.message_count,
-    createdAtTimestamp: signer.signer_timestamp || signer.signer_created_at,
+    createdAtTimestamp: signer.signer_timestamp || signer.signer_createdAt,
     lastMessageTimestamp: signer.last_message_timestamp,
     name: signer.signer_name,
     noneCount: signer.none_count,

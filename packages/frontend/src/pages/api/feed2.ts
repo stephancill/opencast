@@ -26,16 +26,16 @@ export default async function handle(
 
       let startTime = Date.now();
 
-      // Get all the target_fids (people that the user follows)
+      // Get all the targetFids (people that the user follows)
       const links = await prisma.link.findMany({
         where: {
-          AND: [{ fid: userFid }, { target_fid: { not: null } }]
+          AND: [{ fid: userFid }, { targetFid: { not: null } }]
         },
         select: {
-          target_fid: true
+          targetFid: true
         }
       });
-      const targetFids = links.map((link) => link.target_fid) as bigint[];
+      const targetFids = links.map((link) => link.targetFid) as bigint[];
 
       console.log(`Got links in ${Date.now() - startTime}ms`);
       startTime = Date.now();
@@ -45,19 +45,19 @@ export default async function handle(
           fid: {
             in: targetFids
           },
-          message_type: {
+          messageType: {
             in: [MessageType.REACTION_ADD, MessageType.CAST_ADD]
           },
           timestamp: {
             lt: cursor || undefined
           },
-          deleted_at: null
+          deletedAt: null
         },
         include: {
           cast: {
             select: {
               hash: true,
-              parent_hash: true
+              parentHash: true
             }
           },
           reaction: true
@@ -74,17 +74,17 @@ export default async function handle(
       console.log(`Messages count: ${messages.length}`);
       console.log(
         `Messages without parent hash: ${
-          messages.filter((message) => message.cast?.parent_hash == null).length
+          messages.filter((message) => message.cast?.parentHash == null).length
         }`
       );
 
       const castRecastInfo = messages
-        .filter((message) => message.cast?.parent_hash == null)
+        .filter((message) => message.cast?.parentHash == null)
         .map((message) =>
-          message.message_type === MessageType.CAST_ADD
+          message.messageType === MessageType.CAST_ADD
             ? { castHash: message.cast?.hash, recast: null }
             : {
-                castHash: message.reaction?.target_hash,
+                castHash: message.reaction?.targetHash,
                 recast: message.fid
               }
         );
@@ -118,7 +118,7 @@ export default async function handle(
         if (recaster) acc.add(BigInt(parseInt(recaster)));
 
         // Parent cast author
-        if (cur.parent_fid) acc.add(cur.parent_fid);
+        if (cur.parentFid) acc.add(cur.parentFid);
 
         // Mentions
         cur.mentions.forEach((mention) => acc.add(mention));
@@ -130,7 +130,7 @@ export default async function handle(
         resolveUsersMap([...fids]),
         resolveTopicsMap(
           casts
-            .map((cast) => cast.parent_url)
+            .map((cast) => cast.parentUrl)
             .filter((url) => url !== null) as string[]
         )
       ]);

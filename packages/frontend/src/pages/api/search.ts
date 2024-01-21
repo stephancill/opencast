@@ -24,7 +24,7 @@ export default async function handle(
           type: {
             in: [UserDataType.USERNAME, UserDataType.DISPLAY]
           },
-          deleted_at: null,
+          deletedAt: null,
           value: {
             contains: query,
             mode: 'insensitive'

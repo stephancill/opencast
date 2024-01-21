@@ -6,23 +6,22 @@ import { User, UsersMapType } from './user';
 export type MessageMetadata = {
   message_fid: bigint;
   message_hash: Buffer;
-  message_type: number;
+  messageType: number;
   message_timestamp: Date;
 };
 
 export type ReactionQueryResult = Cast &
   MessageMetadata & {
-    reaction_type: number;
+    reactionType: number;
   };
 
 export type FollowerQueryResult = MessageMetadata;
 
-export type RepliesQueryResult = Cast &
-  MessageMetadata & { parent_fid: bigint };
+export type RepliesQueryResult = Cast & MessageMetadata & { parentFid: bigint };
 
 export type MentionsQueryResult = Cast &
   MessageMetadata & {
-    parent_fid: bigint | null;
+    parentFid: bigint | null;
   };
 
 export type BasicNotification = {

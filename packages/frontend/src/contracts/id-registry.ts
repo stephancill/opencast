@@ -1,23 +1,23 @@
 const ID_REGISTRY_ADDRESS =
-  '0x00000000fc6c5f01fc30151999387bb99a9f489b' as `0x${string}`
+  '0x00000000fc6c5f01fc30151999387bb99a9f489b' as `0x${string}`;
 
 const ID_REGISTRY_ABI = [
   {
     inputs: [
-      { internalType: 'address', name: '_initialOwner', type: 'address' },
+      { internalType: 'address', name: '_initialOwner', type: 'address' }
     ],
     stateMutability: 'nonpayable',
-    type: 'constructor',
+    type: 'constructor'
   },
   { inputs: [], name: 'HasId', type: 'error' },
   { inputs: [], name: 'HasNoId', type: 'error' },
   {
     inputs: [
       { internalType: 'address', name: 'account', type: 'address' },
-      { internalType: 'uint256', name: 'currentNonce', type: 'uint256' },
+      { internalType: 'uint256', name: 'currentNonce', type: 'uint256' }
     ],
     name: 'InvalidAccountNonce',
-    type: 'error',
+    type: 'error'
   },
   { inputs: [], name: 'InvalidAddress', type: 'error' },
   { inputs: [], name: 'InvalidShortString', type: 'error' },
@@ -29,7 +29,7 @@ const ID_REGISTRY_ABI = [
   {
     inputs: [{ internalType: 'string', name: 'str', type: 'string' }],
     name: 'StringTooLong',
-    type: 'error',
+    type: 'error'
   },
   { inputs: [], name: 'Unauthorized', type: 'error' },
   {
@@ -40,11 +40,11 @@ const ID_REGISTRY_ABI = [
         indexed: true,
         internalType: 'address',
         name: 'recovery',
-        type: 'address',
-      },
+        type: 'address'
+      }
     ],
     name: 'ChangeRecoveryAddress',
-    type: 'event',
+    type: 'event'
   },
   { anonymous: false, inputs: [], name: 'DisableTrustedOnly', type: 'event' },
   { anonymous: false, inputs: [], name: 'EIP712DomainChanged', type: 'event' },
@@ -55,17 +55,17 @@ const ID_REGISTRY_ABI = [
         indexed: true,
         internalType: 'address',
         name: 'previousOwner',
-        type: 'address',
+        type: 'address'
       },
       {
         indexed: true,
         internalType: 'address',
         name: 'newOwner',
-        type: 'address',
-      },
+        type: 'address'
+      }
     ],
     name: 'OwnershipTransferStarted',
-    type: 'event',
+    type: 'event'
   },
   {
     anonymous: false,
@@ -74,17 +74,17 @@ const ID_REGISTRY_ABI = [
         indexed: true,
         internalType: 'address',
         name: 'previousOwner',
-        type: 'address',
+        type: 'address'
       },
       {
         indexed: true,
         internalType: 'address',
         name: 'newOwner',
-        type: 'address',
-      },
+        type: 'address'
+      }
     ],
     name: 'OwnershipTransferred',
-    type: 'event',
+    type: 'event'
   },
   {
     anonymous: false,
@@ -93,21 +93,21 @@ const ID_REGISTRY_ABI = [
         indexed: false,
         internalType: 'address',
         name: 'account',
-        type: 'address',
-      },
+        type: 'address'
+      }
     ],
     name: 'Paused',
-    type: 'event',
+    type: 'event'
   },
   {
     anonymous: false,
     inputs: [
       { indexed: true, internalType: 'address', name: 'from', type: 'address' },
       { indexed: true, internalType: 'address', name: 'to', type: 'address' },
-      { indexed: true, internalType: 'uint256', name: 'id', type: 'uint256' },
+      { indexed: true, internalType: 'uint256', name: 'id', type: 'uint256' }
     ],
     name: 'Recover',
-    type: 'event',
+    type: 'event'
   },
   {
     anonymous: false,
@@ -118,11 +118,11 @@ const ID_REGISTRY_ABI = [
         indexed: false,
         internalType: 'address',
         name: 'recovery',
-        type: 'address',
-      },
+        type: 'address'
+      }
     ],
     name: 'Register',
-    type: 'event',
+    type: 'event'
   },
   {
     anonymous: false,
@@ -131,33 +131,33 @@ const ID_REGISTRY_ABI = [
         indexed: true,
         internalType: 'address',
         name: 'oldCaller',
-        type: 'address',
+        type: 'address'
       },
       {
         indexed: true,
         internalType: 'address',
         name: 'newCaller',
-        type: 'address',
+        type: 'address'
       },
       {
         indexed: false,
         internalType: 'address',
         name: 'owner',
-        type: 'address',
-      },
+        type: 'address'
+      }
     ],
     name: 'SetTrustedCaller',
-    type: 'event',
+    type: 'event'
   },
   {
     anonymous: false,
     inputs: [
       { indexed: true, internalType: 'address', name: 'from', type: 'address' },
       { indexed: true, internalType: 'address', name: 'to', type: 'address' },
-      { indexed: true, internalType: 'uint256', name: 'id', type: 'uint256' },
+      { indexed: true, internalType: 'uint256', name: 'id', type: 'uint256' }
     ],
     name: 'Transfer',
-    type: 'event',
+    type: 'event'
   },
   {
     anonymous: false,
@@ -166,79 +166,79 @@ const ID_REGISTRY_ABI = [
         indexed: false,
         internalType: 'address',
         name: 'account',
-        type: 'address',
-      },
+        type: 'address'
+      }
     ],
     name: 'Unpaused',
-    type: 'event',
+    type: 'event'
   },
   {
     inputs: [],
-    name: 'CHANGE_RECOVERY_ADDRESS_TYPEHASH',
+    name: 'CHANGE_RECOVERY_ADDRESSTypeHASH',
     outputs: [{ internalType: 'bytes32', name: '', type: 'bytes32' }],
     stateMutability: 'view',
-    type: 'function',
+    type: 'function'
   },
   {
     inputs: [],
-    name: 'REGISTER_TYPEHASH',
+    name: 'REGISTERTypeHASH',
     outputs: [{ internalType: 'bytes32', name: '', type: 'bytes32' }],
     stateMutability: 'view',
-    type: 'function',
+    type: 'function'
   },
   {
     inputs: [],
-    name: 'TRANSFER_TYPEHASH',
+    name: 'TRANSFERTypeHASH',
     outputs: [{ internalType: 'bytes32', name: '', type: 'bytes32' }],
     stateMutability: 'view',
-    type: 'function',
+    type: 'function'
   },
   {
     inputs: [],
     name: 'VERSION',
     outputs: [{ internalType: 'string', name: '', type: 'string' }],
     stateMutability: 'view',
-    type: 'function',
+    type: 'function'
   },
   {
     inputs: [],
     name: 'acceptOwnership',
     outputs: [],
     stateMutability: 'nonpayable',
-    type: 'function',
+    type: 'function'
   },
   {
     inputs: [{ internalType: 'address', name: 'recovery', type: 'address' }],
     name: 'changeRecoveryAddress',
     outputs: [],
     stateMutability: 'nonpayable',
-    type: 'function',
+    type: 'function'
   },
   {
     inputs: [
       { internalType: 'address', name: 'owner', type: 'address' },
       { internalType: 'address', name: 'recovery', type: 'address' },
       { internalType: 'uint256', name: 'deadline', type: 'uint256' },
-      { internalType: 'bytes', name: 'sig', type: 'bytes' },
+      { internalType: 'bytes', name: 'sig', type: 'bytes' }
     ],
     name: 'changeRecoveryAddressFor',
     outputs: [],
     stateMutability: 'nonpayable',
-    type: 'function',
+    type: 'function'
   },
   {
     inputs: [],
     name: 'disableTrustedOnly',
     outputs: [],
     stateMutability: 'nonpayable',
-    type: 'function',
+    type: 'function'
   },
   {
     inputs: [],
     name: 'domainSeparatorV4',
     outputs: [{ internalType: 'bytes32', name: '', type: 'bytes32' }],
     stateMutability: 'view',
-    type: 'function',
+    type: 'function'
   },
   {
     inputs: [],
@@ -250,85 +250,85 @@ const ID_REGISTRY_ABI = [
       { internalType: 'uint256', name: 'chainId', type: 'uint256' },
       { internalType: 'address', name: 'verifyingContract', type: 'address' },
       { internalType: 'bytes32', name: 'salt', type: 'bytes32' },
-      { internalType: 'uint256[]', name: 'extensions', type: 'uint256[]' },
+      { internalType: 'uint256[]', name: 'extensions', type: 'uint256[]' }
     ],
     stateMutability: 'view',
-    type: 'function',
+    type: 'function'
   },
   {
     inputs: [{ internalType: 'bytes32', name: 'structHash', type: 'bytes32' }],
     name: 'hashTypedDataV4',
     outputs: [{ internalType: 'bytes32', name: '', type: 'bytes32' }],
     stateMutability: 'view',
-    type: 'function',
+    type: 'function'
   },
   {
     inputs: [],
     name: 'idCounter',
     outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
     stateMutability: 'view',
-    type: 'function',
+    type: 'function'
   },
   {
     inputs: [{ internalType: 'address', name: 'owner', type: 'address' }],
     name: 'idOf',
     outputs: [{ internalType: 'uint256', name: 'fid', type: 'uint256' }],
     stateMutability: 'view',
-    type: 'function',
+    type: 'function'
   },
   {
     inputs: [],
     name: 'name',
     outputs: [{ internalType: 'string', name: '', type: 'string' }],
     stateMutability: 'view',
-    type: 'function',
+    type: 'function'
   },
   {
     inputs: [{ internalType: 'address', name: 'owner', type: 'address' }],
     name: 'nonces',
     outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
     stateMutability: 'view',
-    type: 'function',
+    type: 'function'
   },
   {
     inputs: [],
     name: 'owner',
     outputs: [{ internalType: 'address', name: '', type: 'address' }],
     stateMutability: 'view',
-    type: 'function',
+    type: 'function'
   },
   {
     inputs: [],
     name: 'pause',
     outputs: [],
     stateMutability: 'nonpayable',
-    type: 'function',
+    type: 'function'
   },
   {
     inputs: [],
     name: 'paused',
     outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
     stateMutability: 'view',
-    type: 'function',
+    type: 'function'
   },
   {
     inputs: [],
     name: 'pendingOwner',
     outputs: [{ internalType: 'address', name: '', type: 'address' }],
     stateMutability: 'view',
-    type: 'function',
+    type: 'function'
   },
   {
     inputs: [
       { internalType: 'address', name: 'from', type: 'address' },
       { internalType: 'address', name: 'to', type: 'address' },
       { internalType: 'uint256', name: 'deadline', type: 'uint256' },
-      { internalType: 'bytes', name: 'sig', type: 'bytes' },
+      { internalType: 'bytes', name: 'sig', type: 'bytes' }
     ],
     name: 'recover',
     outputs: [],
     stateMutability: 'nonpayable',
-    type: 'function',
+    type: 'function'
   },
   {
     inputs: [
@@ -337,65 +337,65 @@ const ID_REGISTRY_ABI = [
       { internalType: 'uint256', name: 'recoveryDeadline', type: 'uint256' },
       { internalType: 'bytes', name: 'recoverySig', type: 'bytes' },
       { internalType: 'uint256', name: 'toDeadline', type: 'uint256' },
-      { internalType: 'bytes', name: 'toSig', type: 'bytes' },
+      { internalType: 'bytes', name: 'toSig', type: 'bytes' }
     ],
     name: 'recoverFor',
     outputs: [],
     stateMutability: 'nonpayable',
-    type: 'function',
+    type: 'function'
   },
   {
     inputs: [{ internalType: 'uint256', name: 'fid', type: 'uint256' }],
     name: 'recoveryOf',
     outputs: [{ internalType: 'address', name: 'recovery', type: 'address' }],
     stateMutability: 'view',
-    type: 'function',
+    type: 'function'
   },
   {
     inputs: [{ internalType: 'address', name: 'recovery', type: 'address' }],
     name: 'register',
     outputs: [{ internalType: 'uint256', name: 'fid', type: 'uint256' }],
     stateMutability: 'nonpayable',
-    type: 'function',
+    type: 'function'
   },
   {
     inputs: [
       { internalType: 'address', name: 'to', type: 'address' },
       { internalType: 'address', name: 'recovery', type: 'address' },
       { internalType: 'uint256', name: 'deadline', type: 'uint256' },
-      { internalType: 'bytes', name: 'sig', type: 'bytes' },
+      { internalType: 'bytes', name: 'sig', type: 'bytes' }
     ],
     name: 'registerFor',
     outputs: [{ internalType: 'uint256', name: 'fid', type: 'uint256' }],
     stateMutability: 'nonpayable',
-    type: 'function',
+    type: 'function'
   },
   {
     inputs: [],
     name: 'renounceOwnership',
     outputs: [],
     stateMutability: 'nonpayable',
-    type: 'function',
+    type: 'function'
   },
   {
     inputs: [
-      { internalType: 'address', name: '_trustedCaller', type: 'address' },
+      { internalType: 'address', name: '_trustedCaller', type: 'address' }
     ],
     name: 'setTrustedCaller',
     outputs: [],
     stateMutability: 'nonpayable',
-    type: 'function',
+    type: 'function'
   },
   {
     inputs: [
       { internalType: 'address', name: 'to', type: 'address' },
       { internalType: 'uint256', name: 'deadline', type: 'uint256' },
-      { internalType: 'bytes', name: 'sig', type: 'bytes' },
+      { internalType: 'bytes', name: 'sig', type: 'bytes' }
     ],
     name: 'transfer',
     outputs: [],
     stateMutability: 'nonpayable',
-    type: 'function',
+    type: 'function'
   },
   {
     inputs: [
@@ -404,66 +404,66 @@ const ID_REGISTRY_ABI = [
       { internalType: 'uint256', name: 'fromDeadline', type: 'uint256' },
       { internalType: 'bytes', name: 'fromSig', type: 'bytes' },
       { internalType: 'uint256', name: 'toDeadline', type: 'uint256' },
-      { internalType: 'bytes', name: 'toSig', type: 'bytes' },
+      { internalType: 'bytes', name: 'toSig', type: 'bytes' }
     ],
     name: 'transferFor',
     outputs: [],
     stateMutability: 'nonpayable',
-    type: 'function',
+    type: 'function'
   },
   {
     inputs: [{ internalType: 'address', name: 'newOwner', type: 'address' }],
     name: 'transferOwnership',
     outputs: [],
     stateMutability: 'nonpayable',
-    type: 'function',
+    type: 'function'
   },
   {
     inputs: [],
     name: 'trustedCaller',
     outputs: [{ internalType: 'address', name: '', type: 'address' }],
     stateMutability: 'view',
-    type: 'function',
+    type: 'function'
   },
   {
     inputs: [],
     name: 'trustedOnly',
     outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
     stateMutability: 'view',
-    type: 'function',
+    type: 'function'
   },
   {
     inputs: [
       { internalType: 'address', name: 'to', type: 'address' },
-      { internalType: 'address', name: 'recovery', type: 'address' },
+      { internalType: 'address', name: 'recovery', type: 'address' }
     ],
     name: 'trustedRegister',
     outputs: [{ internalType: 'uint256', name: 'fid', type: 'uint256' }],
     stateMutability: 'nonpayable',
-    type: 'function',
+    type: 'function'
   },
   {
     inputs: [],
     name: 'unpause',
     outputs: [],
     stateMutability: 'nonpayable',
-    type: 'function',
+    type: 'function'
   },
   {
     inputs: [
       { internalType: 'address', name: 'custodyAddress', type: 'address' },
       { internalType: 'uint256', name: 'fid', type: 'uint256' },
       { internalType: 'bytes32', name: 'digest', type: 'bytes32' },
-      { internalType: 'bytes', name: 'sig', type: 'bytes' },
+      { internalType: 'bytes', name: 'sig', type: 'bytes' }
     ],
     name: 'verifyFidSignature',
     outputs: [{ internalType: 'bool', name: 'isValid', type: 'bool' }],
     stateMutability: 'view',
-    type: 'function',
-  },
-] as const
+    type: 'function'
+  }
+] as const;
 
 export const ID_REGISTRY = {
   address: ID_REGISTRY_ADDRESS,
-  abi: ID_REGISTRY_ABI,
-}
+  abi: ID_REGISTRY_ABI
+};

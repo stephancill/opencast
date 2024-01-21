@@ -117,10 +117,10 @@ export const tweetConverter = {
     const isBuffer = Buffer.isBuffer(cast.hash);
 
     let parent: { id: string; userId?: string } | null = null;
-    if (cast.parent_hash) {
+    if (cast.parentHash) {
       parent = {
-        id: cast.parent_hash.toString('hex'),
-        userId: cast.parent_fid?.toString()
+        id: cast.parentHash.toString('hex'),
+        userId: cast.parentFid?.toString()
       };
     }
 
@@ -150,7 +150,7 @@ export const tweetConverter = {
     const mentions = cast.mentions.map(
       (userId, index): Mention => ({
         userId: userId.toString(),
-        position: cast.mentions_positions[index]!
+        position: cast.mentionsPositions[index]!
       })
     );
 
@@ -163,13 +163,13 @@ export const tweetConverter = {
       embeds: externalEmbeds,
       parent,
       topic: null,
-      topicUrl: cast.parent_url,
+      topicUrl: cast.parentUrl,
       userLikes: [],
       createdBy: cast.fid.toString(),
       user: null,
       createdAt: cast.timestamp,
       updatedAt: null,
-      deletedAt: cast.deleted_at,
+      deletedAt: cast.deletedAt,
       userReplies: 0,
       userRetweets: [],
       mentions,

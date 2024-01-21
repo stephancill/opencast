@@ -25,13 +25,13 @@ export default async function handle(
           timestamp: {
             lt: cursor || undefined
           },
-          deleted_at: null,
+          deletedAt: null,
           type: 'follow',
           fid: type === 'following' ? fid : undefined,
-          target_fid: type === 'followers' ? fid : undefined
+          targetFid: type === 'followers' ? fid : undefined
         },
         take: limit,
-        distinct: ['target_fid', 'fid'],
+        distinct: ['targetFid', 'fid'],
         orderBy: {
           timestamp: 'desc'
         }
@@ -39,7 +39,7 @@ export default async function handle(
 
       const users = await resolveUsers(
         type === 'following'
-          ? links.map((link) => link.target_fid!)
+          ? links.map((link) => link.targetFid!)
           : links.map((link) => link.fid!)
       );
 

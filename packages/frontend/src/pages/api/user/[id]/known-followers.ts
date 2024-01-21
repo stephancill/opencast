@@ -13,28 +13,28 @@ export default async function handle(
       const fid = parseInt(req.query.id as string);
       const contextFid = parseInt(req.query.context_id as string);
 
-      // Get all the target_fids (people that the user follows)
+      // Get all the targetFids (people that the user follows)
       const contextFollowing = await prisma.link.findMany({
         where: {
           fid: contextFid,
-          target_fid: { not: null },
-          deleted_at: null
+          targetFid: { not: null },
+          deletedAt: null
         },
         select: {
-          target_fid: true
+          targetFid: true
         }
       });
 
       const links = await prisma.link.findMany({
         where: {
-          deleted_at: null,
+          deletedAt: null,
           type: 'follow',
           fid: {
-            in: contextFollowing.map((link) => link.target_fid!)
+            in: contextFollowing.map((link) => link.targetFid!)
           },
-          target_fid: fid
+          targetFid: fid
         },
-        distinct: ['target_fid', 'fid'],
+        distinct: ['targetFid', 'fid'],
         select: {
           fid: true
         },

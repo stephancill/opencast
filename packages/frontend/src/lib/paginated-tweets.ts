@@ -55,7 +55,7 @@ export async function convertAndCalculateCursor(
 
   const fids: Set<bigint> = casts.reduce((acc: Set<bigint>, cur) => {
     acc.add(cur.fid);
-    if (cur.parent_fid) acc.add(cur.parent_fid);
+    if (cur.parentFid) acc.add(cur.parentFid);
     cur.mentions.forEach((mention) => acc.add(mention));
     return acc;
   }, new Set<bigint>());
@@ -96,67 +96,67 @@ export async function castsToTweets(
 
   const engagements = await prisma.reaction.findMany({
     where: {
-      target_hash: {
+      targetHash: {
         in: castHashes
       },
-      deleted_at: null,
+      deletedAt: null,
       message: {
-        deleted_at: null
+        deletedAt: null
       }
     },
     select: {
       fid: true,
-      reaction_type: true,
-      target_hash: true
+      reactionType: true,
+      targetHash: true
     }
   });
 
   const replyCount = await prisma.cast.groupBy({
-    by: ['parent_hash'],
+    by: ['parentHash'],
     where: {
-      parent_hash: {
+      parentHash: {
         in: castHashes
       },
-      deleted_at: null,
+      deletedAt: null,
       message: {
-        deleted_at: null
+        deletedAt: null
       }
     },
     _count: {
-      parent_hash: true
+      parentHash: true
     }
   });
 
-  // Create a map of parent_hash to reply count
+  // Create a map of parentHash to reply count
   const replyCountMap = replyCount.reduce((acc: any, cur) => {
-    const key = cur.parent_hash!.toString('hex');
+    const key = cur.parentHash!.toString('hex');
     if (acc[key]) {
-      acc[key] = cur._count.parent_hash;
+      acc[key] = cur._count.parentHash;
     } else {
-      acc[key] = cur._count.parent_hash;
+      acc[key] = cur._count.parentHash;
     }
     return acc;
   }, {});
 
-  // Group reactions by reaction_type for each target_hash
+  // Group reactions by reactionType for each targetHash
   const reactionsMap = engagements.reduce(
     (acc: { [key: string]: { [key: number]: string[] } }, cur) => {
-      const key = cur.target_hash!.toString('hex');
+      const key = cur.targetHash!.toString('hex');
       if (!key) {
         return acc;
       }
       if (acc[key]) {
-        if (acc[key]![cur.reaction_type]) {
-          acc[key]![cur.reaction_type] = [
-            ...acc[key]![cur.reaction_type]!,
+        if (acc[key]![cur.reactionType]) {
+          acc[key]![cur.reactionType] = [
+            ...acc[key]![cur.reactionType]!,
             cur.fid.toString()
           ];
         } else {
-          acc[key]![cur.reaction_type] = [cur.fid.toString()];
+          acc[key]![cur.reactionType] = [cur.fid.toString()];
         }
       } else {
         acc[key] = {
-          [cur.reaction_type]: [cur.fid.toString()]
+          [cur.reactionType]: [cur.fid.toString()]
         };
       }
       return acc;

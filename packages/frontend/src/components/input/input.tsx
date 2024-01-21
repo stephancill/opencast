@@ -236,17 +236,6 @@ export function Input({
   useEffect(() => {
     setModPopoverEnabled(false);
   }, [currentMod]);
-  useEffect(() => {
-    // TODO: This was creating an error. Not sure if its needed.
-    // topic &&
-    //   setChannel({
-    //     parent_url: topic.url,
-    //     image: topic.image || null,
-    //     channel_id: topic.url,
-    //     name: topic.name
-    //   });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [topic]);
 
   const handleFileUpload = useCallback(async (files: FileList) => {
     // Mod expects a blob, so we convert the file to a blob

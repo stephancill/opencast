@@ -25,9 +25,9 @@ export default async function tweetIdEndpoint(
   const cast = await prisma.cast.findUnique({
     where: {
       hash: Buffer.from(id, 'hex'),
-      deleted_at: null,
+      deletedAt: null,
       message: {
-        deleted_at: null
+        deletedAt: null
       }
     },
     include: {
@@ -50,18 +50,18 @@ export default async function tweetIdEndpoint(
 
   const engagements = await prisma.reaction.findMany({
     where: {
-      target_hash: cast.hash,
-      deleted_at: null
+      targetHash: cast.hash,
+      deletedAt: null
     },
     select: {
       fid: true,
-      reaction_type: true
+      reactionType: true
     }
   });
 
   // Group reactions by type
   const reactions = engagements.reduce((acc: any, cur) => {
-    const key = cur.reaction_type;
+    const key = cur.reactionType;
     if (acc[key]) {
       acc[key] = [...acc[key], cur.fid.toString()];
     } else {
@@ -73,14 +73,14 @@ export default async function tweetIdEndpoint(
   // Get all fids from cast and mentions
   const fids = new Set<bigint>();
   fids.add(cast.fid);
-  if (cast.parent_fid) fids.add(cast.parent_fid);
+  if (cast.parentFid) fids.add(cast.parentFid);
   cast.mentions.forEach((mention) => fids.add(mention));
 
   const users = await resolveUsersMap([...fids]);
 
   let topic: TopicType | null = null;
-  if (cast.parent_url) {
-    topic = await resolveTopic(cast.parent_url);
+  if (cast.parentUrl) {
+    topic = await resolveTopic(cast.parentUrl);
   }
 
   let tweet: Tweet = tweetConverter.toTweet(cast);

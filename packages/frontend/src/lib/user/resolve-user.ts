@@ -51,26 +51,26 @@ export async function resolveUserFullFromFid(
 
   const followers = await prisma.link.findMany({
     where: {
-      target_fid: fid,
+      targetFid: fid,
       type: 'follow',
-      deleted_at: null
+      deletedAt: null
     },
-    distinct: ['target_fid', 'fid']
+    distinct: ['targetFid', 'fid']
   });
 
   const following = await prisma.link.findMany({
     where: {
       fid: fid,
       type: 'follow',
-      deleted_at: null
+      deletedAt: null
     },
-    distinct: ['target_fid', 'fid']
+    distinct: ['targetFid', 'fid']
   });
 
   const castCount = await prisma.cast.aggregate({
     where: {
       fid: fid,
-      deleted_at: null
+      deletedAt: null
     },
     _count: true
   });
@@ -80,7 +80,7 @@ export async function resolveUserFullFromFid(
   const verification = await prisma.verification.findFirst({
     where: {
       fid: fid,
-      deleted_at: null
+      deletedAt: null
     }
   });
   const verificationClaim = verification?.claim as
@@ -93,7 +93,7 @@ export async function resolveUserFullFromFid(
   return {
     ...user,
     followers: followers.map((f) => f.fid!.toString()),
-    following: following.map((f) => f.target_fid!.toString()),
+    following: following.map((f) => f.targetFid!.toString()),
     totalTweets: castCount._count,
     address: userAddress || null,
     interests
@@ -163,28 +163,28 @@ export async function resolveUsersMap(
 export async function userInterests(fid: bigint): Promise<TopicType[]> {
   const reactionGroups = (await prisma.$queryRaw`
         SELECT 
-            c.parent_url, 
+            c.parentUrl, 
             COUNT(*) as reaction_count 
         FROM 
             Reaction r
         INNER JOIN 
-            Cast c ON r.target_hash = c.hash 
+            Cast c ON r.targetHash = c.hash 
         WHERE 
             r.fid = ${fid}  
-            AND c.deleted_at IS NULL 
-            AND c.parent_url IS NOT NULL 
-        GROUP BY c.parent_url
+            AND c.deletedAt IS NULL 
+            AND c.parentUrl IS NOT NULL 
+        GROUP BY c.parentUrl
         ORDER BY reaction_count DESC
         LIMIT 5;
-      `) as { parent_url: string; reaction_count: number }[];
+      `) as { parentUrl: string; reaction_count: number }[];
 
   const topics = (
     await Promise.all(
       reactionGroups.map(async (group) => {
-        const url = group.parent_url!;
+        const url = group.parentUrl!;
         const topic = await resolveTopic(url);
         if (!topic) {
-          console.error(`Unresolved topic: ${group.parent_url}`);
+          console.error(`Unresolved topic: ${group.parentUrl}`);
         }
         return topic;
       })

@@ -23,7 +23,7 @@ export type TrendsData = [
   {
     trends: Trends;
     as_of: string;
-    created_at: string;
+    createdAt: string;
     locations: Location;
   }
 ];

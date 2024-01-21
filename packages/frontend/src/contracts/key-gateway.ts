@@ -120,7 +120,7 @@ const KEY_GATEWAY_ABI = [
   },
   {
     inputs: [],
-    name: 'ADD_TYPEHASH',
+    name: 'ADDTypeHASH',
     outputs: [{ internalType: 'bytes32', name: '', type: 'bytes32' }],
     stateMutability: 'view',
     type: 'function'
