@@ -34,7 +34,7 @@ export default function ManageSigners(): JSX.Element {
 
   return (
     <MainContainer>
-      <SEO title={`Manage Signers / Opencast`} />
+      <SEO title={`Manage Signers / Selekt`} />
       <MainHeader
         useMobileSidebar
         title='Manage Signers'

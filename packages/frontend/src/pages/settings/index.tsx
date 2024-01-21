@@ -24,7 +24,7 @@ export default function Settings(): JSX.Element {
 
   return (
     <MainContainer>
-      <SEO title={`Settings / Opencast`} />
+      <SEO title={`Settings / Selekt`} />
       <MainHeader
         useMobileSidebar
         title='Settings'

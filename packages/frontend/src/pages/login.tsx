@@ -8,7 +8,7 @@ export default function Login(): JSX.Element {
   return (
     <div className='grid min-h-screen grid-rows-[1fr,auto]'>
       <SEO
-        title='Opencast - Fully open source Twitter flavoured Farcaster client'
+        title='Selekt - Fully open source Twitter flavoured Farcaster client'
         description='From breaking news and entertainment to sports and politics, get the full story with all the live commentary.'
       />
       <LoginMain />

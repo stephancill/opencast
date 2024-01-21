@@ -13,7 +13,7 @@ export function LoginMain(): JSX.Element {
           imgClassName='object-cover'
           blurClassName='bg-accent-blue'
           src='/assets/twitter-banner.png'
-          alt='Opencast banner'
+          alt='Selekt banner'
           layout='fill'
           useSkeleton
         />

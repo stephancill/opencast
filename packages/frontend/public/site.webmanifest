@@ -1,6 +1,6 @@
 {
-  "name": "Opencast - Open Source Farcaster Client",
-  "short_name": "Opencast",
+  "name": "Selekt - Open Source Farcaster Client",
+  "short_name": "Selekt",
   "description": "Fully open source Twitter flavoured Farcaster client",
   "display": "standalone",
   "start_url": "/",

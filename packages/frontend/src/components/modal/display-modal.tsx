@@ -30,7 +30,7 @@ export function DisplayModal({ closeModal }: DisplayModalProps): JSX.Element {
       <div className='flex flex-col gap-3 text-center'>
         <h2 className='text-2xl font-bold'>Customize your view</h2>
         <p className='text-light-secondary dark:text-dark-secondary'>
-          These settings affect all the Opencast accounts on this browser.
+          These settings affect all the Selekt accounts on this browser.
         </p>
       </div>
       <article
@@ -38,12 +38,12 @@ export function DisplayModal({ closeModal }: DisplayModalProps): JSX.Element {
                    border-light-border px-4 py-3 dark:border-dark-border'
       >
         <div className='grid grid-cols-[auto,1fr] gap-3'>
-          <UserAvatar src='/assets/twitter-avatar.jpg' alt='Opencast' />
+          <UserAvatar src='/assets/twitter-avatar.jpg' alt='Selekt' />
           <div>
             <div className='flex gap-1'>
-              <UserName verified name='Opencast' />
+              <UserName verified name='Selekt' />
               <p className='text-light-secondary dark:text-dark-secondary'>
-                @opencast
+                @selekt
               </p>
               <div className='flex gap-1 text-light-secondary dark:text-dark-secondary'>
                 <i>·</i>

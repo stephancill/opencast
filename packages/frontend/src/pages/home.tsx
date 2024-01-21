@@ -22,7 +22,7 @@ export default function Home(): JSX.Element {
       <SEO
         title={`${
           userNotifications && user?.keyPair ? `(${userNotifications}) ` : ''
-        }Home / Opencast`}
+        }Home / Selekt`}
       />
       <MainHeader
         useMobileSidebar

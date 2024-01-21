@@ -105,7 +105,7 @@ export default function SignerDetailPage(): JSX.Element {
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.setAttribute('download', `opencast-backup-${pubKey}.json`);
+      link.setAttribute('download', `selekt-backup-${pubKey}.json`);
       document.body.appendChild(link);
       link.click();
       link.remove();
@@ -149,7 +149,7 @@ export default function SignerDetailPage(): JSX.Element {
 
   return (
     <MainContainer>
-      <SEO title={`Manage Signer / Opencast`} />
+      <SEO title={`Manage Signer / Selekt`} />
       <MainHeader
         useMobileSidebar
         title={

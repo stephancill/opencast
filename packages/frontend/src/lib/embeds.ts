@@ -45,7 +45,7 @@ async function getEmbedsForTweetIds(ids: string[]) {
 }
 
 async function processWarpcastEmbed(embed: ModEmbed): Promise<ModEmbed> {
-  // Replace warpcast links with opencast links
+  // Replace warpcast links with selekt links
   // Warpcast regex
   const regex = /https:\/\/warpcast\.com\/([^\/]+)\/0x([a-fA-F0-9]+)/;
   const match = isFarcasterUrlEmbed(embed) && embed.url.match(regex);

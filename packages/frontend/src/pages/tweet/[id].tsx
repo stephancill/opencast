@@ -59,11 +59,9 @@ export default function TweetId(): JSX.Element {
   const parentId = tweetData?.parent?.id;
 
   const pageTitle = tweetData
-    ? `${tweetData.users[tweetData.createdBy]?.name} on Opencast: "${
-        text ?? ''
-      }${
+    ? `${tweetData.users[tweetData.createdBy]?.name} on Selekt: "${text ?? ''}${
         images ? ` (${imagesLength} image${isPlural(imagesLength)})` : ''
-      }" / Opencast`
+      }" / Selekt`
     : null;
 
   const tweetWithPopulatedUsers = useMemo(() => {
@@ -83,7 +81,7 @@ export default function TweetId(): JSX.Element {
           <Loading className='mt-5' />
         ) : !(tweetWithPopulatedUsers && tweetData) ? (
           <>
-            <SEO title='Cast not found / Opencast' />
+            <SEO title='Cast not found / Selekt' />
             <Error message='Cast not found' />
           </>
         ) : (

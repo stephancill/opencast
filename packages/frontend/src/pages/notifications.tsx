@@ -67,7 +67,7 @@ export default function NotificationsPage(): JSX.Element {
 
   return (
     <MainContainer>
-      <SEO title={`Notifications / Opencast`} />
+      <SEO title={`Notifications / Selekt`} />
       <MainHeader
         useMobileSidebar
         title='Recent Notifications'
