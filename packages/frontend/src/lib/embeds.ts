@@ -54,12 +54,12 @@ async function processWarpcastEmbed(embed: ModEmbed): Promise<ModEmbed> {
     // Select cast
     const hashLength = match[2]!.length;
     const [cast] = (await prisma.$queryRaw`
-        select c.*, ud.value from casts c 
-        inner join UserData ud on c.fid = ud.fid 
+        select c.*, u.value from casts c 
+        inner join User u on c.fid = u.fid 
         where 
-          ud."type" = ${UserDataType.USERNAME} 
+          u."type" = ${UserDataType.USERNAME} 
           and SUBSTRING(encode(c.hash, 'hex'), 1, ${hashLength}::integer) = ${match[2]!.toLowerCase()} 
-          and ud.value = ${match[1]!.toLowerCase()}
+          and u.value = ${match[1]!.toLowerCase()}
       `) as Cast[];
     if (cast) {
       const user = await resolveUserFromFid(cast.fid);
