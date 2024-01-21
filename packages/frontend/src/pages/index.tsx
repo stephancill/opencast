@@ -1,12 +1,17 @@
-// import { AuthLayout } from '@components/layout/auth-layout';
-// import type { ReactElement, ReactNode } from 'react';
+import { useRouter } from 'next/router';
 import Login from './login';
+import React from 'react';
+import { useAuth } from '@lib/context/auth-context';
 
 export default function Landing(): JSX.Element {
+  const router = useRouter();
+  const { user } = useAuth();
+
+  React.useEffect(() => {
+    if (user) {
+      router.push('/home');
+    }
+  }, [user, router]);
+
   return <Login />;
 }
-
-// TODO: Uncomment or delete
-// Landing.getLayout = (page: ReactElement): ReactNode => (
-//   <AuthLayout>{page}</AuthLayout>
-// );

@@ -47,6 +47,7 @@ export function TweetFeed({ feedOrdering, apiEndpoint }: TweetFeedProps) {
       revalidateFirstPage: false
     }
   );
+
   const hasMore = !!pages?.[size - 1]?.result?.tweets.length;
 
   // Fetch new tweets every 20 seconds
