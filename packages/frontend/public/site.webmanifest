@@ -1,7 +1,7 @@
 {
-  "name": "Selekt - Open Source Farcaster Client",
+  "name": "Selekt",
   "short_name": "Selekt",
-  "description": "Fully open source Twitter flavoured Farcaster client",
+  "description": "An exclusive community for musicians & DJs",
   "display": "standalone",
   "start_url": "/",
   "theme_color": "#fff",

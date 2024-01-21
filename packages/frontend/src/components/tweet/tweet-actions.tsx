@@ -8,7 +8,7 @@ import { Dialog, Popover } from '@headlessui/react';
 import { useAuth } from '@lib/context/auth-context';
 import { useModal } from '@lib/hooks/useModal';
 import type { Tweet } from '@lib/types/tweet';
-import type { User, UserFullResponse } from '@lib/types/user';
+import type { User } from '@lib/types/user';
 import { preventBubbling } from '@lib/utils';
 import cn from 'clsx';
 import type { Variants } from 'framer-motion';
@@ -25,7 +25,6 @@ import {
 import { fetchJSON } from '../../lib/fetch';
 import { BaseResponse } from '../../lib/types/responses';
 import { TopicResponse, TopicType } from '../../lib/types/topic';
-import { TipModal } from '../modal/tip-modal';
 import { SearchTopics } from '../search/search-topics';
 import { Loading } from '../ui/loading';
 import { TopicView } from './tweet-topic';
@@ -60,13 +59,6 @@ export function TweetActions({
 }: TweetActionsProps): JSX.Element {
   const { user: currentUser, isAdmin } = useAuth();
 
-  const [shouldFetchUser, setShouldFetchUser] = useState(false);
-  const { data: user, isValidating: isUserLoading } = useSWR(
-    shouldFetchUser ? `/api/user/${createdBy}` : null,
-    async (url) => (await fetchJSON<UserFullResponse>(url)).result,
-    { revalidateOnFocus: false }
-  );
-
   const {
     open: removeOpen,
     openModal: removeOpenModal,
@@ -77,12 +69,6 @@ export function TweetActions({
     open: repostOpen,
     openModal: repostOpenModal,
     closeModal: repostCloseModal
-  } = useModal();
-
-  const {
-    open: tipUserOpen,
-    openModal: tipOpenModal,
-    closeModal: tipCloseModal
   } = useModal();
 
   const [repostTopicUrl, setRepostTopicUrl] = useState<string>();
@@ -213,11 +199,6 @@ export function TweetActions({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [topicResult]);
 
-  useEffect(() => {
-    if (!tipUserOpen) return;
-    setShouldFetchUser(true);
-  }, [tipUserOpen]);
-
   return (
     <>
       <Modal
@@ -299,13 +280,6 @@ export function TweetActions({
           )}
         </div>
       </Modal>
-      <TipModal
-        isUserLoading={isUserLoading}
-        tipCloseModal={tipCloseModal}
-        tipUserOpen={tipUserOpen}
-        user={user}
-        username={username}
-      />
       <Popover>
         {({ open, close }): JSX.Element => (
           <>
@@ -381,20 +355,6 @@ export function TweetActions({
                       Repost to topic
                     </Popover.Button>
                   )}
-                  {
-                    <Popover.Button
-                      className='accent-tab flex w-full gap-3 rounded-md rounded-t-none p-4 hover:bg-main-sidebar-background'
-                      as={Button}
-                      onClick={preventBubbling(() => {
-                        close();
-                        tipOpenModal();
-                      })}
-                    >
-                      <HeroIcon iconName='BanknotesIcon' />
-                      Tip user
-                    </Popover.Button>
-                  }
-
                   <Popover.Button
                     className='accent-tab flex w-full gap-3 rounded-md rounded-t-none p-4 hover:bg-main-sidebar-background'
                     as={Button}

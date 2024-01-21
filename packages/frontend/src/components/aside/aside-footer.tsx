@@ -1,6 +1,4 @@
-const footerLinks = [
-  ['GitHub', 'https://github.com/stephancill/twitter-farcaster-client']
-] as const;
+const footerLinks = [['Contact', 'https://gigameshmusic.com/contact']] as const;
 
 export function AsideFooter(): JSX.Element {
   return (
@@ -22,7 +20,7 @@ export function AsideFooter(): JSX.Element {
         ))}
       </nav>
       <div></div>
-      <p>Built by @stephancill. Use at own risk.</p>
+      <p>Built by @gigamesh. Use at own risk.</p>
     </footer>
   );
 }
