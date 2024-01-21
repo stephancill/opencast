@@ -11,7 +11,6 @@ import type { Tweet } from '@lib/types/tweet';
 import type { User } from '@lib/types/user';
 import { isFarcasterUrlEmbed } from '@mod-protocol/farcaster';
 import cn from 'clsx';
-import type { Variants } from 'framer-motion';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { hasAncestorWithClass } from '../../lib/utils';
@@ -29,12 +28,6 @@ export type TweetProps = Tweet & {
   pinned?: boolean;
   profile?: User | null;
   parentTweet?: boolean;
-};
-
-export const variants: Variants = {
-  initial: { opacity: 0 },
-  animate: { opacity: 1, transition: { duration: 0.8 } },
-  exit: { opacity: 0, transition: { duration: 0.2 } }
 };
 
 export function Tweet(tweet: TweetProps): JSX.Element {

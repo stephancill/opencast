@@ -6,7 +6,7 @@ import { replaceOccurrencesMultiple } from '../../lib/utils';
 import { UserTooltip } from '../user/user-tooltip';
 import isURL from 'validator/lib/isURL';
 
-export interface TweetTextProps {
+interface TweetTextProps {
   text: string;
   images: ImagesPreview | null;
   mentions: Mention[];

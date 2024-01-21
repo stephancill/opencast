@@ -47,7 +47,7 @@ export async function getTweetsPaginatedPrismaArgs(
  * @param calculateNextPageCursor Function to calculate the next page cursor
  * @returns PaginatedTweets
  */
-export async function convertAndCalculateCursor(
+async function convertAndCalculateCursor(
   casts: Cast[],
   calculateNextPageCursor?: (casts: Cast[]) => string | null
 ): Promise<PaginatedTweetsType> {

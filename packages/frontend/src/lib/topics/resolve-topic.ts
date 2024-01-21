@@ -15,7 +15,7 @@ const chainById = Object.values(chains).reduce(
   {}
 );
 
-export type TopicsMapType = { [key: string]: TopicType };
+type TopicsMapType = { [key: string]: TopicType };
 
 export async function resolveTopic(url: string): Promise<TopicType | null> {
   const key = `topic:${url}`;

@@ -25,7 +25,7 @@ export function isValidImageExtension(
   );
 }
 
-export function isValidImage(name: string, bytes: number): boolean {
+function isValidImage(name: string, bytes: number): boolean {
   return isValidImageExtension(name) && bytes < 20 * Math.pow(1024, 2);
 }
 

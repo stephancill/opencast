@@ -3,7 +3,7 @@ import { BaseResponse } from './responses';
 import { Tweet } from './tweet';
 import { User, UsersMapType } from './user';
 
-export type MessageMetadata = {
+type MessageMetadata = {
   message_fid: bigint;
   message_hash: Buffer;
   messageType: number;

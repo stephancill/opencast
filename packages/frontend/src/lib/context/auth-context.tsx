@@ -29,7 +29,7 @@ type AuthContext = {
   resetNotifications: () => void;
 };
 
-export const AuthContext = createContext<AuthContext | null>(null);
+const AuthContext = createContext<AuthContext | null>(null);
 
 type AuthContextProviderProps = {
   children: ReactNode;

@@ -12,7 +12,7 @@ type ThemeContext = {
   changeAccent: ({ target: { value } }: ChangeEvent<HTMLInputElement>) => void;
 };
 
-export const ThemeContext = createContext<ThemeContext | null>(null);
+const ThemeContext = createContext<ThemeContext | null>(null);
 
 type ThemeContextProviderProps = {
   children: ReactNode;

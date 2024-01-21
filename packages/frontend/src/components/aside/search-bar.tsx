@@ -9,7 +9,7 @@ import { fetchJSON } from '../../lib/fetch';
 import { BaseResponse } from '../../lib/types/responses';
 import { Loading } from '../ui/loading';
 
-export type SearchBarProps<T> = {
+type SearchBarProps<T> = {
   urlBuilder: (query: string) => string | null;
   resultBuilder: (data: T, callback: () => void) => JSX.Element;
 };

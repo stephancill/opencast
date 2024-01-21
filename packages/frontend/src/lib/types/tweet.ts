@@ -1,7 +1,6 @@
 import { Embed as FarcasterEmbed } from '@farcaster/hub-web';
 import { Embed as ModEmbed } from '@mod-protocol/core';
 import { Cast } from '@selekt/db';
-import { TopicsMapType } from '../topics/resolve-topic';
 import { TopicType } from './topic';
 import { isValidImageExtension } from '../validation';
 import type { ImagesPreview } from './file';
@@ -45,16 +44,9 @@ export type Tweet = {
   retweet: { username?: string; userId?: string } | null;
 };
 
-export type TweetWithUsers = Tweet & { users: UsersMapType<User> };
+type TweetWithUsers = Tweet & { users: UsersMapType<User> };
 
 export type TweetResponse = BaseResponse<TweetWithUsers>;
-export interface TweetRepliesResponse
-  extends BaseResponse<{
-    tweets: Tweet[];
-    nextPageCursor: string | null;
-    // fid -> User
-    users: UsersMapType<User>;
-  }> {}
 
 export const populateTweetUsers = (
   tweet: Tweet,
@@ -93,22 +85,6 @@ export const populateTweetUsers = (
     retweet: resolvedRetweet,
     user: resolvedUser || null
   };
-};
-
-export const populateTweetTopic = (
-  tweet: Tweet,
-  topics: TopicsMapType
-): Tweet => {
-  if (tweet.topicUrl) {
-    const topic = topics[tweet.topicUrl];
-    if (topic) {
-      return {
-        ...tweet,
-        topic
-      };
-    }
-  }
-  return tweet;
 };
 
 export const tweetConverter = {

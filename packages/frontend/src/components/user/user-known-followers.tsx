@@ -36,7 +36,7 @@ export function UserKnownFollowersLazy({
   );
 }
 
-export function UserKnownFollowers({
+function UserKnownFollowers({
   resolvedUsers,
   knownFollowerCount
 }: {

@@ -10,7 +10,7 @@ import { fetchJSON } from '../../lib/fetch';
 import { TrendsResponse } from '../../lib/types/trends';
 import { NextImage } from '../ui/next-image';
 
-export const variants: MotionProps = {
+const variants: MotionProps = {
   initial: { opacity: 0 },
   animate: { opacity: 1 },
   transition: { duration: 0.8 }

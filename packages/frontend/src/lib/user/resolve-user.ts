@@ -160,7 +160,7 @@ export async function resolveUsersMap(
   return usersMap;
 }
 
-export async function userInterests(fid: bigint): Promise<TopicType[]> {
+async function userInterests(fid: bigint): Promise<TopicType[]> {
   const reactionGroups = (await prisma.$queryRaw`
         SELECT 
             c.parentUrl, 

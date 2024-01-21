@@ -12,7 +12,7 @@ export async function resolveChainIcon(chainId: number) {
   return icon;
 }
 
-export async function _resolveChainIcon(chainId: number) {
+async function _resolveChainIcon(chainId: number) {
   const chain = await fetch(
     `https://raw.githubusercontent.com/ethereum-lists/chains/master/_data/chains/eip155-${chainId}.json`
   );

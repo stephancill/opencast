@@ -39,7 +39,6 @@ export function UserHomeLayout({ children }: LayoutProps): JSX.Element {
           <Loading className='mt-5' />
         ) : !userData ? (
           <>
-            {/* <UserHomeCover /> */}
             <div className='flex flex-col gap-8'>
               <div className='relative flex flex-col gap-3 px-4 py-3'>
                 <UserHomeAvatar />
@@ -55,7 +54,6 @@ export function UserHomeLayout({ children }: LayoutProps): JSX.Element {
           </>
         ) : (
           <>
-            {/* <UserHomeCover coverData={coverData} /> */}
             <div className='relative flex flex-col gap-3 px-4 py-3'>
               <div className='flex justify-between'>
                 <UserHomeAvatar profileData={profileData} />

@@ -10,7 +10,7 @@ type WindowContext = WindowSize & {
   isMobile: boolean;
 };
 
-export const WindowContext = createContext<WindowContext | null>(null);
+const WindowContext = createContext<WindowContext | null>(null);
 
 type WindowContextProviderProps = {
   children: ReactNode;

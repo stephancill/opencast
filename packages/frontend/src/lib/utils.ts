@@ -1,6 +1,5 @@
 import type { SyntheticEvent } from 'react';
 import type { MotionProps } from 'framer-motion';
-import isURL from 'validator/lib/isURL';
 
 export function preventBubbling(
   callback?: (() => unknown) | null,
@@ -26,10 +25,6 @@ export function hasAncestorWithClass(element: HTMLElement, className: string) {
     currentElement = currentElement.parentElement;
   }
   return false;
-}
-
-export function delayScroll(ms: number) {
-  return (): NodeJS.Timeout => setTimeout(() => window.scrollTo(0, 0), ms);
 }
 
 export function sleep(ms: number): Promise<void> {
@@ -72,7 +67,7 @@ export function replaceOccurrencesMultiple(
   );
 }
 
-export type ParsedChainURL = {
+type ParsedChainURL = {
   scheme: string;
   chainId: string;
   contractType: string;
@@ -102,27 +97,6 @@ export function parseChainURL(url: string): ParsedChainURL | null {
   };
 }
 
-export function getHttpsUrls(text: string): string[] {
-  const words = text
-    .split(' ')
-    .map((word) => word.split('\n'))
-    .flat();
-  const urls = words.filter((word) =>
-    isURL(word, { require_tld: true, require_protocol: false })
-  );
-  // Add https to urls that don't have a protocol
-  const httpsUrls = urls.map((url) => {
-    if (url.startsWith('http://')) {
-      return url.replace('http://', 'https://');
-    } else if (!url.startsWith('https://')) {
-      return `https://${url}`;
-    }
-    return url;
-  });
-  const uniqueUrls = [...new Set(httpsUrls)];
-  return uniqueUrls;
-}
-
 export const truncateAddress = (address: string): string => {
   return `${address.slice(0, 6)}...${address.slice(-4)}`;
 };
@@ -144,11 +118,11 @@ const replacer = (_: any, value: any) => {
   return value;
 };
 
-export function JSONStringify<T>(data: T): string {
+function JSONStringify<T>(data: T): string {
   return JSON.stringify(data, replacer);
 }
 
-export function JSONParse<T>(data: string): T {
+function JSONParse<T>(data: string): T {
   return JSON.parse(data);
 }
 

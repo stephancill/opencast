@@ -7,7 +7,7 @@ type UserContext = {
   loading: boolean;
 };
 
-export const UserContext = createContext<UserContext | null>(null);
+const UserContext = createContext<UserContext | null>(null);
 
 type UserContextProviderProps = {
   value: UserContext;

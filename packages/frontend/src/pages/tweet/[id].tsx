@@ -73,7 +73,7 @@ export default function TweetId(): JSX.Element {
     <MainContainer className='!pb-[1280px]'>
       <MainHeader
         useActionButton
-        title={parentId ? 'Thread' : 'Cast'}
+        title={parentId ? 'Thread' : 'Post'}
         action={back}
       />
       <section>
@@ -81,8 +81,8 @@ export default function TweetId(): JSX.Element {
           <Loading className='mt-5' />
         ) : !(tweetWithPopulatedUsers && tweetData) ? (
           <>
-            <SEO title='Cast not found / Selekt' />
-            <Error message='Cast not found' />
+            <SEO title='Post not found / Selekt' />
+            <Error message='Post not found' />
           </>
         ) : (
           <>
