@@ -17,8 +17,6 @@ export default function Home(): JSX.Element {
 
   const [feedOrdering, setFeedOrdering] = useState<FeedOrderingType>('latest');
 
-  console.log('Home');
-
   return (
     <MainContainer>
       <SEO

@@ -1,3 +1,5 @@
+'use client';
+
 import { UserAvatar } from '@components/user/user-avatar';
 import { Message } from '@farcaster/hub-web';
 import { useAuth } from '@lib/context/auth-context';

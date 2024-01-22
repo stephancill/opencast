@@ -12,6 +12,7 @@ import { configureChains } from 'wagmi';
 import { mainnet, optimism, sepolia } from 'wagmi/chains';
 import { publicProvider } from 'wagmi/providers/public';
 import { PrivyWagmiConnector } from '@privy-io/wagmi-connector';
+import { trpcClient } from '@lib/trpc';
 
 const queryClient = new QueryClient();
 
@@ -29,10 +30,7 @@ const wagmiChainsConfig = configureChains(
   [publicProvider()]
 );
 
-export default function App({
-  Component,
-  pageProps
-}: AppPropsWithLayout): ReactNode {
+function App({ Component, pageProps }: AppPropsWithLayout): ReactNode {
   const getLayout = Component.getLayout ?? ((page): ReactNode => page);
 
   if (!process.env.NEXT_PUBLIC_PRIVY_APP_ID) {
@@ -63,3 +61,5 @@ export default function App({
     </>
   );
 }
+
+export default trpcClient.withTRPC(App);

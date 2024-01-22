@@ -9,8 +9,7 @@
       "node": true
     }
   },
-  "plugins": ["react-hooks"],
-  "extends": ["react-app"],
+  "extends": ["eslint-config-next"],
   "overrides": [
     {
       "files": [
