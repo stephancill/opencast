@@ -1,9 +1,6 @@
 import '@styles/globals.scss';
 
 import { PrivyProvider, User } from '@privy-io/react-auth';
-import { AppHead } from '@components/common/app-head';
-import { AuthContextProvider } from '@lib/context/auth-context';
-import { ThemeContextProvider } from '@lib/context/theme-context';
 import type { NextPage } from 'next';
 import type { AppProps } from 'next/app';
 import type { ReactElement, ReactNode } from 'react';
@@ -12,7 +9,6 @@ import { configureChains } from 'wagmi';
 import { mainnet, optimism, sepolia } from 'wagmi/chains';
 import { publicProvider } from 'wagmi/providers/public';
 import { PrivyWagmiConnector } from '@privy-io/wagmi-connector';
-import { trpcClient } from '@lib/trpc';
 
 const queryClient = new QueryClient();
 
@@ -43,18 +39,13 @@ function App({ Component, pageProps }: AppPropsWithLayout): ReactNode {
 
   return (
     <>
-      <AppHead />
       <PrivyProvider
         appId={process.env.NEXT_PUBLIC_PRIVY_APP_ID}
         onSuccess={handleLogin}
       >
         <PrivyWagmiConnector wagmiChainsConfig={wagmiChainsConfig}>
           <QueryClientProvider client={queryClient}>
-            <AuthContextProvider>
-              <ThemeContextProvider>
-                {getLayout(<Component {...pageProps} />)}
-              </ThemeContextProvider>
-            </AuthContextProvider>
+            {getLayout(<Component {...pageProps} />)}
           </QueryClientProvider>
         </PrivyWagmiConnector>
       </PrivyProvider>
@@ -62,4 +53,4 @@ function App({ Component, pageProps }: AppPropsWithLayout): ReactNode {
   );
 }
 
-export default trpcClient.withTRPC(App);
+export default App;
