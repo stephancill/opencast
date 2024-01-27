@@ -5,10 +5,10 @@
   "main": "prisma/index.ts",
   "types": "prisma/index.ts",
   "scripts": {
-    "db:generate": "prisma generate",
-    "db:push": "prisma db push --skip-generate",
+    "generate": "prisma generate",
+    "push": "prisma db push --skip-generate",
     "docker:build": "docker-compose down && docker-compose up",
-    "dev": "pnpm docker:build && db:generate && db:push"
+    "dev": "pnpm docker:build && db:generate && push"
   },
   "keywords": [],
   "author": "",

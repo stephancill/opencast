@@ -2,9 +2,14 @@
   "$schema": "https://turbo.build/schema.json",
   "globalDependencies": ["**/.env.*local"],
   "pipeline": {
+    "generate": {
+      "dependsOn": ["^generate"],
+      "env": ["NEXT_PUBLIC_VERCEL_ENV"]
+    },
     "build": {
-      "dependsOn": ["^build"],
-      "outputs": [".next/**", "!.next/cache/**"]
+      "dependsOn": ["generate", "^build"],
+      "outputs": [".next/**", "!.next/cache/**"],
+      "env": ["NEXT_PUBLIC_VERCEL_ENV"]
     },
     "lint": {
       "dependsOn": ["^lint"]
