@@ -2,6 +2,7 @@ import { useRouter } from 'next/router';
 import Login from './login';
 import React from 'react';
 import { useAuth } from '@lib/context/auth-context';
+import { isProduction } from '@lib/env';
 
 export default function Landing(): JSX.Element {
   const router = useRouter();
@@ -13,5 +14,5 @@ export default function Landing(): JSX.Element {
     }
   }, [user, router]);
 
-  return <Login />;
+  return isProduction ? <div>Coming soon</div> : <Login />;
 }

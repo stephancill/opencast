@@ -10,9 +10,16 @@ export const appRouter = router({
     )
     .query((opts) => {
       return {
-        greeting: `hello ${opts.input.name}`
+        greeting: `helllllo ${opts.input.name}`
       };
-    })
+    }),
+  getUser: publicProcedure.input(z.string()).query((opts) => {
+    return {
+      user: {
+        privyId: opts.input
+      }
+    };
+  })
 });
 
 // export type definition of API

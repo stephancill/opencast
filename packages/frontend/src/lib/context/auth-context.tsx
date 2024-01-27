@@ -10,6 +10,7 @@ import { KeyPair } from '../types/keypair';
 import { NotificationsResponseSummary } from '../types/notifications';
 import { useRouter } from 'next/router';
 import { usePrivy } from '@privy-io/react-auth';
+import { trpcClient } from '@lib/trpc';
 
 type UserWithKey = UserFull & { keyPair?: KeyPair };
 
@@ -40,14 +41,21 @@ export function AuthContextProvider({
 }: AuthContextProviderProps): JSX.Element {
   const router = useRouter();
 
-  const [user, _setUser] = useState<UserWithKey | null>(null);
+  // const [user, _setUser] = useState<UserWithKey | null>(null);
   const [userBookmarks] = useState<Bookmark[] | null>(null);
   const [error, setError] = useState<Error | null>(null);
   const [loading, _setLoading] = useState(true);
   const {
-    logout: privyLogOut
-    // authenticated
+    user: privyUser,
+    logout: privyLogOut,
+    authenticated: privyAuthenticated
   } = usePrivy();
+
+  const { data: userData } = trpcClient.getUser.useQuery(privyUser?.id || '', {
+    enabled: !!privyUser?.id
+  });
+
+  console.log({ privyUser, userData });
 
   const modal = useModal();
 
@@ -73,24 +81,26 @@ export function AuthContextProvider({
   };
 
   const isAdmin = false;
-  const randomSeed = useMemo(getRandomId, [user?.id]);
 
-  const { data: userNotifications } = useSWR(
-    router.pathname !== '/notifications' &&
-      user?.keyPair &&
-      lastCheckedNotifications
-      ? `/api/user/${
-          user.id
-        }/notifications?last_time=${lastCheckedNotifications.toISOString()}`
-      : null,
-    async (url) => (await fetchJSON<NotificationsResponseSummary>(url)).result,
-    {
-      revalidateOnFocus: false,
-      revalidateOnReconnect: false,
-      refreshWhenHidden: true,
-      refreshInterval: 10000 // Poll every 10 seconds
-    }
-  );
+  // const randomSeed = useMemo(getRandomId, [user?.id]);
+  const randomSeed = '';
+
+  // const { data: userNotifications } = useSWR(
+  //   router.pathname !== '/notifications' &&
+  //     user?.keyPair &&
+  //     lastCheckedNotifications
+  //     ? `/api/user/${
+  //         user.id
+  //       }/notifications?last_time=${lastCheckedNotifications.toISOString()}`
+  //     : null,
+  //   async (url) => (await fetchJSON<NotificationsResponseSummary>(url)).result,
+  //   {
+  //     revalidateOnFocus: false,
+  //     revalidateOnReconnect: false,
+  //     refreshWhenHidden: true,
+  //     refreshInterval: 10000 // Poll every 10 seconds
+  //   }
+  // );
 
   const resetNotifications = (): void => {
     setLastCheckedNotifications(new Date());
@@ -104,24 +114,15 @@ export function AuthContextProvider({
       );
   }, [lastCheckedNotifications]);
 
-  // useEffect(() => {
-  //   if (authenticated) {
-  //     // TODO: fetch user
-
-  //     const { result: user } = await fetchJSON<UserFullResponse>(
-  //       `/api/signer/${keyPair.publicKey}/user`
-  //     );
-  //   }
-  // }, [authenticated]);
-
   const value: AuthContext = {
-    user,
+    user: null,
     error,
     loading,
     isAdmin,
     randomSeed,
     userBookmarks,
-    userNotifications: userNotifications?.badgeCount || null,
+    // userNotifications: userNotifications?.badgeCount || null,
+    userNotifications: null,
     timelineCursor,
     setTimelineCursor,
     signOut,
