@@ -17,7 +17,7 @@ import {
   getFarcasterMentions,
   getMentionFidsByUsernames
 } from '@mod-protocol/farcaster';
-import { creationMods, defaultRichEmbedMod } from '@mod-protocol/mod-registry';
+import { defaultRichEmbedMod } from '@mod-protocol/mod-registry';
 import { CreationMod, RichEmbed } from '@mod-protocol/react';
 import {
   EditorContent,
@@ -43,11 +43,9 @@ import { useAccount } from 'wagmi';
 import { createCastMessage, submitHubMessage } from '@lib/farcaster/utils';
 import { fetchJSON } from '@lib/fetch';
 import { TopicResponse, TopicType } from '@lib/types/topic';
-import { CreationModsSearch } from '../search/creation-mods-search';
 import { SearchTopics } from '../search/search-topics';
 import { TopicView, TweetTopicSkeleton } from '../tweet/tweet-topic';
 import { Loading } from '../ui/loading';
-import { InputOptions } from './input-options';
 import { NEXT_PUBLIC_MOD_API_URL } from '@lib/env';
 
 type InputProps = {
@@ -402,62 +400,6 @@ export function Input({
               )}
             </div>
             {contentLoading && <Loading />}
-            <div className='mt-2'>
-              {(isReply ? isReply && visited && !loading : !loading) && (
-                <InputOptions
-                  inputLength={textLength.length}
-                  isValidTweet={
-                    textLength.isValid &&
-                    (textLength.length > 0 || getEmbeds().length > 0)
-                  }
-                  inputLimit={320}
-                  isCharLimitExceeded={textLength.length > 320}
-                  handleImageUpload={() => {}}
-                  options={
-                    [
-                      !isReply && {
-                        name: 'Topic',
-                        iconName: 'HashtagIcon',
-                        disabled: false,
-                        popoverContent: () => (
-                          <SearchTopics
-                            enabled={true}
-                            onSelectRawUrl={setTopicUrl}
-                            onSelectTopic={setTopic}
-                            setShowing={setShowingTopicSelector}
-                          />
-                        )
-                      },
-                      {
-                        name: 'Mods',
-                        iconName: 'PlusIcon',
-                        disabled: false,
-                        popoverContent: () => (
-                          <CreationModsSearch
-                            mods={creationMods.filter(
-                              (mod) =>
-                                // Mods to exclude
-                                ![
-                                  'livepeer-video',
-                                  'infura-ipfs-upload'
-                                ].includes(mod.slug)
-                            )}
-                            onSelect={(mod) => {
-                              setCurrentMod(mod);
-                            }}
-                            open={!!currentMod}
-                            setOpen={(op: boolean) => {
-                              setModPopoverEnabled(true);
-                              if (!op && modPopoverEnabled) setCurrentMod(null);
-                            }}
-                          />
-                        )
-                      }
-                    ].filter(Boolean) as any[]
-                  }
-                />
-              )}
-            </div>
             <Popover
               open={!!currentMod}
               onOpenChange={(op: boolean) => {
