@@ -1,3 +1,9 @@
+### Notice: 6 Feb 2024
+
+Unfortunately I started having issues with my hub replicator after the unprecedented growth since the launch of Frames due to hardware constraints. Working on syncing the new replicator but still having trouble and haven't had the time to fix unfortunately so my instance opencast.stephancill.co.za is down for now.
+
+You are obviously free to (and I encourage you to) run it locally. Opencast supports the legacy replicator (check out the hub-monorepo around November last year) and the new replicator (hub-monorepo/apps/replicator) so you can use either. Running the replicator is quite challenging - please share your findings if you manage to successfully sync.
+
 # Opencast
 
 A fully open source Twitter flavoured Farcaster client. Originally a fork of [ccrsxx/twitter-clone](https://github.com/ccrsxx/twitter-clone).
