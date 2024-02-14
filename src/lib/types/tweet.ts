@@ -147,10 +147,10 @@ export const tweetConverter = {
             }))
         : [];
 
-    const mentions = cast.mentions.map(
+    const mentions = (cast.mentions as number[])?.map(
       (userId, index): Mention => ({
         userId: userId.toString(),
-        position: cast.mentions_positions[index]
+        position: (cast.mentions_positions as number[])[index]
       })
     );
 
@@ -163,7 +163,7 @@ export const tweetConverter = {
       embeds: externalEmbeds,
       parent,
       topic: null,
-      topicUrl: cast.parent_url,
+      topicUrl: cast.root_parent_url,
       userLikes: [],
       createdBy: cast.fid.toString(),
       user: null,

@@ -18,8 +18,8 @@ export default async function signerUserEndpoint(
 
   const signerRow = await prisma.signers.findFirst({
     where: {
-      signer: Buffer.from(pubKey, 'hex'),
-      deleted_at: null
+      key: Buffer.from(pubKey, 'hex'),
+      removed_at: null
     }
   });
 

@@ -10,7 +10,7 @@ export interface PaginatedUsersResponse
     nextPageCursor: string | null;
   }> {}
 
-export async function getUsersPaginated(
+export async function getReactionUsersPaginated(
   findManyArgs: Prisma.reactionsFindManyArgs,
   full: boolean = false
 ) {

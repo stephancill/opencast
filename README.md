@@ -10,7 +10,7 @@ It only depends on the reference Farcaster postgres indexer and optionally a hub
 
 ### Farcaster Replicator
 
-This project depends on the reference Farcaster PosgreSQL indexer. Follow the instructions at [replicate-data-postgres](https://github.com/farcasterxyz/hub-monorepo/tree/main/apps/replicator) to set up an instance.
+This project depends on the reference Farcaster PosgreSQL indexer. Follow the instructions at [farcasterxyz/hub-monorepo/apps/replicator](https://github.com/farcasterxyz/hub-monorepo/tree/main/apps/replicator) to set up an instance.
 
 ### Local
 

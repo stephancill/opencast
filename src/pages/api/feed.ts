@@ -46,7 +46,6 @@ export default async function handle(
         const links = await prisma.links.findMany({
           where: {
             fid: userFid,
-            target_fid: { not: null },
             deleted_at: null
           },
           select: {
@@ -79,7 +78,7 @@ export default async function handle(
             AND (
               ${topicUrl}::text IS NULL
               OR
-              (${topicUrl}::text IS NOT NULL AND parent_url = ${topicUrl}::text)
+              (${topicUrl}::text IS NOT NULL AND root_parent_url = ${topicUrl}::text)
             )
             AND parent_hash IS NULL
             AND casts.deleted_at IS NULL
@@ -95,7 +94,7 @@ export default async function handle(
           FROM 
               casts
           LEFT JOIN 
-              reactions ON casts.hash = reactions.target_hash AND reactions.reaction_type = 1
+              reactions ON casts.hash = reactions.target_cast_hash AND reactions.type = 1
           WHERE 
             casts.parent_hash is null  
             AND casts.deleted_at is null
@@ -108,7 +107,7 @@ export default async function handle(
             AND (
               ${topicUrl}::text IS NULL
               OR
-              (${topicUrl}::text IS NOT NULL AND parent_url = ${topicUrl}::text)
+              (${topicUrl}::text IS NOT NULL AND root_parent_url = ${topicUrl}::text)
             )
           GROUP BY 
               casts.id
@@ -131,7 +130,7 @@ export default async function handle(
             AND (
               ${topicUrl}::text IS NULL
               OR
-              (${topicUrl}::text IS NOT NULL AND parent_url = ${topicUrl}::text)
+              (${topicUrl}::text IS NOT NULL AND root_parent_url = ${topicUrl}::text)
             )
             AND parent_hash IS NULL
             AND casts.deleted_at IS NULL
@@ -147,7 +146,9 @@ export default async function handle(
           FROM 
               casts
           LEFT JOIN 
-              reactions ON casts.hash = reactions.target_hash AND reactions.reaction_type = 1
+              reactions ON casts.hash = reactions.target_cast_hash AND reactions.type = 1
+          LEFT JOIN
+              signers ON casts.signer = signers.id
           WHERE 
             casts.parent_hash is null  
             AND casts.deleted_at is null
@@ -157,7 +158,7 @@ export default async function handle(
             AND (
               ${topicUrl}::text IS NULL
               OR
-              (${topicUrl}::text IS NOT NULL AND parent_url = ${topicUrl}::text)
+              (${topicUrl}::text IS NOT NULL AND root_parent_url = ${topicUrl}::text)
             )
           GROUP BY 
               casts.id

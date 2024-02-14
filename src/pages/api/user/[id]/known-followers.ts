@@ -17,7 +17,7 @@ export default async function handle(
       const contextFollowing = await prisma.links.findMany({
         where: {
           fid: contextFid,
-          target_fid: { not: null },
+          target_fid: { not: undefined },
           deleted_at: null
         },
         select: {
