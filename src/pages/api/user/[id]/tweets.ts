@@ -1,11 +1,12 @@
 import { UserDataType } from '@farcaster/hub-web';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { populateEmbedsForTweets } from '../../../../lib/embeds';
 import {
-  PaginatedTweetsResponse,
-  getTweetsPaginatedPrismaArgs
+  getTweetsPaginatedPrismaArgs,
+  PaginatedTweetsResponse
 } from '../../../../lib/paginated-tweets';
 import { prisma } from '../../../../lib/prisma';
+import { getEmbedsForTweetIds } from '../../../../lib/embeds';
+import { mergeMetadataCacheResponse } from '../../../../lib/types/tweet';
 
 export default async function handle(
   req: NextApiRequest,
@@ -59,10 +60,17 @@ export default async function handle(
         }
       });
 
-      const tweetsWithEmbeds = await populateEmbedsForTweets(result.tweets);
+      const tweetEmbeds = await getEmbedsForTweetIds(
+        result.tweets.map((t) => t.id)
+      );
+
+      const mergedTweets = mergeMetadataCacheResponse(
+        result.tweets,
+        tweetEmbeds
+      );
 
       res.json({
-        result: { ...result, tweets: tweetsWithEmbeds }
+        result: { ...result, tweets: mergedTweets }
       });
       break;
     default:

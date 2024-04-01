@@ -85,10 +85,9 @@ export default async function tweetIdEndpoint(
   }
 
   let tweet: Tweet = tweetConverter.toTweet(cast);
-  const [tweetWithEmbeds] = await populateEmbedsForTweets([tweet]);
 
   const tweetWithUsers: TweetWithUsers = {
-    ...tweetWithEmbeds,
+    ...tweet,
     topic: topic,
     userLikes: reactions[ReactionType.LIKE] || [],
     userRetweets: reactions[ReactionType.RECAST] || [],
@@ -96,7 +95,13 @@ export default async function tweetIdEndpoint(
     client: signer?.name || null
   };
 
+  const embeds = await getEmbedsForTweetIds([tweetWithUsers.id]);
+  const mergedTweets = mergeMetadataCacheResponse(
+    [tweetWithUsers],
+    embeds
+  ) as TweetWithUsers[];
+
   res.json({
-    result: tweetWithUsers
+    result: mergedTweets[0]
   });
 }
