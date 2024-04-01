@@ -35,10 +35,8 @@ export default async function handle(
         }
       });
 
-      const tweetsWithEmbeds = await populateEmbedsForTweets(result.tweets);
-
       res.json({
-        result: { ...result, tweets: tweetsWithEmbeds }
+        result
       });
       break;
     default:

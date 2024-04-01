@@ -14,14 +14,13 @@ import cn from 'clsx';
 import type { Variants } from 'framer-motion';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { hasAncestorWithClass } from '../../lib/utils';
 import { TweetActions } from './tweet-actions';
 import { TweetDate } from './tweet-date';
-import { TweetEmbed } from './tweet-embed';
-import { ModEmbeds } from './tweet-embeds-mod';
+import { TweetEmbeds } from './tweet-embed';
 import { TweetStats } from './tweet-stats';
 import { TweetText } from './tweet-text';
 import { TweetTopicLazy } from './tweet-topic';
+import { hasAncestorWithClass } from '../../lib/utils';
 
 export type TweetProps = Tweet & {
   user: User;
@@ -195,35 +194,7 @@ export function Tweet(tweet: TweetProps): JSX.Element {
                   previewCount={images.length}
                 />
               )}
-              {/* All embeds that do not route locally are handled by Mod */}
-              {embeds && embeds.length > 0 && (
-                <ModEmbeds
-                  embeds={embeds.filter(
-                    (embed) =>
-                      !embed.metadata?.mimeType?.startsWith('image/') &&
-                      !(isFarcasterUrlEmbed(embed) && embed.url.startsWith('/'))
-                  )}
-                />
-              )}
-              {/* Local routing embeds embeds i.e. /tweet/... */}
-              {embeds &&
-                embeds.length > 0 &&
-                embeds
-                  .filter(
-                    (embed) =>
-                      isFarcasterUrlEmbed(embed) && embed.url.startsWith('/')
-                  )
-                  .map((embed, index) => (
-                    <TweetEmbed
-                      url={(embed as { url: string }).url}
-                      image={embed.metadata?.image?.url}
-                      icon={embed.metadata?.logo?.url}
-                      title={embed.metadata?.title}
-                      text={embed.metadata?.description}
-                      key={index}
-                    />
-                  ))}
-
+              {embeds && embeds.length > 0 && <TweetEmbeds embeds={embeds} />}
               {topicUrl && <TweetTopicLazy topicUrl={topicUrl} />}
               {!modal && (
                 <TweetStats
