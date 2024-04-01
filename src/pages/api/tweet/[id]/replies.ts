@@ -1,9 +1,10 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { populateEmbedsForTweets } from '../../../../lib/embeds';
 import {
-  PaginatedTweetsResponse,
-  getTweetsPaginatedPrismaArgs
+  getTweetsPaginatedPrismaArgs,
+  PaginatedTweetsResponse
 } from '../../../../lib/paginated-tweets';
+import { getEmbedsForTweetIds } from '../../../../lib/embeds';
+import { mergeMetadataCacheResponse } from '../../../../lib/types/tweet';
 
 export default async function handle(
   req: NextApiRequest,

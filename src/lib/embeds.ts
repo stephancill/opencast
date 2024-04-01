@@ -91,3 +91,13 @@ export async function populateTweetEmbeds(tweet: Tweet): Promise<Tweet> {
   };
   return populatedTweet;
 }
+
+// export async function populateTweetEmbeds(tweet: Tweet): Promise<Tweet> {
+//   const populatedTweet: Tweet = {
+//     ...tweet,
+//     embeds: (await Promise.all(tweet.embeds.map(populateEmbed))).filter(
+//       (embed) => embed !== null
+//     ) as ExternalEmbed[]
+//   };
+//   return populatedTweet;
+// }
