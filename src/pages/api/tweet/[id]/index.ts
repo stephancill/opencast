@@ -1,14 +1,15 @@
 import { ReactionType } from '@farcaster/hub-web';
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { populateEmbedsForTweets } from '../../../../lib/embeds';
+import { populateEmbed } from '../../../../lib/embeds';
 import { prisma } from '../../../../lib/prisma';
 import { resolveTopic } from '../../../../lib/topics/resolve-topic';
 import { TopicType } from '../../../../lib/types/topic';
 import {
+  ExternalEmbed,
   Tweet,
+  tweetConverter,
   TweetResponse,
-  TweetWithUsers,
-  tweetConverter
+  TweetWithUsers
 } from '../../../../lib/types/tweet';
 import {
   resolveUserFromFid,

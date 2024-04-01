@@ -16,11 +16,9 @@ import type { User } from '@lib/types/user';
 import cn from 'clsx';
 import Link from 'next/link';
 import { RefObject } from 'react';
+import { TweetEmbeds } from '../tweet/tweet-embed';
 import { TweetText } from '../tweet/tweet-text';
 import { TweetTopic } from '../tweet/tweet-topic';
-import { ModEmbeds } from '../tweet/tweet-embeds-mod';
-import { isFarcasterUrlEmbed } from '@mod-protocol/farcaster';
-import { TweetEmbed } from '../tweet/tweet-embed';
 
 type ViewTweetProps = Tweet & {
   user: User;
@@ -143,33 +141,7 @@ export function ViewTweet(tweet: ViewTweetProps): JSX.Element {
             previewCount={images.length}
           />
         )}
-        {/* All embeds that do not route locally are handled by Mod */}
-        {embeds && embeds.length > 0 && (
-          <ModEmbeds
-            embeds={embeds.filter(
-              (embed) =>
-                !embed.metadata?.mimeType?.startsWith('image/') &&
-                !(isFarcasterUrlEmbed(embed) && embed.url.startsWith('/'))
-            )}
-          />
-        )}
-        {/* Local routing embeds embeds i.e. /tweet/... */}
-        {embeds &&
-          embeds.length > 0 &&
-          embeds
-            .filter(
-              (embed) => isFarcasterUrlEmbed(embed) && embed.url.startsWith('/')
-            )
-            .map((embed, index) => (
-              <TweetEmbed
-                url={(embed as { url: string }).url}
-                image={embed.metadata?.image?.url}
-                icon={embed.metadata?.logo?.url}
-                title={embed.metadata?.title}
-                text={embed.metadata?.description}
-                key={index}
-              />
-            ))}
+        {embeds && embeds.length > 0 && <TweetEmbeds embeds={embeds} />}
         {topic && (
           <span className='mt-2 inline-block'>
             <TweetTopic topic={topic} />
@@ -209,8 +181,8 @@ export function ViewTweet(tweet: ViewTweetProps): JSX.Element {
         </div>
         {user?.keyPair && (
           <Input
-            isReply
-            parentPost={{ id: tweetId, username: username, userId: ownerId }}
+            reply
+            parent={{ id: tweetId, username: username, userId: ownerId }}
             parentUrl={topic?.url || undefined}
           />
         )}
