@@ -1,14 +1,12 @@
-import { populateEmbedsForTweets } from '@lib/embeds';
 import { Prisma, casts } from '@prisma/client';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { FeedOrderingType } from '../../../lib/types/feed';
-import { prisma } from '../../../lib/prisma';
 import {
   PaginatedTweetsResponse,
   PaginatedTweetsType,
   TweetsResponse,
   getTweetsPaginatedRawSql
 } from '../../../lib/paginated-tweets';
+import { prisma } from '../../../lib/prisma';
 import { tweetConverter } from '../../../lib/types/tweet';
 
 export default async function handle(

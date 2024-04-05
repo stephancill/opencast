@@ -273,9 +273,15 @@ export function Input({
     topic &&
       setChannel({
         parent_url: topic.url,
-        image: topic.image || null,
+        image_url: topic.image || '',
         channel_id: topic.url,
-        name: topic.name
+        name: topic.name,
+        id: '',
+        description: topic.description,
+        created_at: Date.now(),
+        lead: {} as any,
+        object: 'channel',
+        url: topic.url
       });
   }, [topic]);
 

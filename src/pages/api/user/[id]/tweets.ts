@@ -5,7 +5,6 @@ import {
   PaginatedTweetsResponse
 } from '../../../../lib/paginated-tweets';
 import { prisma } from '../../../../lib/prisma';
-import { getEmbedsForTweetIds } from '../../../../lib/embeds';
 import { mergeMetadataCacheResponse } from '../../../../lib/types/tweet';
 
 export default async function handle(
@@ -60,17 +59,8 @@ export default async function handle(
         }
       });
 
-      const tweetEmbeds = await getEmbedsForTweetIds(
-        result.tweets.map((t) => t.id)
-      );
-
-      const mergedTweets = mergeMetadataCacheResponse(
-        result.tweets,
-        tweetEmbeds
-      );
-
       res.json({
-        result: { ...result, tweets: mergedTweets }
+        result: result
       });
       break;
     default:
