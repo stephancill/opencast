@@ -8,11 +8,7 @@ import {
 } from '../../lib/paginated-tweets';
 import { prisma } from '../../lib/prisma';
 import { FeedOrderingType } from '../../lib/types/feed';
-import {
-  mergeMetadataCacheResponse,
-  tweetConverter
-} from '../../lib/types/tweet';
-import { getEmbedsForTweetIds } from '../../lib/embeds';
+import { tweetConverter } from '../../lib/types/tweet';
 
 export default async function handle(
   req: NextApiRequest,
