@@ -181,8 +181,8 @@ export function ViewTweet(tweet: ViewTweetProps): JSX.Element {
         </div>
         {user?.keyPair && (
           <Input
-            reply
-            parent={{ id: tweetId, username: username, userId: ownerId }}
+            isReply={reply}
+            parentPost={{ id: tweetId, username: username, userId: ownerId }}
             parentUrl={topic?.url || undefined}
           />
         )}

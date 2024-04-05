@@ -107,13 +107,7 @@ export default async function tweetIdEndpoint(
     client: clientUser?.name || null
   };
 
-  const embeds = await getEmbedsForTweetIds([tweetWithUsers.id]);
-  const mergedTweets = mergeMetadataCacheResponse(
-    [tweetWithUsers],
-    embeds
-  ) as TweetWithUsers[];
-
   res.json({
-    result: mergedTweets[0]
+    result: tweetWithUsers
   });
 }

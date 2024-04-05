@@ -3,8 +3,6 @@ import {
   getTweetsPaginatedPrismaArgs,
   PaginatedTweetsResponse
 } from '../../../../lib/paginated-tweets';
-import { getEmbedsForTweetIds } from '../../../../lib/embeds';
-import { mergeMetadataCacheResponse } from '../../../../lib/types/tweet';
 
 export default async function handle(
   req: NextApiRequest,
