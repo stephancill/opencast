@@ -5,7 +5,6 @@ import {
   PaginatedTweetsResponse
 } from '../../../../lib/paginated-tweets';
 import { prisma } from '../../../../lib/prisma';
-import { mergeMetadataCacheResponse } from '../../../../lib/types/tweet';
 
 export default async function handle(
   req: NextApiRequest,
@@ -57,7 +56,7 @@ export default async function handle(
       });
 
       res.json({
-        result: result
+        result
       });
       break;
     default:
