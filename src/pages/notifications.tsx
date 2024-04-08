@@ -170,10 +170,10 @@ export default function NotificationsPage(): JSX.Element {
                                         {}{' '}
                                         {reaction.reactions.length > 1
                                           ? `and ${
-                                              reaction.reactions.length - 1
+                                              reaction.reactions.length
                                             } other${
                                               isPlural(
-                                                reaction.reactions.length - 1
+                                                reaction.reactions.length
                                               )
                                                 ? 's'
                                                 : ''
