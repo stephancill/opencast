@@ -11,9 +11,7 @@ module.exports = {
       ...defaultTheme.screens
     },
     extend: {
-      ...modConfig.theme.extend,
       fontFamily: {
-        ...modConfig.theme.extend.fontFamily,
         'twitter-chirp': ['TwitterChirp', 'sans-serif'],
         'twitter-chirp-extended': ['TwitterChirpExtendedHeavy', 'sans-serif']
       },
