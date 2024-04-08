@@ -131,13 +131,11 @@ export function ViewTweet(tweet: ViewTweetProps): JSX.Element {
           </Link>
         </p>
       )}
-      {/* TODO: Refactor these embeds and those in <Tweet> into common component */}
-      <div className='space-y-2'>
+      <div>
         <TweetText text={text || ''} images={images} mentions={mentions} />
-        {/* Images are shown using native image preview component */}
         {images && (
           <ImagePreview
-            tweet
+            viewTweet
             imagesPreview={images}
             previewCount={images.length}
           />
