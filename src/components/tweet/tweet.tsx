@@ -9,7 +9,6 @@ import { useAuth } from '@lib/context/auth-context';
 import { useModal } from '@lib/hooks/useModal';
 import type { Tweet } from '@lib/types/tweet';
 import type { User } from '@lib/types/user';
-import { isFarcasterUrlEmbed } from '@mod-protocol/farcaster';
 import cn from 'clsx';
 import type { Variants } from 'framer-motion';
 import Link from 'next/link';
@@ -186,7 +185,6 @@ export function Tweet(tweet: TweetProps): JSX.Element {
               />
             </div>
             <div className='mt-1 flex flex-col gap-2'>
-              {/* Images are shown using native image preview component */}
               {images && (
                 <ImagePreview
                   tweet
