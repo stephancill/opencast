@@ -59,6 +59,19 @@ export default async function handle(
         afterTime = new Date(beforeTime.getTime() - 24 * 60 * 60 * 1000);
       }
 
+      res.json({
+        result: {
+          notifications: [],
+          tweetsMap: {},
+          usersMap: {},
+          badgeCount: 0,
+          lastChecked: new Date().toISOString(),
+          cursor: null
+        }
+      });
+
+      return;
+
       const userPostsReactions = (await prisma.$queryRaw`
         SELECT 
           casts.*, 

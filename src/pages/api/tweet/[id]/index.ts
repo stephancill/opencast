@@ -30,13 +30,7 @@ export default async function tweetIdEndpoint(
   const cast = await prisma.casts.findUnique({
     where: {
       hash: Buffer.from(id, 'hex'),
-      deleted_at: null,
-      messages: {
-        deleted_at: null
-      }
-    },
-    include: {
-      messages: true
+      deleted_at: null
     }
   });
 
@@ -47,19 +41,19 @@ export default async function tweetIdEndpoint(
     return;
   }
 
-  const signer = await prisma.signers.findFirst({
-    where: {
-      key: cast.messages.signer
-    }
-  });
-  const clientFid =
-    signer?.metadata_type === 1
-      ? ((signer?.metadata as JsonObject | undefined)?.requestFid as string) ||
-        null
-      : null;
-  const clientUser = clientFid
-    ? await resolveUserFromFid(BigInt(clientFid))
-    : null;
+  // const signer = await prisma.signers.findFirst({
+  //   where: {
+  //     key: cast.signer
+  //   }
+  // });
+  // const clientFid =
+  //   signer?.metadata_type === 1
+  //     ? ((signer?.metadata as JsonObject | undefined)?.requestFid as string) ||
+  //       null
+  //     : null;
+  // const clientUser = clientFid
+  //   ? await resolveUserFromFid(BigInt(clientFid))
+  //   : null;
 
   const engagements = await prisma.reactions.findMany({
     where: {
@@ -104,7 +98,7 @@ export default async function tweetIdEndpoint(
     userLikes: reactions[ReactionType.LIKE] || [],
     userRetweets: reactions[ReactionType.RECAST] || [],
     users: users,
-    client: clientUser?.name || null
+    client: null
   };
 
   res.json({
