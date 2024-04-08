@@ -58,8 +58,13 @@ export function TweetText({
       indices,
       mentions.map((mention, index) => {
         const link = (
-          <Link href={`/user/${mention.username}`} key={index}>
-            <span className='inline text-main-accent hover:cursor-pointer hover:underline'>{`@${mention.username}`}</span>
+          <Link
+            href={`/user/${mention.username || mention.userId}`}
+            key={index}
+          >
+            <span className='inline text-main-accent hover:cursor-pointer hover:underline'>{`@${
+              mention.username || `!${mention.userId}`
+            }`}</span>
           </Link>
         );
         return mention.user ? (
