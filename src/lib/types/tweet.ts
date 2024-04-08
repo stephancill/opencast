@@ -176,17 +176,3 @@ export const tweetConverter = {
     } as Tweet;
   }
 };
-
-export function mergeMetadataCacheResponse(
-  tweets: Tweet[],
-  metadataJson: any
-): Tweet[] {
-  const merged = tweets.map((tweet) => {
-    return {
-      ...tweet,
-      embeds: metadataJson[`0x${tweet.id}`]
-    };
-  });
-
-  return merged;
-}
