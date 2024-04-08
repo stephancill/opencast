@@ -101,20 +101,21 @@ export function MobileSidebarModal({
       <section className='mt-0.5 flex flex-col gap-2 px-4'>
         {user?.keyPair && (
           <>
-            <Link href={userLink}>
-              <a className='blur-picture relative h-20 rounded-md'>
-                {coverPhotoURL ? (
-                  <NextImage
-                    useSkeleton
-                    imgClassName='rounded-md'
-                    src={coverPhotoURL}
-                    alt={name}
-                    layout='fill'
-                  />
-                ) : (
-                  <div className='h-full rounded-md bg-light-line-reply dark:bg-dark-line-reply' />
-                )}
-              </a>
+            <Link
+              href={userLink}
+              className='blur-picture relative h-20 rounded-md'
+            >
+              {coverPhotoURL ? (
+                <NextImage
+                  useSkeleton
+                  imgClassName='rounded-md'
+                  src={coverPhotoURL}
+                  alt={name}
+                  layout='fill'
+                />
+              ) : (
+                <div className='h-full rounded-md bg-light-line-reply dark:bg-dark-line-reply' />
+              )}
             </Link>
             <div className='-mt-4 mb-8 ml-2'>
               <UserAvatar
@@ -144,17 +145,17 @@ export function MobileSidebarModal({
               </div>
               <div className='text-secondary flex gap-4'>
                 {allStats.map(([id, label, stat]) => (
-                  <Link href={`${userLink}/${id}`} key={id}>
-                    <a
-                      className='hover-animation flex h-4 items-center gap-1 border-b border-b-transparent 
+                  <Link
+                    href={`${userLink}/${id}`}
+                    key={id}
+                    className='hover-animation flex h-4 items-center gap-1 border-b border-b-transparent 
                              outline-none hover:border-b-light-primary focus-visible:border-b-light-primary
                              dark:hover:border-b-dark-primary dark:focus-visible:border-b-dark-primary'
-                    >
-                      <p className='font-bold'>{stat}</p>
-                      <p className='text-light-secondary dark:text-dark-secondary'>
-                        {label}
-                      </p>
-                    </a>
+                  >
+                    <p className='font-bold'>{stat}</p>
+                    <p className='text-light-secondary dark:text-dark-secondary'>
+                      {label}
+                    </p>
                   </Link>
                 ))}
                 <i className='h-0.5 bg-light-line-reply dark:bg-dark-line-reply' />
@@ -227,13 +228,12 @@ export function MobileSidebarModal({
           </nav>
         </div>
         {!user?.keyPair && (
-          <Link passHref href='/login'>
-            <a
-              className='custom-button main-tab accent-tab right-4 mt-4 bg-main-accent text-center text-lg font-bold text-white
+          <Link
+            href='/login'
+            className='custom-button main-tab accent-tab right-4 mt-4 bg-main-accent text-center text-lg font-bold text-white
                    outline-none transition hover:brightness-90 active:brightness-75 xl:w-11/12'
-            >
-              <p>Login</p>
-            </a>
+          >
+            <p>Login</p>
           </Link>
         )}
       </section>

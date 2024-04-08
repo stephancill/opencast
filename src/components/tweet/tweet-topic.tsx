@@ -32,10 +32,11 @@ export function TweetTopicSkeleton() {
 
 export function TweetTopic({ topic }: { topic: TopicType }) {
   return (
-    <Link href={`/topic?url=${encodeURIComponent(topic.url)}`} passHref>
-      <a className='flex w-full cursor-pointer items-center whitespace-nowrap text-light-secondary hover:underline dark:text-dark-secondary'>
-        <TopicView topic={topic}></TopicView>
-      </a>
+    <Link
+      href={`/topic?url=${encodeURIComponent(topic.url)}`}
+      className='flex w-full cursor-pointer items-center whitespace-nowrap text-light-secondary hover:underline dark:text-dark-secondary'
+    >
+      <TopicView topic={topic}></TopicView>
     </Link>
   );
 }

@@ -185,23 +185,24 @@ export default function NotificationsPage(): JSX.Element {
                                           : 'recasted'}{' '}
                                         your post
                                       </div>
-                                      <Link href={`/tweet/${cast.id}`} passHref>
-                                        <a className='w-full cursor-pointer break-words text-gray-500 [overflow-wrap:anywhere] hover:brightness-75 dark:hover:brightness-125'>
-                                          {splitAndInsert(
-                                            cast.text || '',
-                                            cast.mentions.map(
-                                              (mention) => mention.position
-                                            ),
-                                            cast.mentions.map(
-                                              (mention, index) => (
-                                                <>@{mention.username || ''}</>
-                                              )
-                                            ),
-                                            (s) => (
-                                              <>{s}</>
+                                      <Link
+                                        href={`/tweet/${cast.id}`}
+                                        className='w-full cursor-pointer break-words text-gray-500 [overflow-wrap:anywhere] hover:brightness-75 dark:hover:brightness-125'
+                                      >
+                                        {splitAndInsert(
+                                          cast.text || '',
+                                          cast.mentions.map(
+                                            (mention) => mention.position
+                                          ),
+                                          cast.mentions.map(
+                                            (mention, index) => (
+                                              <>@{mention.username || ''}</>
                                             )
-                                          )}
-                                        </a>
+                                          ),
+                                          (s) => (
+                                            <>{s}</>
+                                          )
+                                        )}
                                       </Link>
                                     </div>
                                   </div>

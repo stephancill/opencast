@@ -69,10 +69,8 @@ export function MenuRow(props: MenuLinkProps) {
   const { href, onClick, isLoading, ...rest } = props;
 
   return href ? (
-    <Link href={href} passHref>
-      <a>
-        <MenuRowBase {...rest} />
-      </a>
+    <Link href={href}>
+      <MenuRowBase {...rest} />
     </Link>
   ) : (
     <div onClick={() => !isLoading && onClick?.()}>

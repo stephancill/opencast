@@ -21,7 +21,7 @@
     "@heroicons/react": "^2.0.11",
     "@noble/ed25519": "^2.0.0",
     "@prisma/client": "^5.1.0",
-    "@rainbow-me/rainbowkit": "^1.0.9",
+    "@rainbow-me/rainbowkit": "1.0.9",
     "clsx": "^1.2.1",
     "firebase": "^9.9.4",
     "framer-motion": "^7.2.1",

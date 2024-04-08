@@ -64,10 +64,12 @@ export function TipModal({
       () => (
         <span className='flex gap-2'>
           Your tip was sent
-          <Link href={`${explorerUrl?.url}/tx/${tipTxResult?.hash}`}>
-            <a className='custom-underline font-bold' target='_blank'>
-              View
-            </a>
+          <Link
+            href={`${explorerUrl?.url}/tx/${tipTxResult?.hash}`}
+            className='custom-underline font-bold'
+            target='_blank'
+          >
+            View
           </Link>
         </span>
       ),

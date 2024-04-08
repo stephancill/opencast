@@ -86,15 +86,10 @@ export function TweetText({
                         : part
                     }
                     key={index_}
-                    passHref
+                    className='inline text-main-accent hover:cursor-pointer hover:underline'
+                    target='_blank'
                   >
-                    <a
-                      target={'_blank'}
-                      key={part}
-                      className='inline text-main-accent hover:cursor-pointer hover:underline'
-                    >
-                      {part}
-                    </a>
+                    {part}
                   </Link>
                 );
               } else {

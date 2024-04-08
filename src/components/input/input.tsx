@@ -14,7 +14,6 @@ import type { ChangeEvent, ClipboardEvent, FormEvent, ReactNode } from 'react';
 import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { toast } from 'react-hot-toast';
 import useSWR from 'swr';
-import { useAccount } from 'wagmi';
 import { createCastMessage, submitHubMessage } from '../../lib/farcaster/utils';
 import { fetchJSON } from '../../lib/fetch';
 import { uploadToImgur } from '../../lib/imgur/upload';
@@ -29,9 +28,6 @@ import { Loading } from '../ui/loading';
 import { ImagePreview } from './image-preview';
 import { InputForm, fromTop } from './input-form';
 import { InputOptions } from './input-options';
-// import { FarcasterMention as ModMention } from '@mod-protocol/farcaster';
-// import { BaseResponse } from '../../lib/types/responses';
-// import { User } from '../../lib/types/user';
 
 type InputProps = {
   modal?: boolean;
@@ -105,7 +101,6 @@ export function Input({
   const [inputValue, setInputValue] = useState('');
   const [loading, setLoading] = useState(false);
   const [visited, setVisited] = useState(false);
-  const { address } = useAccount();
 
   const [embedUrls, setEmbedUrls] = useState<string[]>([]); // URLs to be fetched
   const [embeds, setEmbeds] = useState<ExternalEmbed[]>([]); // Fetched embeds
@@ -272,8 +267,11 @@ export function Input({
         () => (
           <span className='flex gap-2'>
             Your post was sent
-            <Link href={`/tweet/${tweetId}`}>
-              <a className='custom-underline font-bold'>View</a>
+            <Link
+              href={`/tweet/${tweetId}`}
+              className='custom-underline font-bold'
+            >
+              View
             </Link>
           </span>
         ),
@@ -379,8 +377,6 @@ export function Input({
     []
   );
 
-  const textLength = useTextLength({ getText, maxByteLength: 320 });
-
   useEffect(() => {
     if (!inputRef.current) return;
     const cursorPosition = inputRef.current.selectionStart;
@@ -459,66 +455,6 @@ export function Input({
     handleEmbedsChange(inputValue);
   }, [ignoredEmbedUrls]);
 
-  const handleFileUpload = useCallback(async (files: FileList) => {
-    // Mod expects a blob, so we convert the file to a blob
-    const imageFiles = await Promise.all(
-      Array.from(files)
-        .filter(({ type }) => {
-          return type.startsWith('image/');
-        })
-        .map(async (file) => {
-          const arrayBuffer = await file.arrayBuffer();
-          const blob = new Blob([new Uint8Array(arrayBuffer)], {
-            type: file.type
-          });
-          return { blob, ...file };
-        })
-    );
-
-    if (imageFiles.length === 0) return;
-
-    setContentLoading(true);
-    try {
-      // Upload to imgur
-      await Promise.all(
-        imageFiles.map(async (file) => {
-          const formData = new FormData();
-          formData.append('file', file.blob);
-          const res = await fetch(
-            `${process.env.NEXT_PUBLIC_MOD_API_URL}/imgur-upload`,
-            {
-              method: 'POST',
-              body: formData
-            }
-          );
-
-          const { url } = await res.json();
-          if (!url) return;
-
-          const currentEmbeds = getEmbeds();
-          const newEmbeds: typeof currentEmbeds = [
-            ...currentEmbeds,
-            {
-              url,
-              metadata: {
-                image: {
-                  url: url
-                },
-                mimeType: 'image/png'
-              },
-              status: 'loaded'
-            }
-          ];
-
-          setEmbeds(newEmbeds);
-        })
-      );
-    } catch (e) {
-      console.error(e);
-    }
-    setContentLoading(false);
-  }, []);
-
   return (
     <form
       className={cn('flex flex-col', {
@@ -538,10 +474,11 @@ export function Input({
           {...fromTop}
         >
           Replying to{' '}
-          <Link href={`/user/${parent?.username as string}`}>
-            <a className='custom-underline text-main-accent'>
-              {parent?.username as string}
-            </a>
+          <Link
+            href={`/user/${parent?.username as string}`}
+            className='custom-underline text-main-accent'
+          >
+            {parent?.username as string}
           </Link>
         </motion.p>
       )}

@@ -123,10 +123,11 @@ export function ViewTweet(tweet: ViewTweetProps): JSX.Element {
       {reply && (
         <p className='text-light-secondary dark:text-dark-secondary'>
           Replying to{' '}
-          <Link href={`/user/${parentUsername}`}>
-            <a className='custom-underline text-main-accent'>
-              @{parentUsername}
-            </a>
+          <Link
+            href={`/user/${parentUsername}`}
+            className='custom-underline text-main-accent'
+          >
+            @{parentUsername}
           </Link>
         </p>
       )}
@@ -180,11 +181,11 @@ export function ViewTweet(tweet: ViewTweetProps): JSX.Element {
           />
         </div>
         {user?.keyPair && (
-        <Input
-          reply
-          parent={{ id: tweetId, username: username, userId: ownerId }}
-          parentUrl={topic?.url || undefined}
-        />
+          <Input
+            reply
+            parent={{ id: tweetId, username: username, userId: ownerId }}
+            parentUrl={topic?.url || undefined}
+          />
         )}
       </div>
     </article>

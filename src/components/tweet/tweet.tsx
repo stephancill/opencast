@@ -163,10 +163,11 @@ export function Tweet(tweet: TweetProps): JSX.Element {
                 )}
               >
                 Replying to{' '}
-                <Link href={`/user/${parentUsername}`}>
-                  <a className='custom-underline text-main-accent'>
-                    @{parentUsername}
-                  </a>
+                <Link
+                  href={`/user/${parentUsername}`}
+                  className='custom-underline text-main-accent'
+                >
+                  @{parentUsername}
                 </Link>
               </p>
             )}

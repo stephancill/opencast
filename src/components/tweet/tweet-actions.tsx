@@ -212,8 +212,11 @@ export function TweetActions({
       () => (
         <span className='flex gap-2'>
           Your cast was reposted
-          <Link href={`/tweet/${newCastId}`}>
-            <a className='custom-underline font-bold'>View</a>
+          <Link
+            href={`/tweet/${newCastId}`}
+            className='custom-underline font-bold'
+          >
+            View
           </Link>
         </span>
       ),
