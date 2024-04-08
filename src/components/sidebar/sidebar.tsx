@@ -29,7 +29,7 @@ export const navLinks: Readonly<NavLink[]> = [
   {
     href: '/trends',
     linkName: 'Topics',
-    iconName: 'HashtagIcon'
+    iconName: 'ChatBubbleBottomCenterTextIcon'
   }
 ];
 

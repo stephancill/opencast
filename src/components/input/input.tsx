@@ -2,7 +2,7 @@ import { UserAvatar } from '@components/user/user-avatar';
 import { Message } from '@farcaster/hub-web';
 import { useAuth } from '@lib/context/auth-context';
 import type { FilesWithId, ImageData, ImagesPreview } from '@lib/types/file';
-import type { User } from '@lib/types/user';
+import type { User, UsersMapType } from '@lib/types/user';
 import { getHttpsUrls, sleep } from '@lib/utils';
 import { getImagesData } from '@lib/validation';
 import cn from 'clsx';
@@ -26,7 +26,6 @@ import { UserSearchResult } from '../search/user-search-result';
 import { TweetEmbed } from '../tweet/tweet-embed';
 import { TopicView, TweetTopicSkeleton } from '../tweet/tweet-topic';
 import { Loading } from '../ui/loading';
-import EditorExample from './editor-example';
 import { ImagePreview } from './image-preview';
 import { InputForm, fromTop } from './input-form';
 import { InputOptions } from './input-options';
@@ -521,177 +520,164 @@ export function Input({
   }, []);
 
   return (
-    <div>
-      <form
-        className={cn('flex flex-col', {
-          '-mx-4': reply,
-          'gap-2': replyModal,
-          'cursor-not-allowed': disabled
-        })}
-        onSubmit={handleSubmit}
-      >
-        {loading && (
-          <motion.i
-            className='h-1 animate-pulse bg-main-accent'
-            {...variants}
-          />
-        )}
-        {children}
-        {reply && visited && (
-          <motion.p
-            className='-mb-2 ml-[75px] mt-2 text-light-secondary dark:text-dark-secondary'
-            {...fromTop}
-          >
-            Replying to{' '}
-            <Link href={`/user/${parent?.username as string}`}>
-              <a className='custom-underline text-main-accent'>
-                {parent?.username as string}
-              </a>
-            </Link>
-          </motion.p>
-        )}
-        <label
-          className={cn(
-            'hover-animation grid w-full grid-cols-[auto,1fr] gap-3 px-4 py-3',
-            reply
-              ? 'pb-1 pt-3'
-              : replyModal
-              ? 'pt-0'
-              : 'border-b-2 border-light-border dark:border-dark-border',
-            (disabled || loading) && 'pointer-events-none opacity-50'
-          )}
-          htmlFor={formId}
+    <form
+      className={cn('flex flex-col', {
+        '-mx-4': reply,
+        'gap-2': replyModal,
+        'cursor-not-allowed': disabled
+      })}
+      onSubmit={handleSubmit}
+    >
+      {loading && (
+        <motion.i className='h-1 animate-pulse bg-main-accent' {...variants} />
+      )}
+      {children}
+      {reply && visited && (
+        <motion.p
+          className='-mb-2 ml-[75px] mt-2 text-light-secondary dark:text-dark-secondary'
+          {...fromTop}
         >
-          <UserAvatar src={photoURL} alt={name} username={username} />
-          <div className='flex w-full flex-col gap-4'>
-            <InputForm
-              modal={modal}
-              reply={reply}
-              formId={formId}
-              visited={visited}
-              loading={loading}
-              inputRef={inputRef}
-              replyModal={replyModal}
-              inputValue={inputValue}
-              isValidTweet={isValidTweet}
-              isUploadingImages={isUploadingImages}
-              sendTweet={sendTweet}
-              handleFocus={handleFocus}
-              discardTweet={discardTweet}
-              handleChange={(e) => {
-                handleChangeDebounced(e);
-                handleChange(e);
-              }}
-              handleImageUpload={handleImageUpload}
-            >
-              {showUsers &&
-                (usersSearchLoading ? (
-                  <Loading />
-                ) : (
-                  usersSearch &&
-                  usersSearch.length > 0 && (
-                    <ul className='menu-container hover-animation mt-1 overflow-hidden rounded-2xl bg-main-background'>
-                      {usersSearch.map((user) => {
-                        return (
-                          <li
-                            key={user.id}
-                            className='cursor-pointer p-2'
-                            onClick={() => handleUserClick(user)}
-                          >
-                            <UserSearchResult user={user} />
-                          </li>
-                        );
-                      })}
-                    </ul>
-                  )
-                ))}
-              {isUploadingImages && (
-                <ImagePreview
-                  imagesPreview={imagesPreview}
-                  previewCount={previewCount}
-                  removeImage={!loading ? removeImage : undefined}
-                />
-              )}
-              {embeds?.map(
-                (embed) =>
-                  embed &&
-                  !ignoredEmbedUrls.includes(embed.url) && (
-                    <div key={embed.url} className='flex items-center gap-2'>
-                      <button
-                        className='text-light-secondary dark:text-dark-secondary'
-                        onClick={() => {
-                          setIgnoredEmbedUrls([...ignoredEmbedUrls, embed.url]);
-                        }}
-                      >
-                        x
-                      </button>
-                      <TweetEmbed {...embed} key={embed.url} />
-                    </div>
-                  )
-              )}
-            </InputForm>
-
-            {loadingTopic ? (
-              <div className='w-10'>
-                <TweetTopicSkeleton />
-              </div>
-            ) : showingTopicSelector && !parent ? (
-              <SearchTopics
-                enabled={showingTopicSelector}
-                onSelectRawUrl={setTopicUrl}
-                onSelectTopic={setTopic}
-                setShowing={setShowingTopicSelector}
+          Replying to{' '}
+          <Link href={`/user/${parent?.username as string}`}>
+            <a className='custom-underline text-main-accent'>
+              {parent?.username as string}
+            </a>
+          </Link>
+        </motion.p>
+      )}
+      <label
+        className={cn(
+          'hover-animation grid w-full grid-cols-[auto,1fr] gap-3 px-4 py-3',
+          reply
+            ? 'pb-1 pt-3'
+            : replyModal
+            ? 'pt-0'
+            : 'border-b-2 border-light-border dark:border-dark-border',
+          (disabled || loading) && 'pointer-events-none opacity-50'
+        )}
+        htmlFor={formId}
+      >
+        <UserAvatar src={photoURL} alt={name} username={username} />
+        <div className='flex w-full flex-col gap-4'>
+          <InputForm
+            modal={modal}
+            reply={reply}
+            formId={formId}
+            visited={visited}
+            loading={loading}
+            inputRef={inputRef}
+            replyModal={replyModal}
+            inputValue={inputValue}
+            isValidTweet={isValidTweet}
+            isUploadingImages={isUploadingImages}
+            sendTweet={sendTweet}
+            handleFocus={handleFocus}
+            discardTweet={discardTweet}
+            handleChange={(e) => {
+              handleChangeDebounced(e);
+              handleChange(e);
+            }}
+            handleImageUpload={handleImageUpload}
+          >
+            {showUsers &&
+              (usersSearchLoading ? (
+                <Loading />
+              ) : (
+                usersSearch &&
+                usersSearch.length > 0 && (
+                  <ul className='menu-container hover-animation mt-1 overflow-hidden rounded-2xl bg-main-background'>
+                    {usersSearch.map((user) => {
+                      return (
+                        <li
+                          key={user.id}
+                          className='cursor-pointer p-2'
+                          onClick={() => handleUserClick(user)}
+                        >
+                          <UserSearchResult user={user} />
+                        </li>
+                      );
+                    })}
+                  </ul>
+                )
+              ))}
+            {isUploadingImages && (
+              <ImagePreview
+                imagesPreview={imagesPreview}
+                previewCount={previewCount}
+                removeImage={!loading ? removeImage : undefined}
               />
-            ) : (
-              topic && (
-                <div
-                  className='cursor-pointer text-light-secondary dark:text-dark-secondary'
-                  onClick={() => setShowingTopicSelector(true)}
-                >
-                  <TopicView topic={topic} />
-                </div>
-              )
             )}
+            {embeds?.map(
+              (embed) =>
+                embed &&
+                !ignoredEmbedUrls.includes(embed.url) && (
+                  <div key={embed.url} className='flex items-center gap-2'>
+                    <button
+                      className='text-light-secondary dark:text-dark-secondary'
+                      onClick={() => {
+                        setIgnoredEmbedUrls([...ignoredEmbedUrls, embed.url]);
+                      }}
+                    >
+                      x
+                    </button>
+                    <TweetEmbed {...embed} key={embed.url} />
+                  </div>
+                )
+            )}
+          </InputForm>
 
-            <AnimatePresence initial={false}>
-              {(reply ? reply && visited && !loading : !loading) && (
-                <InputOptions
-                  reply={reply}
-                  modal={modal}
-                  inputLimit={inputLimit}
-                  inputLength={inputLength}
-                  isValidTweet={isValidTweet}
-                  isCharLimitExceeded={isCharLimitExceeded}
-                  handleImageUpload={handleImageUpload}
-                  options={[
-                    {
-                      name: 'Media',
-                      iconName: 'PhotoIcon',
-                      disabled: false
-                    },
-                    {
-                      name: 'Topic',
-                      iconName: 'HashtagIcon',
-                      disabled: false,
-                      onClick() {
-                        setShowingTopicSelector(!showingTopicSelector);
-                      }
+          {loadingTopic ? (
+            <div className='w-10'>
+              <TweetTopicSkeleton />
+            </div>
+          ) : showingTopicSelector && !parent ? (
+            <SearchTopics
+              enabled={showingTopicSelector}
+              onSelectRawUrl={setTopicUrl}
+              onSelectTopic={setTopic}
+              setShowing={setShowingTopicSelector}
+            />
+          ) : (
+            topic && (
+              <div
+                className='cursor-pointer text-light-secondary dark:text-dark-secondary'
+                onClick={() => setShowingTopicSelector(true)}
+              >
+                <TopicView topic={topic} />
+              </div>
+            )
+          )}
+
+          <AnimatePresence initial={false}>
+            {(reply ? reply && visited && !loading : !loading) && (
+              <InputOptions
+                reply={reply}
+                modal={modal}
+                inputLimit={inputLimit}
+                inputLength={inputLength}
+                isValidTweet={isValidTweet}
+                isCharLimitExceeded={isCharLimitExceeded}
+                handleImageUpload={handleImageUpload}
+                options={[
+                  {
+                    name: 'Media',
+                    iconName: 'PhotoIcon',
+                    disabled: false
+                  },
+                  {
+                    name: 'Topic',
+                    iconName: 'ChatBubbleBottomCenterTextIcon',
+                    disabled: false,
+                    onClick() {
+                      setShowingTopicSelector(!showingTopicSelector);
                     }
-                  ]}
-                />
-              )}
-            </AnimatePresence>
-          </div>
-        </label>
-      </form>
-      <EditorExample
-        isReply={reply}
-        replyModal={replyModal}
-        loading={loading}
-        disabled={disabled}
-        parentAuthor={parent}
-        parentUrl={parentUrl}
-      ></EditorExample>
-    </div>
+                  }
+                ]}
+              />
+            )}
+          </AnimatePresence>
+        </div>
+      </label>
+    </form>
   );
 }
