@@ -1,13 +1,11 @@
+import { User, UsersMapType } from './types/user';
+import { resolveUserFromFid } from './user/resolve-user';
 import { UserDataType } from '@farcaster/hub-nodejs';
-import { Embed as ModEmbed } from '@mod-protocol/core';
-import { isFarcasterUrlEmbed } from '@mod-protocol/farcaster';
 import { casts } from '@prisma/client';
 import getMetaData from 'metadata-scraper';
 import { LRU } from './lru-cache';
 import { prisma } from './prisma';
 import { ExternalEmbed, Tweet } from './types/tweet';
-import { User, UsersMapType } from './types/user';
-import { resolveUserFromFid } from './user/resolve-user';
 
 const KNOWN_HOSTS_MAP: {
   [key: string]: { urlBuilder?: (url: string) => string; userAgent?: string };
