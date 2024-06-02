@@ -77,7 +77,7 @@ export default async function handle(
             AND (
               ${topicUrl}::text IS NULL
               OR
-              (${topicUrl}::text IS NOT NULL AND root_parent_url = ${topicUrl}::text)
+              (${topicUrl}::text IS NOT NULL AND parent_url = ${topicUrl}::text)
             )
             AND parent_hash IS NULL
             AND casts.deleted_at IS NULL
@@ -106,7 +106,7 @@ export default async function handle(
             AND (
               ${topicUrl}::text IS NULL
               OR
-              (${topicUrl}::text IS NOT NULL AND root_parent_url = ${topicUrl}::text)
+              (${topicUrl}::text IS NOT NULL AND parent_url = ${topicUrl}::text)
             )
           GROUP BY 
               casts.id
@@ -129,7 +129,7 @@ export default async function handle(
             AND (
               ${topicUrl}::text IS NULL
               OR
-              (${topicUrl}::text IS NOT NULL AND root_parent_url = ${topicUrl}::text)
+              (${topicUrl}::text IS NOT NULL AND parent_url = ${topicUrl}::text)
             )
             AND parent_hash IS NULL
             AND casts.deleted_at IS NULL
@@ -157,7 +157,7 @@ export default async function handle(
             AND (
               ${topicUrl}::text IS NULL
               OR
-              (${topicUrl}::text IS NOT NULL AND root_parent_url = ${topicUrl}::text)
+              (${topicUrl}::text IS NOT NULL AND parent_url = ${topicUrl}::text)
             )
           GROUP BY 
               casts.id
