@@ -48,10 +48,7 @@ export default async function handle(
           },
           fid: BigInt(id as string),
           parent_hash: replies ? undefined : null,
-          deleted_at: null,
-          messages: {
-            deleted_at: null
-          }
+          deleted_at: null
         },
         take: limit,
         orderBy: {
