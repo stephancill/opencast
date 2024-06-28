@@ -69,8 +69,8 @@ export function ImagePreview({
           ? previewCount - 1
           : selectedIndex - 1
         : selectedIndex === previewCount - 1
-        ? 0
-        : selectedIndex + 1;
+          ? 0
+          : selectedIndex + 1;
 
     setSelectedIndex(nextIndex);
   };

@@ -43,6 +43,7 @@ export type Tweet = {
   topic: TopicType | null;
   topicUrl: string | null;
   retweet: { username?: string; userId?: string } | null;
+  quoteTweets?: Tweet[];
 };
 
 export type TweetWithUsers = Tweet & { users: UsersMapType<User> };

@@ -16,6 +16,7 @@ import {
   resolveUsersMap
 } from '../../../../lib/user/resolve-user';
 import { JsonObject } from '@prisma/client/runtime/library';
+import { convertAndCalculateCursor } from '@lib/paginated-tweets';
 
 type TweetEndpointQuery = {
   id: string;
@@ -41,6 +42,9 @@ export default async function tweetIdEndpoint(
     return;
   }
 
+  const { tweets, users } = await convertAndCalculateCursor([cast]);
+  const tweet = tweets[0];
+
   // const signer = await prisma.signers.findFirst({
   //   where: {
   //     key: cast.signer
@@ -55,49 +59,15 @@ export default async function tweetIdEndpoint(
   //   ? await resolveUserFromFid(BigInt(clientFid))
   //   : null;
 
-  const engagements = await prisma.reactions.findMany({
-    where: {
-      target_cast_hash: cast.hash,
-      deleted_at: null
-    },
-    select: {
-      fid: true,
-      type: true
-    }
-  });
-
-  // Group reactions by type
-  const reactions = engagements.reduce((acc: any, cur) => {
-    const key = cur.type;
-    if (acc[key]) {
-      acc[key] = [...acc[key], cur.fid.toString()];
-    } else {
-      acc[key] = [cur.fid.toString()];
-    }
-    return acc;
-  }, {});
-
-  // Get all fids from cast and mentions
-  const fids = new Set<bigint>();
-  fids.add(cast.fid);
-  if (cast.parent_fid) fids.add(cast.parent_fid);
-  (cast.mentions as number[]).forEach((mention) => fids.add(BigInt(mention)));
-
-  const users = await resolveUsersMap([...fids]);
-
   let topic: TopicType | null = null;
   if (cast.root_parent_url) {
     topic = await resolveTopic(cast.root_parent_url);
   }
 
-  let tweet: Tweet = tweetConverter.toTweet(cast);
-
   const tweetWithUsers: TweetWithUsers = {
     ...tweet,
+    users,
     topic: topic,
-    userLikes: reactions[ReactionType.LIKE] || [],
-    userRetweets: reactions[ReactionType.RECAST] || [],
-    users: users,
     client: null
   };
 

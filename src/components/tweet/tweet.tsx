@@ -8,7 +8,7 @@ import { UserUsername } from '@components/user/user-username';
 import { useAuth } from '@lib/context/auth-context';
 import { useModal } from '@lib/hooks/useModal';
 import type { Tweet } from '@lib/types/tweet';
-import type { User } from '@lib/types/user';
+import type { User, UsersMapType } from '@lib/types/user';
 import cn from 'clsx';
 import type { Variants } from 'framer-motion';
 import Link from 'next/link';
@@ -23,10 +23,12 @@ import { hasAncestorWithClass } from '../../lib/utils';
 
 export type TweetProps = Tweet & {
   user: User;
+  usersMap?: UsersMapType<User>;
   modal?: boolean;
   pinned?: boolean;
   profile?: User | null;
   parentTweet?: boolean;
+  quoted?: boolean;
 };
 
 export const variants: Variants = {
@@ -56,7 +58,8 @@ export function Tweet(tweet: TweetProps): JSX.Element {
     topicUrl,
     retweet,
     embeds,
-    user: tweetUserData
+    user: tweetUserData,
+    quoted
   } = tweet;
 
   const { id: ownerId, name, username, verified, photoURL } = tweetUserData;
@@ -86,7 +89,9 @@ export function Tweet(tweet: TweetProps): JSX.Element {
              flex-col gap-y-4 px-4 py-3 outline-none duration-200`,
           parentTweet
             ? 'mt-0.5 pb-0 pt-2.5'
-            : 'border-b border-light-border dark:border-dark-border'
+            : 'border-b border-light-border dark:border-dark-border',
+          quoted
+          && 'border border-light-border dark:border-dark-border rounded-md p-4 mt-4'
         )}
         onClick={(event) => {
           const clickedElement = event.target as any;
@@ -142,7 +147,7 @@ export function Tweet(tweet: TweetProps): JSX.Element {
                 )}
               </div>
               <div className='px-4'>
-                {!modal && (
+                {!modal && !quoted && (
                   <TweetActions
                     isOwner={isOwner}
                     ownerId={ownerId}
@@ -194,8 +199,21 @@ export function Tweet(tweet: TweetProps): JSX.Element {
                 />
               )}
               {embeds && embeds.length > 0 && <TweetEmbeds embeds={embeds} />}
+              {
+                tweet.usersMap && tweet.quoteTweets?.map((quoteTweet) => (
+                  <Tweet
+                    key={quoteTweet.id}
+                    {...quoteTweet}
+                    user={tweet.usersMap![quoteTweet.createdBy]}
+                    modal={modal}
+                    profile={profile}
+                    parentTweet={false}
+                    quoted
+                  />
+                ))
+              }
               {topicUrl && <TweetTopicLazy topicUrl={topicUrl} />}
-              {!modal && (
+              {!modal && !quoted && (
                 <TweetStats
                   reply={reply}
                   userId={userId}
@@ -208,6 +226,7 @@ export function Tweet(tweet: TweetProps): JSX.Element {
                   openModal={openModal}
                 />
               )}
+
             </div>
           </div>
         </div>

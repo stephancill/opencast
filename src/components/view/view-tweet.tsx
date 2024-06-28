@@ -12,16 +12,18 @@ import { UserUsername } from '@components/user/user-username';
 import { useAuth } from '@lib/context/auth-context';
 import { useModal } from '@lib/hooks/useModal';
 import type { Tweet } from '@lib/types/tweet';
-import type { User } from '@lib/types/user';
+import type { User, UsersMapType } from '@lib/types/user';
 import cn from 'clsx';
 import Link from 'next/link';
 import { RefObject } from 'react';
 import { TweetEmbeds } from '../tweet/tweet-embed';
 import { TweetText } from '../tweet/tweet-text';
 import { TweetTopic } from '../tweet/tweet-topic';
+import { Tweet as TweetView } from '@components/tweet/tweet';
 
 type ViewTweetProps = Tweet & {
   user: User;
+  usersMap?: UsersMapType<User>;
   viewTweetRef?: RefObject<HTMLElement>;
 };
 
@@ -141,6 +143,18 @@ export function ViewTweet(tweet: ViewTweetProps): JSX.Element {
           />
         )}
         {embeds && embeds.length > 0 && <TweetEmbeds embeds={embeds} />}
+
+        {
+          tweet.usersMap && tweet.quoteTweets?.map((quoteTweet) => (
+            <TweetView
+              key={quoteTweet.id}
+              {...quoteTweet}
+              user={tweet.usersMap![quoteTweet.createdBy]}
+              parentTweet={false}
+              quoted
+            />
+          ))
+        }
         {topic && (
           <span className='mt-2 inline-block'>
             <TweetTopic topic={topic} />

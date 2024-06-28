@@ -51,9 +51,9 @@ export async function convertAndCalculateCursor(
   casts: casts[],
   calculateNextPageCursor?: (casts: casts[]) => string | null
 ): Promise<PaginatedTweetsType> {
-  let { tweets } = await castsToTweets(casts);
+  let { tweets, casts: allCasts } = await castsToTweets(casts);
 
-  const fids: Set<bigint> = casts.reduce((acc: Set<bigint>, cur) => {
+  const fids: Set<bigint> = allCasts.reduce((acc: Set<bigint>, cur) => {
     acc.add(cur.fid);
     if (cur.parent_fid) acc.add(cur.parent_fid);
     (cur.mentions as number[])?.forEach((mention) => acc.add(BigInt(mention)));
@@ -73,9 +73,28 @@ export async function convertAndCalculateCursor(
   };
 }
 
+type CastToTweetsReturnType = {
+  tweets: Tweet[];
+  casts: casts[];
+  castHashes: Buffer[];
+};
+
 export async function castsToTweets(
-  castsOrHashes: Buffer[] | casts[]
-): Promise<{ tweets: Tweet[]; casts: casts[]; castHashes: Buffer[] }> {
+  castsOrHashes: Buffer[] | casts[],
+  options: {
+    castRecursionDepth: number;
+    maxCastRecursionDepth: number;
+    includeEngagements: boolean;
+    includeReactions: boolean;
+    includeReplies: boolean;
+  } = {
+    castRecursionDepth: 0,
+    maxCastRecursionDepth: 1,
+    includeEngagements: true,
+    includeReactions: true,
+    includeReplies: true
+  }
+): Promise<CastToTweetsReturnType> {
   const casts =
     castsOrHashes[0] instanceof Buffer
       ? await prisma.casts.findMany({
@@ -92,32 +111,76 @@ export async function castsToTweets(
       ? (castsOrHashes as Buffer[])
       : casts.map((cast) => cast.hash);
 
-  const engagements = await prisma.reactions.findMany({
-    where: {
-      target_cast_hash: {
-        in: castHashes
-      },
-      deleted_at: null
-    },
-    select: {
-      fid: true,
-      type: true,
-      target_cast_hash: true
-    }
-  });
+  const castEmbedsHashes: Set<Buffer> = new Set();
 
-  const replyCount = await prisma.casts.groupBy({
-    by: ['parent_hash'],
-    where: {
-      parent_hash: {
-        in: castHashes
-      },
-      deleted_at: null
+  const castEmbedsHashesByCast = casts.reduce(
+    (acc: Record<string, string[]>, cast) => {
+      acc[cast.hash.toString('hex')] = (cast.embeds as any[])
+        .filter((embed) => 'castId' in embed)
+        .map((embed) => {
+          const hash = Buffer.from(embed.castId.hash.data);
+          castEmbedsHashes.add(Buffer.from(embed.castId.hash.data));
+          return hash.toString('hex');
+        });
+
+      return acc;
     },
-    _count: {
-      parent_hash: true
-    }
-  });
+    {}
+  );
+
+  let embeddedTweets: CastToTweetsReturnType | undefined = undefined;
+
+  if (options.castRecursionDepth < options.maxCastRecursionDepth) {
+    // Get contents of casts that are embedded
+    const castEmbeds = await prisma.casts.findMany({
+      where: {
+        hash: {
+          in: [...castEmbedsHashes]
+        }
+      }
+    });
+
+    embeddedTweets = await castsToTweets(castEmbeds, {
+      castRecursionDepth: options.castRecursionDepth + 1,
+      maxCastRecursionDepth: options.maxCastRecursionDepth,
+      includeEngagements: false,
+      includeReactions: false,
+      includeReplies: false
+    });
+
+    casts.push(...embeddedTweets.casts);
+  }
+
+  const engagements = options.includeEngagements
+    ? await prisma.reactions.findMany({
+        where: {
+          target_cast_hash: {
+            in: castHashes
+          },
+          deleted_at: null
+        },
+        select: {
+          fid: true,
+          type: true,
+          target_cast_hash: true
+        }
+      })
+    : [];
+
+  const replyCount = options.includeReplies
+    ? await prisma.casts.groupBy({
+        by: ['parent_hash'],
+        where: {
+          parent_hash: {
+            in: castHashes
+          },
+          deleted_at: null
+        },
+        _count: {
+          parent_hash: true
+        }
+      })
+    : [];
 
   // Create a map of parent_hash to reply count
   const replyCountMap = replyCount.reduce((acc: any, cur) => {
@@ -156,6 +219,12 @@ export async function castsToTweets(
   // Merge the casts with the reactions
   const tweets = casts.map((cast): Tweet => {
     const id = cast.hash.toString('hex');
+
+    const quoteTweets = castEmbedsHashesByCast[id]
+      ?.map(
+        (id) => embeddedTweets?.tweets.find((tweet) => tweet.id === id) || null
+      )
+      .filter(Boolean) as Tweet[];
     return {
       ...tweetConverter.toTweet(cast),
       userLikes: reactionsMap[id]
@@ -164,9 +233,10 @@ export async function castsToTweets(
       userRetweets: reactionsMap[id]
         ? reactionsMap[id][ReactionType.RECAST] || []
         : [],
-      userReplies: replyCountMap[id] || 0
+      userReplies: replyCountMap[id] || 0,
+      quoteTweets: quoteTweets
     };
   });
 
-  return { tweets, casts, castHashes };
+  return { tweets, casts: casts, castHashes };
 }

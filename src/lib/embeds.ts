@@ -37,15 +37,23 @@ export async function populateEmbed(
   }
 
   const url = KNOWN_HOSTS_MAP[host]?.urlBuilder?.(embed.url) || embed.url;
-  // const cached = LRU.get(url);
-  // if (cached !== undefined) {
-  //   return cached;
-  // }
+  const cached = LRU.get(url);
+  if (cached !== undefined) {
+    return cached;
+  }
 
   let result: ExternalEmbed | null = null;
 
   try {
     const userAgent = KNOWN_HOSTS_MAP[host]?.userAgent || undefined;
+    // TODO:
+    // {
+    //     maxRedirects: 1,
+    //     timeout: 1000,
+    //     ua:
+    //       userAgent ||
+    //       'Mozilla/5.0 (compatible; TelegramBot/1.0; +https://core.telegram.org/bots/webhooks)'
+    //   }
     const req = await fetch(url, {
       headers: {
         'User-Agent':
@@ -56,25 +64,10 @@ export async function populateEmbed(
     const contentType = req.headers.get('content-type');
     const html = await req.text();
 
-    const metadata = await getMetaData(
-      {
-        html
-      },
-      {
-        maxRedirects: 1,
-        timeout: 1000,
-        ua:
-          userAgent ||
-          'Mozilla/5.0 (compatible; TelegramBot/1.0; +https://core.telegram.org/bots/webhooks)'
-      }
-    );
-    let { title, description, icon, image } = metadata;
-    console.log({ contentType, metadata });
-
-    if (contentType?.startsWith('image')) {
-      image = url;
-      title = 'Image';
-    }
+    const metadata = await getMetaData({
+      html
+    });
+    const { title, description, icon, image } = metadata;
 
     if (!contentType) {
       return null;
@@ -85,8 +78,8 @@ export async function populateEmbed(
         url: embed.url,
         title: title,
         text: description,
-        icon,
-        image,
+        icon: icon ? new URL(icon).toString() : undefined,
+        image: image ? new URL(image).toString() : undefined,
         contentType
       };
       LRU.set(url, populatedEmbed);
