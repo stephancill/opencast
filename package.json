@@ -53,6 +53,7 @@
     "@typescript-eslint/eslint-plugin": "^5.32.0",
     "@typescript-eslint/parser": "^5.32.0",
     "autoprefixer": "^10.4.8",
+    "dotenv": "^16.4.5",
     "eslint": "8.21.0",
     "eslint-config-next": "12.2.4",
     "eslint-import-resolver-typescript": "^3.4.0",
