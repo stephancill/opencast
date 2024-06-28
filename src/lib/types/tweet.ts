@@ -21,6 +21,7 @@ export type ExternalEmbed = {
   image?: string;
   provider?: string;
   url: string;
+  contentType?: string;
 };
 
 export type Tweet = {

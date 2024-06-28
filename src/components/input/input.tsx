@@ -22,7 +22,7 @@ import { TopicResponse, TopicType } from '../../lib/types/topic';
 import { ExternalEmbed } from '../../lib/types/tweet';
 import { SearchTopics } from '../search/search-topics';
 import { UserSearchResult } from '../search/user-search-result';
-import { TweetEmbed } from '../tweet/tweet-embed';
+import { TweetExternalEmbed } from '../tweet/tweet-embed';
 import { TopicView, TweetTopicSkeleton } from '../tweet/tweet-topic';
 import { Loading } from '../ui/loading';
 import { ImagePreview } from './image-preview';
@@ -557,7 +557,7 @@ export function Input({
                     >
                       x
                     </button>
-                    <TweetEmbed {...embed} key={embed.url} />
+                    <TweetExternalEmbed {...embed} key={embed.url} />
                   </div>
                 )
             )}

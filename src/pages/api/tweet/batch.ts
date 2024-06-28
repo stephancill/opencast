@@ -37,8 +37,6 @@ export default async function handle(
 
       const castHashes = req.body.castHashes as string[];
 
-      console.log('castHashes', castHashes);
-
       // Get all the target_fids (people that the user follows)
       let targetFids: bigint[] | null = null;
       if (userFid != null) {

@@ -3,6 +3,7 @@ import { useMemo } from 'react';
 import useSWR from 'swr';
 import { ExternalEmbed } from '../../lib/types/tweet';
 import { NextImage } from '../ui/next-image';
+import { ImagePreview } from '@components/input/image-preview';
 
 const hoverModifier =
   'hover:brightness-75 dark:hover:brightness-125 hover:duration-200 transition';
@@ -32,12 +33,25 @@ export function TweetEmbeds({ embeds }: { embeds: ExternalEmbed[] }) {
     return embedsData?.filter((embed) => embed !== null).length || 0;
   }, [embedsData]);
 
+  const imageEmbeds = useMemo(() => {
+    return embedsData?.filter((embed) => embed?.contentType?.startsWith("image/"))
+  }, [embedsData])
+
   return embedsData !== undefined ? (
     embedsData && embedsCount > 0 && (
-      <div className={embedsCount > 1 ? `mt-2 grid gap-2` : 'mt-2'}>
-        {embedsData?.map((embed, index) =>
-          embed ? <TweetEmbed {...embed} key={index}></TweetEmbed> : <></>
-        )}
+      <div>
+        {imageEmbeds && imageEmbeds.length > 0 && <div>
+          <ImagePreview
+            tweet
+            imagesPreview={imageEmbeds.map(e => ({ alt: e?.title || "", id: e!.url, src: e!.url }))}
+            previewCount={imageEmbeds.length}
+          />
+        </div>}
+        <div className={embedsCount > 1 ? `mt-2 grid gap-2` : 'mt-2'}>
+          {embedsData?.map((embed, index) =>
+            embed && !embed.contentType?.startsWith("image/") ? <TweetEmbed {...embed} key={index}></TweetEmbed> : <></>
+          )}
+        </div>
       </div>
     )
   ) : (
@@ -79,9 +93,8 @@ border-black border-light-border p-2 text-left text-sm dark:border-dark-border'
             {icon && (
               // Only fully rounded if it's a link to a cast
               <span
-                className={`mx-1 ${
-                  url.startsWith('/tweet') ? 'overflow-hidden rounded-full' : ''
-                }`}
+                className={`mx-1 ${url.startsWith('/tweet') ? 'overflow-hidden rounded-full' : ''
+                  }`}
               >
                 <NextImage
                   src={icon}
