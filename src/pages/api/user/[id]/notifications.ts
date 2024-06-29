@@ -59,52 +59,35 @@ export default async function handle(
         afterTime = new Date(beforeTime.getTime() - 24 * 60 * 60 * 1000);
       }
 
-      res.json({
-        result: {
-          notifications: [],
-          tweetsMap: {},
-          usersMap: {},
-          badgeCount: 0,
-          lastChecked: new Date().toISOString(),
-          cursor: null
-        }
-      });
-
-      return;
-
       const userPostsReactions = (await prisma.$queryRaw`
         SELECT 
           casts.*, 
           reactions.type as reaction_type, 
-          messages.fid as message_fid, 
-          messages.hash as message_hash, 
-          messages.timestamp as message_timestamp,
-          messages.type as message_type
+          reactions.fid as message_fid, 
+          reactions.hash as message_hash, 
+          reactions.timestamp as message_timestamp,
+          3 as message_type
         FROM casts 
         JOIN reactions ON casts.hash = reactions.target_cast_hash 
-        JOIN messages ON reactions.hash = messages.hash
         WHERE
             casts.fid = ${fid} AND
-            messages.type = 3 AND
             reactions.deleted_at IS NULL AND
-            messages.timestamp > ${afterTime}
+            reactions.timestamp > ${afterTime}
         ORDER BY reactions.timestamp DESC;
       `) as ReactionQueryResult[];
 
       const userNewFollowers = (await prisma.$queryRaw`
         SELECT 
-          messages.fid as message_fid, 
-          messages.hash as message_hash, 
-          messages.type as message_type,
-          messages.timestamp as message_timestamp
+          links.fid as message_fid, 
+          links.hash as message_hash, 
+          5 as message_type,
+          links.timestamp as message_timestamp
         FROM links
-        JOIN messages ON links.hash = messages.hash
         WHERE
             links.target_fid = ${fid} AND
-            messages.type = 5 AND
             links.type = 'follow' AND
             links.deleted_at IS NULL AND
-            messages.timestamp > ${afterTime};
+            links.timestamp > ${afterTime};
       `) as FollowerQueryResult[];
 
       const userPostsReplies = (await prisma.$queryRaw`
@@ -112,11 +95,10 @@ export default async function handle(
         replies.fid as message_fid, 
         replies.hash as message_hash, 
         replies.timestamp as message_timestamp,
-        messages.type as message_type,
+        1 as message_type,
         casts.fid as parent_fid 
         FROM casts as replies
         JOIN casts ON casts.hash = replies.parent_hash
-        JOIN messages ON replies.hash = messages.hash
         WHERE 
             casts.fid = ${fid} AND
             replies.deleted_at IS NULL AND
@@ -126,17 +108,16 @@ export default async function handle(
 
       const userMentions = (await prisma.$queryRaw`
         SELECT casts.*, 
-    casts.fid as message_fid, 
-    casts.hash as message_hash, 
-    casts.timestamp as message_timestamp,
-    messages.type as message_type
-    FROM casts
-    JOIN messages ON casts.hash = messages.hash
-    CROSS JOIN LATERAL json_array_elements_text(casts.mentions) as mention
-    WHERE
-        casts.deleted_at IS NULL AND
-        casts.timestamp > ${afterTime} AND
-        mention::INTEGER = ${fid};`) as MentionsQueryResult[];
+        casts.fid as message_fid, 
+        casts.hash as message_hash, 
+        casts.timestamp as message_timestamp,
+        1 as message_type
+        FROM casts
+        CROSS JOIN LATERAL json_array_elements_text(casts.mentions) as mention
+        WHERE
+            casts.deleted_at IS NULL AND
+            casts.timestamp > ${afterTime} AND
+            mention::INTEGER = ${fid};`) as MentionsQueryResult[];
 
       const badgeCount =
         userNewFollowers.length +
