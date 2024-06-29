@@ -37,16 +37,16 @@ export function NextImage({
   const handleLoad = (): void => setLoading(false);
 
   return (
-    <figure style={{ width, height }} className={className}>
+    <figure style={{ width, height }} className={cn(className, "overflow-hidden")}>
       <Image
         className={cn(
           imgClassName,
           loading
             ? blurClassName ??
-                'animate-pulse bg-light-secondary dark:bg-dark-secondary'
+            'animate-pulse bg-light-secondary dark:bg-dark-secondary'
             : previewCount === 1
-            ? '!h-auto !min-h-0 !w-auto !min-w-0 rounded-lg object-contain'
-            : 'object-cover'
+              ? '!h-auto !min-h-0 !w-auto !min-w-0 rounded-lg object-contain'
+              : 'object-cover'
         )}
         src={src}
         width={width}

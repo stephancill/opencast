@@ -43,8 +43,8 @@ export function TweetTopic({ topic }: { topic: TopicType }) {
 
 export function TopicView({ topic }: { topic: TopicType }) {
   return (
-    <div className='override-nav inline flex items-center'>
-      #
+    <div className='override-nav inline flex items-center gap-[2px]'>
+      <span>#</span>
       {topic.image && (
         <span className='mx-1 inline flex-shrink-0 flex-grow-0 overflow-hidden rounded-md'>
           <NextImage

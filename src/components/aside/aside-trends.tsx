@@ -32,14 +32,14 @@ export function AsideTrends({ inTrendsPage }: AsideTrendsProps): JSX.Element {
     <section
       className={cn(
         !inTrendsPage &&
-          'hover-animation rounded-2xl bg-main-sidebar-background'
+        'hover-animation rounded-2xl bg-main-sidebar-background'
       )}
     >
       {loading ? (
         <Loading />
       ) : trends ? (
         <motion.div
-          className={cn('inner:px-4 inner:py-3', inTrendsPage && 'mt-0.5')}
+          // className={cn('inner:px-4 inner:py-3', inTrendsPage && 'mt-0.5')}
           {...variants}
         >
           {!inTrendsPage && (

@@ -60,8 +60,8 @@ export default async function tweetIdEndpoint(
   //   : null;
 
   let topic: TopicType | null = null;
-  if (cast.root_parent_url) {
-    topic = await resolveTopic(cast.root_parent_url);
+  if (cast.parent_url) {
+    topic = await resolveTopic(cast.parent_url);
   }
 
   const tweetWithUsers: TweetWithUsers = {

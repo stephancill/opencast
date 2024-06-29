@@ -33,62 +33,62 @@ export function AsideTrends({ inTrendsPage }: AsideTrendsProps): JSX.Element {
     <section
       className={cn(
         !inTrendsPage &&
-          'hover-animation sticky top-[4.5rem] overflow-hidden rounded-2xl bg-main-sidebar-background'
+        'hover-animation sticky top-[4.5rem] overflow-hidden rounded-2xl bg-main-sidebar-background'
       )}
     >
       {loading ? (
         <Loading />
       ) : trends ? (
         <motion.div
-          className={cn('inner:px-4 inner:py-3', inTrendsPage && 'mt-0.5')}
+          className={cn('flex flex-col gap-4', inTrendsPage && 'mt-0.5')}
           {...variants}
         >
           {!inTrendsPage && (
-            <h2 className='text-xl font-extrabold'>Trending topics</h2>
+
+            <h2 className='px-4 pt-4 text-xl font-extrabold'>Trending topics</h2>
           )}
-          {trends.map(({ topic: topic, volume }) => (
-            <Link href={`/topic?url=${topic?.url}`} key={topic?.url}>
-              {/* <a
-                className='hover-animation accent-tab hover-card relative 
-                           flex cursor-not-allowed flex-col gap-0.5'
-                onClick={preventBubbling()}
-              > */}
-              <div
-                className='hover-animation accent-tab hover-card relative 
-                           flex cursor-pointer flex-col gap-0.5'
-              >
-                <div className='flex items-center'>
-                  {topic?.image && (
-                    <div className='mr-2 overflow-hidden rounded-md'>
-                      <NextImage
-                        src={topic.image}
-                        alt={topic.name}
-                        // layout='fill'
-                        width={36}
-                        height={36}
-                      ></NextImage>
+          <div className='flex flex-col'>
+            <div className='flex flex-col'>
+              {trends.map(({ topic: topic, volume }) => (
+                <Link href={`/topic?url=${topic?.url}`} key={topic?.url}>
+                  <div
+                    className='hover-animation accent-tab hover-card relative 
+                           flex cursor-pointer flex-col gap-0.5 py-2 px-4'
+                  >
+                    <div className='flex items-center'>
+                      {topic?.image && (
+                        <div className='mr-2 overflow-hidden rounded-md border'>
+                          <NextImage
+                            imgClassName='object-fill'
+                            src={topic.image}
+                            alt={topic.name}
+                            // layout='fill'
+                            width={36}
+                            height={36}
+                          ></NextImage>
+                        </div>
+                      )}
+                      <div>
+                        <p className='font-bold'>{topic?.name}</p>
+                        <p className='text-sm text-light-secondary dark:text-dark-secondary'>
+                          {formatNumber(volume)} posts today
+                        </p>
+                      </div>
                     </div>
-                  )}
-                  <div>
-                    <p className='font-bold'>{topic?.name}</p>
-                    <p className='text-sm text-light-secondary dark:text-dark-secondary'>
-                      {formatNumber(volume)} posts today
-                    </p>
                   </div>
-                </div>
-              </div>
-              {/* </a> */}
-            </Link>
-          ))}
-          {!inTrendsPage && (
-            <Link
-              href='/trends'
-              className='custom-button accent-tab hover-card block w-full rounded-2xl
+                </Link>
+              ))}
+            </div>
+            {!inTrendsPage && (
+              <Link
+                href='/trends'
+                className='custom-button accent-tab hover-card block w-full rounded-2xl
                            rounded-t-none text-center text-main-accent'
-            >
-              Show more
-            </Link>
-          )}
+              >
+                Show more
+              </Link>
+            )}
+          </div>
         </motion.div>
       ) : (
         <Error />

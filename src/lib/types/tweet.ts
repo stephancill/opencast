@@ -163,7 +163,7 @@ export const tweetConverter = {
       embeds: externalEmbeds,
       parent,
       topic: null,
-      topicUrl: cast.root_parent_url,
+      topicUrl: cast.parent_url,
       userLikes: [],
       createdBy: cast.fid.toString(),
       user: null,
