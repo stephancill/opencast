@@ -73,12 +73,12 @@ export async function populateEmbed(
       return null;
     }
 
-    if (title || description) {
+    if (title || description || contentType.startsWith('image/')) {
       const populatedEmbed: ExternalEmbed = {
         url: embed.url,
         title: title,
         text: description,
-        icon: icon ? new URL(icon).toString() : undefined,
+        icon: icon ? new URL(icon, url).toString() : undefined,
         image: image ? new URL(image).toString() : undefined,
         contentType
       };
@@ -86,7 +86,10 @@ export async function populateEmbed(
       result = populatedEmbed;
     }
   } catch (e) {
-    console.log(`Error fetching embed for ${url}`);
+    console.log(
+      `Error fetching embed for ${url}`,
+      e instanceof Error ? e.message : e
+    );
     // console.error(e);
   }
 
