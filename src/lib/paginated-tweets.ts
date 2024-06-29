@@ -51,7 +51,7 @@ export async function convertAndCalculateCursor(
   casts: casts[],
   calculateNextPageCursor?: (casts: casts[]) => string | null
 ): Promise<PaginatedTweetsType> {
-  let { tweets, casts: allCasts } = await castsToTweets(casts);
+  let { tweets, allCasts } = await castsToTweets(casts);
 
   const fids: Set<bigint> = allCasts.reduce((acc: Set<bigint>, cur) => {
     acc.add(cur.fid);
@@ -75,8 +75,11 @@ export async function convertAndCalculateCursor(
 
 type CastToTweetsReturnType = {
   tweets: Tweet[];
+  /** Root casts */
   casts: casts[];
   castHashes: Buffer[];
+  /** All casts entities (root casts and quoted casts) */
+  allCasts: casts[];
 };
 
 export async function castsToTweets(
@@ -105,6 +108,7 @@ export async function castsToTweets(
           }
         })
       : (castsOrHashes as casts[]);
+  const allCasts = [...casts];
 
   const castHashes =
     castsOrHashes[0] instanceof Buffer
@@ -148,7 +152,7 @@ export async function castsToTweets(
       includeReplies: false
     });
 
-    casts.push(...embeddedTweets.casts);
+    embeddedTweets.casts.forEach((c) => allCasts.push(c));
   }
 
   const engagements = options.includeEngagements
@@ -238,5 +242,5 @@ export async function castsToTweets(
     };
   });
 
-  return { tweets, casts: casts, castHashes };
+  return { tweets, casts, castHashes, allCasts };
 }
