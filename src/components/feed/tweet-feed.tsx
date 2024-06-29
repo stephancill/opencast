@@ -91,6 +91,7 @@ export function TweetFeed({ feedOrdering, apiEndpoint }: TweetFeedProps) {
                 {...populateTweetUsers(tweet, users)}
                 user={users[tweet.createdBy]}
                 key={tweet.id}
+                usersMap={users}
               />
             );
           });

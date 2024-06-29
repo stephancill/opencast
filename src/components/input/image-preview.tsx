@@ -124,7 +124,7 @@ export function ImagePreview({
             className='flex h-full w-full cursor-pointer 
                          justify-center transition hover:brightness-75 hover:duration-200'
           >
-            <img className={cn('rounded-2xl')} src={src} alt={alt} />
+            <img className={cn('rounded-2xl object-cover')} src={src} alt={alt} />
           </div>
           {removeImage && (
             <Button
