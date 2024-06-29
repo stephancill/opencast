@@ -146,8 +146,6 @@ export default async function handle(
               casts
           LEFT JOIN 
               reactions ON casts.hash = reactions.target_cast_hash AND reactions.type = 1
-          LEFT JOIN
-              signers ON casts.signer = signers.id
           WHERE 
             casts.parent_hash is null  
             AND casts.deleted_at is null
