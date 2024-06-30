@@ -22,7 +22,7 @@ import { TopicResponse, TopicType } from '../../lib/types/topic';
 import { ExternalEmbed } from '../../lib/types/tweet';
 import { SearchTopics } from '../search/search-topics';
 import { UserSearchResult } from '../search/user-search-result';
-import { TweetExternalEmbed } from '../tweet/tweet-embed';
+import { TweetEmbed } from '../tweet/tweet-embed';
 import { TopicView, TweetTopicSkeleton } from '../tweet/tweet-topic';
 import { Loading } from '../ui/loading';
 import { ImagePreview } from './image-preview';
@@ -488,8 +488,8 @@ export function Input({
           reply
             ? 'pb-1 pt-3'
             : replyModal
-            ? 'pt-0'
-            : 'border-b-2 border-light-border dark:border-dark-border',
+              ? 'pt-0'
+              : 'border-b-2 border-light-border dark:border-dark-border',
           (disabled || loading) && 'pointer-events-none opacity-50'
         )}
         htmlFor={formId}
@@ -557,7 +557,7 @@ export function Input({
                     >
                       x
                     </button>
-                    <TweetExternalEmbed {...embed} key={embed.url} />
+                    <TweetEmbed {...embed} key={embed.url} />
                   </div>
                 )
             )}

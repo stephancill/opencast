@@ -4,11 +4,12 @@ import useSWR from 'swr';
 import { ExternalEmbed } from '../../lib/types/tweet';
 import { NextImage } from '../ui/next-image';
 import { ImagePreview } from '@components/input/image-preview';
+import { Frame } from '@components/frames/Frame';
 
 const hoverModifier =
   'hover:brightness-75 dark:hover:brightness-125 hover:duration-200 transition';
 
-export function TweetEmbeds({ embeds }: { embeds: ExternalEmbed[] }) {
+export function TweetEmbeds({ embeds, tweetId, tweetAuthorId }: { embeds: ExternalEmbed[], tweetId: string, tweetAuthorId: string }) {
   const fetchEmbeds = async (url: string | null) => {
     if (!url) return null;
 
@@ -37,6 +38,10 @@ export function TweetEmbeds({ embeds }: { embeds: ExternalEmbed[] }) {
     return embedsData?.filter((embed) => embed?.contentType?.startsWith("image/"))
   }, [embedsData])
 
+  const frames = useMemo(() => {
+    return embedsData?.filter((embed) => embed?.frame)
+  }, [embedsData])
+
   return embedsData !== undefined ? (
     embedsData && embedsCount > 0 && (
       <div>
@@ -49,9 +54,22 @@ export function TweetEmbeds({ embeds }: { embeds: ExternalEmbed[] }) {
         </div>}
         <div className={embedsCount > 1 ? `mt-2 grid gap-2` : 'mt-2'}>
           {embedsData?.map((embed, index) =>
-            embed && !embed.contentType?.startsWith("image/") ? <TweetEmbed {...embed} key={index}></TweetEmbed> : <></>
+            embed && !embed.contentType?.startsWith("image/") && !embed.frame ? <TweetEmbed {...embed} key={index}></TweetEmbed> : <></>
           )}
         </div>
+        {
+          frames?.map(embed => (<div key={embed?.url}>
+            <div className='flex justify-center  override-nav inline-block w-full rounded-md border 
+border-black border-light-border p-2 text-left text-sm dark:border-dark-border'>
+              <Frame url={embed!.url} frame={embed?.frame!} frameContext={{
+                castId: {
+                  fid: parseInt(tweetAuthorId),
+                  hash: `0x${tweetId}`
+                },
+              }} />
+            </div>
+          </div>))
+        }
       </div>
     )
   ) : (

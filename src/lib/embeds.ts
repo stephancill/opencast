@@ -1,10 +1,6 @@
-import { User, UsersMapType } from './types/user';
-import { resolveUserFromFid } from './user/resolve-user';
-import { UserDataType } from '@farcaster/hub-nodejs';
-import { casts } from '@prisma/client';
+import { getFrame } from 'frames.js';
 import getMetaData from 'metadata-scraper';
 import { LRU } from './lru-cache';
-import { prisma } from './prisma';
 import { ExternalEmbed, Tweet } from './types/tweet';
 
 const KNOWN_HOSTS_MAP: {
@@ -57,8 +53,7 @@ export async function populateEmbed(
     const req = await fetch(url, {
       headers: {
         'User-Agent':
-          userAgent ||
-          'Mozilla/5.0 (compatible; TelegramBot/1.0; +https://core.telegram.org/bots/webhooks)'
+          userAgent || 'Mozilla/5.0 (compatible; OpenframesBot/1.0;)'
       }
     });
     const contentType = req.headers.get('content-type');
@@ -68,6 +63,8 @@ export async function populateEmbed(
       html
     });
     const { title, description, icon, image } = metadata;
+
+    const frameResult = getFrame({ htmlString: html, url });
 
     if (!contentType) {
       return null;
@@ -80,7 +77,8 @@ export async function populateEmbed(
         text: description,
         icon: icon ? new URL(icon, url).toString() : undefined,
         image: image ? new URL(image).toString() : undefined,
-        contentType
+        contentType,
+        frame: frameResult.status === 'success' ? frameResult.frame : undefined
       };
       LRU.set(url, populatedEmbed);
       result = populatedEmbed;

@@ -1,10 +1,11 @@
 import { Embed } from '@farcaster/hub-web';
 import { casts } from '@prisma/client';
+import { Frame } from 'frames.js';
 import { TopicsMapType } from '../topics/resolve-topic';
-import { TopicType } from './topic';
 import { isValidImageExtension } from '../validation';
 import type { ImagesPreview } from './file';
 import { BaseResponse } from './responses';
+import { TopicType } from './topic';
 import type { User, UsersMapType } from './user';
 
 export type Mention = {
@@ -22,6 +23,7 @@ export type ExternalEmbed = {
   provider?: string;
   url: string;
   contentType?: string;
+  frame?: Frame;
 };
 
 export type Tweet = {
