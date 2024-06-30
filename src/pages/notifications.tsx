@@ -47,9 +47,8 @@ export default function NotificationsPage(): JSX.Element {
 
       if (prevPage && !prevPage.result?.cursor) return null;
 
-      const baseUrl = `/api/user/${
-        user.id
-      }/notifications?before_time=${lastCheckedNotifications.toISOString()}&full=true`;
+      const baseUrl = `/api/user/${user.id
+        }/notifications?before_time=${lastCheckedNotifications.toISOString()}&full=true`;
 
       if (pageIndex === 0) return baseUrl;
 
@@ -107,7 +106,7 @@ export default function NotificationsPage(): JSX.Element {
                                       className='ml-4 mr-6 mt-3 h-6 w-6 flex-shrink-0 flex-grow-0'
                                       iconName={
                                         reaction.reactionType ===
-                                        ReactionType.LIKE
+                                          ReactionType.LIKE
                                           ? 'HeartIcon'
                                           : 'ArrowPathRoundedSquareIcon'
                                       }
@@ -120,31 +119,31 @@ export default function NotificationsPage(): JSX.Element {
                                             <UserTooltip
                                               key={reaction.userId}
                                               {...data.usersMap[
-                                                reaction.userId
+                                              reaction.userId
                                               ]}
                                             >
                                               {data.usersMap[
                                                 reaction.userId
                                               ] && (
-                                                <UserAvatar
-                                                  src={
-                                                    data.usersMap[
-                                                      reaction.userId
-                                                    ].photoURL
-                                                  }
-                                                  alt={
-                                                    data.usersMap[
-                                                      reaction.userId
-                                                    ].name
-                                                  }
-                                                  username={
-                                                    data.usersMap[
-                                                      reaction.userId
-                                                    ].username
-                                                  }
-                                                  className='h-8 w-8'
-                                                />
-                                              )}
+                                                  <UserAvatar
+                                                    src={
+                                                      data.usersMap[
+                                                        reaction.userId
+                                                      ].photoURL
+                                                    }
+                                                    alt={
+                                                      data.usersMap[
+                                                        reaction.userId
+                                                      ].name
+                                                    }
+                                                    username={
+                                                      data.usersMap[
+                                                        reaction.userId
+                                                      ].username
+                                                    }
+                                                    size={32}
+                                                  />
+                                                )}
                                             </UserTooltip>
                                           ))}
                                       </div>
@@ -154,7 +153,7 @@ export default function NotificationsPage(): JSX.Element {
                                             <UserTooltip
                                               key={reaction.userId}
                                               {...data.usersMap[
-                                                reaction.userId
+                                              reaction.userId
                                               ]}
                                             >
                                               <UserName
@@ -167,20 +166,18 @@ export default function NotificationsPage(): JSX.Element {
                                             </UserTooltip>
                                           )}
                                         </span>
-                                        {}{' '}
+                                        { }{' '}
                                         {reaction.reactions.length > 1
-                                          ? `and ${
-                                              reaction.reactions.length
-                                            } other${
-                                              isPlural(
-                                                reaction.reactions.length
-                                              )
-                                                ? 's'
-                                                : ''
-                                            }`
+                                          ? `and ${reaction.reactions.length
+                                          } other${isPlural(
+                                            reaction.reactions.length
+                                          )
+                                            ? 's'
+                                            : ''
+                                          }`
                                           : ''}{' '}
                                         {reaction.reactionType ===
-                                        ReactionType.LIKE
+                                          ReactionType.LIKE
                                           ? 'liked'
                                           : 'recasted'}{' '}
                                         your post
@@ -267,11 +264,10 @@ export default function NotificationsPage(): JSX.Element {
                                           )}
                                         </span>{' '}
                                         {link.follows.length > 0
-                                          ? ` and ${link.follows.length} other${
-                                              isPlural(link.follows.length)
-                                                ? 's'
-                                                : ''
-                                            }`
+                                          ? ` and ${link.follows.length} other${isPlural(link.follows.length)
+                                            ? 's'
+                                            : ''
+                                          }`
                                           : ''}{' '}
                                         followed you
                                       </div>

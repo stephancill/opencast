@@ -40,13 +40,13 @@ export function NextImage({
     <figure style={{ width, height }} className={cn(className, "overflow-hidden")}>
       <Image
         className={cn(
-          imgClassName,
           loading
             ? blurClassName ??
             'animate-pulse bg-light-secondary dark:bg-dark-secondary'
             : previewCount === 1
-              ? '!h-auto !min-h-0 !w-auto !min-w-0 rounded-lg object-contain'
-              : 'object-cover'
+              ? 'h-full min-h-0 w-full min-w-0 rounded-lg object-contain'
+              : 'object-cover',
+          imgClassName,
         )}
         src={src}
         width={width}

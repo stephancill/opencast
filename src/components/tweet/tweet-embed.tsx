@@ -96,12 +96,8 @@ border-black border-light-border p-2 text-left text-sm dark:border-dark-border'
                 className={`mx-1 ${url.startsWith('/tweet') ? 'overflow-hidden rounded-full' : ''
                   }`}
               >
-                <NextImage
-                  src={icon}
-                  alt={provider || ''}
-                  width={16}
-                  height={16}
-                ></NextImage>
+                <img src={icon}
+                  alt={provider || ''} className='w-4 h-4' />
               </span>
             )}
             {title && (
@@ -131,7 +127,7 @@ border-black border-light-border p-2 text-left text-sm dark:border-dark-border'
         </div>
         {image ? (
           <div className='ml-2 mr-1 block hidden h-28 w-28 flex-shrink-0 flex-grow-0 overflow-hidden rounded-md sm:block'>
-            <NextImage
+            <img
               src={image}
               alt={title || ''}
               title={title || 'Unknown'}
