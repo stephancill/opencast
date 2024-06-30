@@ -8,7 +8,8 @@ import { useFrame } from "@frames.js/render/use-frame";
 import { useAuth } from "@lib/context/auth-context";
 import { Frame as FrameType } from "frames.js";
 import { useEffect, useState } from "react";
-import { useAccount } from "wagmi";
+import { useAccount, useChainId, useSendTransaction, useSwitchNetwork, useWalletClient } from "wagmi";
+import * as chains from "viem/chains";
 
 type FrameProps = {
     url: string
@@ -16,10 +17,17 @@ type FrameProps = {
     frameContext: FarcasterFrameContext
 }
 
+const getChainFromId = (id: number): chains.Chain | undefined => {
+    return Object.values(chains).find(chain => chain.id === id)
+}
+
 export function Frame({ frame, frameContext, url }: FrameProps) {
     const { user } = useAuth()
     const { address: connectedAddress } = useAccount()
     const [farcasterSigner, setFarcasterSigner] = useState<FarcasterSigner | undefined>(undefined)
+    const { sendTransactionAsync, sendTransaction } = useSendTransaction()
+    const currentChainId = useChainId()
+    const { switchNetworkAsync } = useSwitchNetwork()
 
     useEffect(() => {
         if (user?.keyPair) {
@@ -29,37 +37,54 @@ export function Frame({ frame, frameContext, url }: FrameProps) {
                 status: 'approved',
                 publicKey: `0x${user.keyPair.publicKey}`
             })
+        } else {
+            setFarcasterSigner(undefined)
         }
     }, [user])
 
+    useEffect(() => {
+        console.log(farcasterSigner)
+    }, [farcasterSigner])
+
     const frameState = useFrame({
-        // replace with your frame url
         homeframeUrl: url,
-        // corresponds to the name of the route for POST in step 3
         frameActionProxy: "/frames",
         connectedAddress,
-        // corresponds to the name of the route for GET in step 3
         frameGetProxy: "/frames",
         frameContext,
-        // map to your identity if you have one
         signerState: {
             hasSigner: farcasterSigner !== undefined,
             signer: farcasterSigner,
             onSignerlessFramePress: () => {
                 // Only run if `hasSigner` is set to `false`
                 // This is a good place to throw an error or prompt the user to login
-                alert("A frame button was pressed without a signer. Perhaps you want to prompt a login");
+                // alert("A frame button was pressed without a signer. Perhaps you want to prompt a login");
             },
             signFrameAction: signFrameAction,
         },
+        onTransaction: async ({ transactionData }) => {
+            // Switch to the chain that the transaction is on
+            const chainId = parseInt(transactionData.chainId.split(":")[1])
+            if (chainId !== currentChainId) {
+                const newChain = await switchNetworkAsync?.(chainId)
+                if (!newChain) {
+                    console.error("Failed to switch network")
+                    return null
+                }
+            }
+
+            const { hash } = await sendTransactionAsync({
+                ...transactionData.params,
+                value: transactionData.params.value ? BigInt(transactionData.params.value) : undefined,
+                chainId: parseInt(transactionData.chainId.split(":")[1]),
+            })
+            return hash || null
+        }
     });
 
     return (
         <div className="w-[400px] rounded-2xl overflow-hidden">
-            <FrameUI frameState={frameState} theme={{
-                bg: 'white',
-                buttonRadius: '12',
-            }} FrameImage={(props) => (<img {...props}></img>)} />
+            <FrameUI frameState={frameState} theme={{}} FrameImage={(props) => (<img {...props}></img>)} />
         </div>
     );
 

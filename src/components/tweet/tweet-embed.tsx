@@ -59,8 +59,7 @@ export function TweetEmbeds({ embeds, tweetId, tweetAuthorId }: { embeds: Extern
         </div>
         {
           frames?.map(embed => (<div key={embed?.url}>
-            <div className='flex justify-center  override-nav inline-block w-full rounded-md border 
-border-black border-light-border p-2 text-left text-sm dark:border-dark-border'>
+            <div className='flex justify-center override-nav rounded-md'>
               <Frame url={embed!.url} frame={embed?.frame!} frameContext={{
                 castId: {
                   fid: parseInt(tweetAuthorId),

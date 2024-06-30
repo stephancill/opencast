@@ -198,7 +198,7 @@ export function Tweet(tweet: TweetProps): JSX.Element {
                   previewCount={images.length}
                 />
               )}
-              {embeds && embeds.length > 0 && <TweetEmbeds embeds={embeds} />}
+              {embeds && embeds.length > 0 && <TweetEmbeds embeds={embeds} tweetAuthorId={tweet.createdBy} tweetId={tweet.id} />}
               {
                 tweet.usersMap && tweet.quoteTweets?.map((quoteTweet) => (
                   <Tweet

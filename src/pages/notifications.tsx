@@ -239,7 +239,7 @@ export default function NotificationsPage(): JSX.Element {
                                                     data.usersMap[follow.userId]
                                                       .username
                                                   }
-                                                  className='h-8 w-8'
+                                                  size={32}
                                                 />
                                               )}
                                             </UserTooltip>
