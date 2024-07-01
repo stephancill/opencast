@@ -10,6 +10,7 @@ import Link from 'next/link';
 import { MoreSettings } from './more-settings';
 import { SidebarLink } from './sidebar-link';
 import { SidebarProfile } from './sidebar-profile';
+import { SyncView } from '@components/sync/sync-view';
 
 export type NavLink = {
   href: string;
@@ -112,21 +113,27 @@ export function Sidebar(): JSX.Element {
             {!isMobile && <MoreSettings />}
           </nav>
           {user?.keyPair && (
-            <Button
-              className='accent-tab absolute right-4 -translate-y-[72px] bg-main-accent text-lg font-bold text-white
+            <div>
+              <Button
+                className='accent-tab absolute right-4 -translate-y-[72px] bg-main-accent text-lg font-bold text-white
                        outline-none transition hover:brightness-90 active:brightness-75 xs:static xs:translate-y-0
                        xs:hover:bg-main-accent/90 xs:active:bg-main-accent/75 xl:w-11/12'
-              onClick={openModal}
-            >
-              <CustomIcon
-                className='block h-6 w-6 xl:hidden'
-                iconName='FeatherIcon'
-              />
-              <p className='hidden xl:block'>Cast</p>
-            </Button>
+                onClick={openModal}
+              >
+                <CustomIcon
+                  className='block h-6 w-6 xl:hidden'
+                  iconName='FeatherIcon'
+                />
+                <p className='hidden xl:block'>Cast</p>
+              </Button>
+            </div>
           )}
         </section>
-        {!isMobile && user?.keyPair && <SidebarProfile />}
+        {!isMobile && user?.keyPair &&
+          <div className='gap-4 flex flex-col'>
+            <SyncView userId={user.id} />
+            <SidebarProfile />
+          </div>}
         {!user?.keyPair && (
           <Link
             className='custom-button main-tab accent-tab absolute right-4 -translate-y-[72px] bg-main-accent text-center text-lg font-bold text-white

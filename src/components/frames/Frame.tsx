@@ -42,10 +42,6 @@ export function Frame({ frame, frameContext, url }: FrameProps) {
         }
     }, [user])
 
-    useEffect(() => {
-        console.log(farcasterSigner)
-    }, [farcasterSigner])
-
     const frameState = useFrame({
         homeframeUrl: url,
         frameActionProxy: "/frames",
