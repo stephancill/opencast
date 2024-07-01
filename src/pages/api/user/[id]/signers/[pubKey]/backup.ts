@@ -24,20 +24,20 @@ export default async function handler(
     });
 
   const pubKeyBytes = Buffer.from(pubKey, 'hex');
-  const messageRows = await prisma.messages.findMany({
-    where: {
-      signer: pubKeyBytes
-    },
-    distinct: ['hash']
-  });
+  // const messageRows = await prisma.messages.findMany({
+  //   where: {
+  //     signer: pubKeyBytes
+  //   },
+  //   distinct: ['hash']
+  // });
 
-  const messages = messageRows.map((m) =>
-    Message.toJSON(Message.decode(m.raw))
-  );
+  // const messages = messageRows.map((m) =>
+  //   Message.toJSON(Message.decode(m.raw))
+  // );
 
   return res.json({
     result: {
-      messages: serialize(messages) as Message[],
+      messages: [],
       signer: serialize(signer)
     }
   });

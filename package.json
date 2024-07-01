@@ -79,7 +79,7 @@
   "engines": {
     "node": ">=18.0.0"
   },
-  "overrides": {
-    "ffi-napi": "../_EXCLUDED_"
+  "resolutions": {
+    "ffi-napi": "https://registry.yarnpkg.com/@favware/skip-dependency/-/skip-dependency-1.0.2.tgz"
   }
 }
