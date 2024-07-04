@@ -1,18 +1,53 @@
-import { UserDataType } from '@farcaster/hub-web';
+import { getHubRpcClient, UserDataType } from '@farcaster/hub-web';
 import { prisma } from '../prisma';
 import { User, userConverter, UserFull, UsersMapType } from '../types/user';
 import { TopicType } from '../types/topic';
 import { resolveTopic } from '../topics/resolve-topic';
+import { bytesToHex } from 'viem';
+import { fetchJSON } from '../fetch';
+import {
+  getInsecureHubRpcClient,
+  getSSLHubRpcClient,
+  isUserDataAddMessage
+} from '@farcaster/hub-nodejs';
 
-export async function resolveUserFromFid(fid: bigint): Promise<User | null> {
-  const userData = await prisma.user_data.findMany({
-    where: {
-      fid: fid
-    }
-  });
+async function getUserDataMap(fid: bigint): Promise<
+  | {
+      type: number;
+      value: string;
+    }[]
+  | null
+> {
+  let userData = (
+    await prisma.user_data.findMany({
+      where: {
+        fid: fid
+      }
+    })
+  ).map((ud) => ({
+    type: ud.type,
+    value: ud.value
+  }));
 
   if (userData.length === 0) {
-    return null;
+    // Query hub
+    const hubClient =
+      process.env.FC_HUB_USE_TLS === 'true'
+        ? getSSLHubRpcClient(process.env.FC_HUB_URL!)
+        : getInsecureHubRpcClient(process.env.FC_HUB_URL!);
+    const userDataHubResponse = await hubClient.getUserDataByFid({
+      fid: Number(fid)
+    });
+
+    if (!userDataHubResponse.isOk()) {
+      return null;
+    }
+
+    const userDataHub = userDataHubResponse.value.messages;
+
+    userData = userDataHub
+      .filter(isUserDataAddMessage)
+      .map((m) => m.data.userDataBody);
   }
 
   const userDataRaw = userData.reduce((acc: any, cur) => {
@@ -22,6 +57,12 @@ export async function resolveUserFromFid(fid: bigint): Promise<User | null> {
     };
     return acc;
   }, {});
+
+  return userDataRaw;
+}
+
+export async function resolveUserFromFid(fid: bigint): Promise<User | null> {
+  const userDataRaw = await getUserDataMap(fid);
 
   const user = userConverter.toUser({ ...userDataRaw, fid });
 
@@ -31,23 +72,7 @@ export async function resolveUserFromFid(fid: bigint): Promise<User | null> {
 export async function resolveUserFullFromFid(
   fid: bigint
 ): Promise<UserFull | null> {
-  const userData = await prisma.user_data.findMany({
-    where: {
-      fid: fid
-    }
-  });
-
-  if (userData.length === 0) {
-    return null;
-  }
-
-  const userDataRaw = userData.reduce((acc: any, cur) => {
-    acc = {
-      ...acc,
-      [cur.type]: cur.value
-    };
-    return acc;
-  }, {});
+  const userDataRaw = await getUserDataMap(fid);
 
   const followers = await prisma.links.findMany({
     where: {
@@ -83,10 +108,10 @@ export async function resolveUserFullFromFid(
       deleted_at: null
     }
   });
-  const verificationClaim = verification?.claim as
-    | { address: string }
-    | undefined;
-  const userAddress = verificationClaim?.address;
+  const signerAddressBuffer = verification?.signer_address;
+  const userAddress = signerAddressBuffer
+    ? bytesToHex(signerAddressBuffer)
+    : null;
 
   const user = userConverter.toUserFull({ ...userDataRaw, fid });
 
@@ -95,7 +120,7 @@ export async function resolveUserFullFromFid(
     followers: followers.map((f) => f.fid!.toString()),
     following: following.map((f) => f.target_fid!.toString()),
     totalTweets: castCount._count,
-    address: userAddress || null,
+    address: userAddress,
     interests
   };
 }
@@ -169,7 +194,7 @@ export async function userInterests(fid: bigint): Promise<TopicType[]> {
         FROM 
             reactions r
         INNER JOIN 
-            casts c ON r.target_hash = c.hash 
+            casts c ON r.target_cast_hash = c.hash 
         WHERE 
             r.fid = ${fid}  
             AND c.deleted_at IS NULL 

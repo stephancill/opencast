@@ -4,14 +4,13 @@ import '@styles/globals.scss';
 import { AppHead } from '@components/common/app-head';
 import { AuthContextProvider } from '@lib/context/auth-context';
 import { ThemeContextProvider } from '@lib/context/theme-context';
-import { RainbowKitProvider, getDefaultWallets } from '@rainbow-me/rainbowkit';
+import { RainbowKitProvider, getDefaultConfig } from '@rainbow-me/rainbowkit';
 import type { NextPage } from 'next';
 import type { AppProps } from 'next/app';
 import type { ReactElement, ReactNode } from 'react';
-import { QueryClient, QueryClientProvider } from 'react-query';
-import { WagmiConfig, configureChains, createConfig } from 'wagmi';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { WagmiProvider } from 'wagmi';
 import { arbitrum, base, mainnet, optimism, polygon, zora } from 'wagmi/chains';
-import { publicProvider } from 'wagmi/providers/public';
 
 const queryClient = new QueryClient();
 
@@ -23,22 +22,17 @@ type AppPropsWithLayout = AppProps & {
   Component: NextPageWithLayout;
 };
 
-const { chains, publicClient } = configureChains(
-  [mainnet, polygon, optimism, arbitrum, base, zora],
-  [publicProvider()]
-);
-
-const { connectors } = getDefaultWallets({
-  appName: process.env.NEXT_PUBLIC_FC_CLIENT_NAME!,
-  projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_ID!, // TODO: Make this optional
-  chains
+const config = getDefaultConfig({
+  appName: 'Opencast',
+  projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_ID!,
+  chains: [arbitrum, base, mainnet, optimism, polygon, zora]
 });
 
-const wagmiConfig = createConfig({
-  autoConnect: true,
-  connectors,
-  publicClient
-});
+// const wagmiConfig = createConfig({
+//   autoConnect: true,
+//   connectors,
+//   publicClient
+// });
 
 export default function App({
   Component,
@@ -49,18 +43,17 @@ export default function App({
   return (
     <>
       <AppHead />
-      <WagmiConfig config={wagmiConfig}>
-        {/* TODO: Theme */}
-        <RainbowKitProvider chains={chains}>
-          <QueryClientProvider client={queryClient}>
+      <WagmiProvider config={config}>
+        <QueryClientProvider client={queryClient}>
+          <RainbowKitProvider>
             <AuthContextProvider>
               <ThemeContextProvider>
                 {getLayout(<Component {...pageProps} />)}
               </ThemeContextProvider>
             </AuthContextProvider>
-          </QueryClientProvider>
-        </RainbowKitProvider>
-      </WagmiConfig>
+          </RainbowKitProvider>
+        </QueryClientProvider>
+      </WagmiProvider>
     </>
   );
 }

@@ -103,10 +103,12 @@ export function UserDetails({
       </div>
       <div className='flex flex-wrap'>
         {interests.map((topic) => (
-          <Link href={`/topic?url=${topic.url}`} key={topic.url} passHref>
-            <a className='cursor-pointer pr-2 text-light-secondary hover:underline dark:text-dark-secondary'>
-              <TopicView topic={topic} />
-            </a>
+          <Link
+            href={`/topic?url=${topic.url}`}
+            key={topic.url}
+            className='cursor-pointer pr-2 text-light-secondary hover:underline dark:text-dark-secondary'
+          >
+            <TopicView topic={topic} />
           </Link>
         ))}
       </div>

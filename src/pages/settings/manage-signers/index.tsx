@@ -65,9 +65,7 @@ export default function ManageSigners(): JSX.Element {
                 >
                   <MenuRow
                     href={`/settings/manage-signers/${signer.pubKey}`}
-                    title={`${
-                      signer.name || truncateAddress(`0x${signer.pubKey}`)
-                    }`}
+                    title={`${signer.name || truncateAddress(signer.pubKey)}`}
                     description={`${formatNumber(
                       signer.messageCount
                     )} messages • Last used ${formatDate(

@@ -23,14 +23,8 @@ export function Aside({ children }: AsideProps): JSX.Element | null {
         }
         resultBuilder={(user, callback) => {
           return (
-            <Link href={`/user/${user.username}`} passHref>
-              <a>
-                <UserSearchResult
-                  user={user}
-                  key={user.id}
-                  callback={callback}
-                />
-              </a>
+            <Link href={`/user/${user.username}`}>
+              <UserSearchResult user={user} key={user.id} callback={callback} />
             </Link>
           );
         }}

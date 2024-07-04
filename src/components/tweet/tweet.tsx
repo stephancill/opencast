@@ -8,27 +8,27 @@ import { UserUsername } from '@components/user/user-username';
 import { useAuth } from '@lib/context/auth-context';
 import { useModal } from '@lib/hooks/useModal';
 import type { Tweet } from '@lib/types/tweet';
-import type { User } from '@lib/types/user';
-import { isFarcasterUrlEmbed } from '@mod-protocol/farcaster';
+import type { User, UsersMapType } from '@lib/types/user';
 import cn from 'clsx';
 import type { Variants } from 'framer-motion';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { hasAncestorWithClass } from '../../lib/utils';
 import { TweetActions } from './tweet-actions';
 import { TweetDate } from './tweet-date';
-import { TweetEmbed } from './tweet-embed';
-import { ModEmbeds } from './tweet-embeds-mod';
+import { TweetEmbeds } from './tweet-embed';
 import { TweetStats } from './tweet-stats';
 import { TweetText } from './tweet-text';
 import { TweetTopicLazy } from './tweet-topic';
+import { hasAncestorWithClass } from '../../lib/utils';
 
 export type TweetProps = Tweet & {
   user: User;
+  usersMap?: UsersMapType<User>;
   modal?: boolean;
   pinned?: boolean;
   profile?: User | null;
   parentTweet?: boolean;
+  quoted?: boolean;
 };
 
 export const variants: Variants = {
@@ -58,7 +58,8 @@ export function Tweet(tweet: TweetProps): JSX.Element {
     topicUrl,
     retweet,
     embeds,
-    user: tweetUserData
+    user: tweetUserData,
+    quoted
   } = tweet;
 
   const { id: ownerId, name, username, verified, photoURL } = tweetUserData;
@@ -88,7 +89,9 @@ export function Tweet(tweet: TweetProps): JSX.Element {
              flex-col gap-y-4 px-4 py-3 outline-none duration-200`,
           parentTweet
             ? 'mt-0.5 pb-0 pt-2.5'
-            : 'border-b border-light-border dark:border-dark-border'
+            : 'border-b border-light-border dark:border-dark-border',
+          quoted
+          && 'border border-light-border dark:border-dark-border rounded-md p-4 mt-4'
         )}
         onClick={(event) => {
           const clickedElement = event.target as any;
@@ -144,7 +147,7 @@ export function Tweet(tweet: TweetProps): JSX.Element {
                 )}
               </div>
               <div className='px-4'>
-                {!modal && (
+                {!modal && !quoted && (
                   <TweetActions
                     isOwner={isOwner}
                     ownerId={ownerId}
@@ -165,10 +168,11 @@ export function Tweet(tweet: TweetProps): JSX.Element {
                 )}
               >
                 Replying to{' '}
-                <Link href={`/user/${parentUsername}`}>
-                  <a className='custom-underline text-main-accent'>
-                    @{parentUsername}
-                  </a>
+                <Link
+                  href={`/user/${parentUsername}`}
+                  className='custom-underline text-main-accent'
+                >
+                  @{parentUsername}
                 </Link>
               </p>
             )}
@@ -187,7 +191,6 @@ export function Tweet(tweet: TweetProps): JSX.Element {
               />
             </div>
             <div className='mt-1 flex flex-col gap-2'>
-              {/* Images are shown using native image preview component */}
               {images && (
                 <ImagePreview
                   tweet
@@ -195,37 +198,22 @@ export function Tweet(tweet: TweetProps): JSX.Element {
                   previewCount={images.length}
                 />
               )}
-              {/* All embeds that do not route locally are handled by Mod */}
-              {embeds && embeds.length > 0 && (
-                <ModEmbeds
-                  embeds={embeds.filter(
-                    (embed) =>
-                      !embed.metadata?.mimeType?.startsWith('image/') &&
-                      !(isFarcasterUrlEmbed(embed) && embed.url.startsWith('/'))
-                  )}
-                />
-              )}
-              {/* Local routing embeds embeds i.e. /tweet/... */}
-              {embeds &&
-                embeds.length > 0 &&
-                embeds
-                  .filter(
-                    (embed) =>
-                      isFarcasterUrlEmbed(embed) && embed.url.startsWith('/')
-                  )
-                  .map((embed, index) => (
-                    <TweetEmbed
-                      url={(embed as { url: string }).url}
-                      image={embed.metadata?.image?.url}
-                      icon={embed.metadata?.logo?.url}
-                      title={embed.metadata?.title}
-                      text={embed.metadata?.description}
-                      key={index}
-                    />
-                  ))}
-
+              {embeds && embeds.length > 0 && <TweetEmbeds embeds={embeds} tweetAuthorId={tweet.createdBy} tweetId={tweet.id} />}
+              {
+                tweet.usersMap && tweet.quoteTweets?.map((quoteTweet) => (
+                  <Tweet
+                    key={quoteTweet.id}
+                    {...quoteTweet}
+                    user={tweet.usersMap![quoteTweet.createdBy]}
+                    modal={modal}
+                    profile={profile}
+                    parentTweet={false}
+                    quoted
+                  />
+                ))
+              }
               {topicUrl && <TweetTopicLazy topicUrl={topicUrl} />}
-              {!modal && (
+              {!modal && !quoted && (
                 <TweetStats
                   reply={reply}
                   userId={userId}
@@ -238,6 +226,7 @@ export function Tweet(tweet: TweetProps): JSX.Element {
                   openModal={openModal}
                 />
               )}
+
             </div>
           </div>
         </div>

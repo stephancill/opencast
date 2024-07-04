@@ -1,16 +1,22 @@
 import { ReactionType } from '@farcaster/hub-web';
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { populateEmbedsForTweets } from '../../../../lib/embeds';
+import { populateEmbed } from '../../../../lib/embeds';
 import { prisma } from '../../../../lib/prisma';
 import { resolveTopic } from '../../../../lib/topics/resolve-topic';
 import { TopicType } from '../../../../lib/types/topic';
 import {
+  ExternalEmbed,
   Tweet,
+  tweetConverter,
   TweetResponse,
-  TweetWithUsers,
-  tweetConverter
+  TweetWithUsers
 } from '../../../../lib/types/tweet';
-import { resolveUsersMap } from '../../../../lib/user/resolve-user';
+import {
+  resolveUserFromFid,
+  resolveUsersMap
+} from '../../../../lib/user/resolve-user';
+import { JsonObject } from '@prisma/client/runtime/library';
+import { convertAndCalculateCursor } from '@lib/paginated-tweets';
 
 type TweetEndpointQuery = {
   id: string;
@@ -25,13 +31,7 @@ export default async function tweetIdEndpoint(
   const cast = await prisma.casts.findUnique({
     where: {
       hash: Buffer.from(id, 'hex'),
-      deleted_at: null,
-      messages: {
-        deleted_at: null
-      }
-    },
-    include: {
-      messages: true
+      deleted_at: null
     }
   });
 
@@ -42,57 +42,33 @@ export default async function tweetIdEndpoint(
     return;
   }
 
-  const signer = await prisma.signers.findFirst({
-    where: {
-      signer: cast.messages.signer
-    }
-  });
+  const { tweets, users } = await convertAndCalculateCursor([cast]);
+  const tweet = tweets[0];
 
-  const engagements = await prisma.reactions.findMany({
-    where: {
-      target_hash: cast.hash,
-      deleted_at: null
-    },
-    select: {
-      fid: true,
-      reaction_type: true
-    }
-  });
-
-  // Group reactions by type
-  const reactions = engagements.reduce((acc: any, cur) => {
-    const key = cur.reaction_type;
-    if (acc[key]) {
-      acc[key] = [...acc[key], cur.fid.toString()];
-    } else {
-      acc[key] = [cur.fid.toString()];
-    }
-    return acc;
-  }, {});
-
-  // Get all fids from cast and mentions
-  const fids = new Set<bigint>();
-  fids.add(cast.fid);
-  if (cast.parent_fid) fids.add(cast.parent_fid);
-  cast.mentions.forEach((mention) => fids.add(mention));
-
-  const users = await resolveUsersMap([...fids]);
+  // const signer = await prisma.signers.findFirst({
+  //   where: {
+  //     key: cast.signer
+  //   }
+  // });
+  // const clientFid =
+  //   signer?.metadata_type === 1
+  //     ? ((signer?.metadata as JsonObject | undefined)?.requestFid as string) ||
+  //       null
+  //     : null;
+  // const clientUser = clientFid
+  //   ? await resolveUserFromFid(BigInt(clientFid))
+  //   : null;
 
   let topic: TopicType | null = null;
   if (cast.parent_url) {
     topic = await resolveTopic(cast.parent_url);
   }
 
-  let tweet: Tweet = tweetConverter.toTweet(cast);
-  const [tweetWithEmbeds] = await populateEmbedsForTweets([tweet]);
-
   const tweetWithUsers: TweetWithUsers = {
-    ...tweetWithEmbeds,
+    ...tweet,
+    users,
     topic: topic,
-    userLikes: reactions[ReactionType.LIKE] || [],
-    userRetweets: reactions[ReactionType.RECAST] || [],
-    users: users,
-    client: signer?.name || null
+    client: null
   };
 
   res.json({

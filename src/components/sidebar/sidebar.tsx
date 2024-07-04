@@ -10,6 +10,7 @@ import Link from 'next/link';
 import { MoreSettings } from './more-settings';
 import { SidebarLink } from './sidebar-link';
 import { SidebarProfile } from './sidebar-profile';
+import { SyncView } from '@components/sync/sync-view';
 
 export type NavLink = {
   href: string;
@@ -29,7 +30,7 @@ export const navLinks: Readonly<NavLink[]> = [
   {
     href: '/trends',
     linkName: 'Topics',
-    iconName: 'HashtagIcon'
+    iconName: 'ChatBubbleBottomCenterTextIcon'
   }
 ];
 
@@ -53,7 +54,7 @@ export function Sidebar(): JSX.Element {
         open={open}
         closeModal={closeModal}
       >
-        <Input isModal closeModal={closeModal} />
+        <Input modal closeModal={closeModal} />
       </Modal>
       <div
         className='fixed bottom-0 z-10 flex w-full flex-col justify-between border-t border-light-border 
@@ -62,14 +63,13 @@ export function Sidebar(): JSX.Element {
       >
         <section className='flex flex-col justify-center gap-2 xs:items-center xl:items-stretch'>
           <h1 className='hidden xs:flex'>
-            <Link href='/home'>
-              <a
-                className='custom-button main-tab text-accent-blue transition hover:bg-light-primary/10 
+            <Link
+              href='/home'
+              className='custom-button main-tab text-accent-blue transition hover:bg-light-primary/10 
                            focus-visible:bg-accent-blue/10 focus-visible:!ring-accent-blue/80
                            dark:text-twitter-icon dark:hover:bg-dark-primary/10'
-              >
-                <CustomIcon className='h-7 w-7' iconName='TwitterIcon' />
-              </a>
+            >
+              <CustomIcon className='h-7 w-7' iconName='TwitterIcon' />
             </Link>
           </h1>
           <nav className='flex items-center justify-around xs:flex-col xs:justify-center xl:block'>
@@ -113,34 +113,39 @@ export function Sidebar(): JSX.Element {
             {!isMobile && <MoreSettings />}
           </nav>
           {user?.keyPair && (
-            <Button
-              className='accent-tab absolute right-4 -translate-y-[72px] bg-main-accent text-lg font-bold text-white
+            <div>
+              <Button
+                className='accent-tab absolute right-4 -translate-y-[72px] bg-main-accent text-lg font-bold text-white
                        outline-none transition hover:brightness-90 active:brightness-75 xs:static xs:translate-y-0
                        xs:hover:bg-main-accent/90 xs:active:bg-main-accent/75 xl:w-11/12'
-              onClick={openModal}
-            >
-              <CustomIcon
-                className='block h-6 w-6 xl:hidden'
-                iconName='FeatherIcon'
-              />
-              <p className='hidden xl:block'>Cast</p>
-            </Button>
+                onClick={openModal}
+              >
+                <CustomIcon
+                  className='block h-6 w-6 xl:hidden'
+                  iconName='FeatherIcon'
+                />
+                <p className='hidden xl:block'>Cast</p>
+              </Button>
+            </div>
           )}
         </section>
-        {!isMobile && user?.keyPair && <SidebarProfile />}
+        {!isMobile && user?.keyPair &&
+          <div className='gap-4 flex flex-col'>
+            <SyncView userId={user.id} />
+            <SidebarProfile />
+          </div>}
         {!user?.keyPair && (
-          <Link passHref href='/login'>
-            <a
-              className='custom-button main-tab accent-tab absolute right-4 -translate-y-[72px] bg-main-accent text-center text-lg font-bold text-white
+          <Link
+            className='custom-button main-tab accent-tab absolute right-4 -translate-y-[72px] bg-main-accent text-center text-lg font-bold text-white
                        outline-none transition hover:brightness-90 active:brightness-75 xs:static xs:translate-y-0
                        xs:hover:bg-main-accent/90 xs:active:bg-main-accent/75 xl:w-11/12'
-            >
-              <CustomIcon
-                className='block h-6 w-6 xl:hidden'
-                iconName='FeatherIcon'
-              />
-              <p className='hidden xl:block'>Login</p>
-            </a>
+            href='/login'
+          >
+            <CustomIcon
+              className='block h-6 w-6 xl:hidden'
+              iconName='FeatherIcon'
+            />
+            <p className='hidden xl:block'>Login</p>
           </Link>
         )}
       </div>

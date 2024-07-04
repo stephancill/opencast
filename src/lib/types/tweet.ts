@@ -1,11 +1,11 @@
-import { Embed as FarcasterEmbed } from '@farcaster/hub-web';
-import { Embed as ModEmbed } from '@mod-protocol/core';
+import { Embed } from '@farcaster/hub-web';
 import { casts } from '@prisma/client';
+import { Frame } from 'frames.js';
 import { TopicsMapType } from '../topics/resolve-topic';
-import { TopicType } from './topic';
 import { isValidImageExtension } from '../validation';
 import type { ImagesPreview } from './file';
 import { BaseResponse } from './responses';
+import { TopicType } from './topic';
 import type { User, UsersMapType } from './user';
 
 export type Mention = {
@@ -22,13 +22,15 @@ export type ExternalEmbed = {
   image?: string;
   provider?: string;
   url: string;
+  contentType?: string;
+  frame?: Frame;
 };
 
 export type Tweet = {
   id: string;
   text: string | null;
   images: ImagesPreview | null;
-  embeds: ModEmbed[];
+  embeds: ExternalEmbed[];
   parent: { id: string; username?: string; userId?: string } | null;
   userLikes: string[];
   createdBy: string;
@@ -43,6 +45,7 @@ export type Tweet = {
   topic: TopicType | null;
   topicUrl: string | null;
   retweet: { username?: string; userId?: string } | null;
+  quoteTweets?: Tweet[];
 };
 
 export type TweetWithUsers = Tweet & { users: UsersMapType<User> };
@@ -124,7 +127,7 @@ export const tweetConverter = {
       };
     }
 
-    const embeds = cast.embeds as FarcasterEmbed[];
+    const embeds = cast.embeds as Embed[];
 
     const images =
       embeds.length > 0
@@ -137,20 +140,19 @@ export const tweetConverter = {
             }))
         : [];
 
-    const externalEmbeds: ModEmbed[] =
+    const externalEmbeds: ExternalEmbed[] =
       embeds.length > 0
         ? embeds
             .filter((embed) => embed.url && !isValidImageExtension(embed.url))
             .map((embed) => ({
-              url: embed.url!,
-              status: 'loading'
+              url: embed.url!
             }))
         : [];
 
-    const mentions = cast.mentions.map(
+    const mentions = (cast.mentions as number[])?.map(
       (userId, index): Mention => ({
         userId: userId.toString(),
-        position: cast.mentions_positions[index]
+        position: (cast.mentions_positions as number[])[index]
       })
     );
 

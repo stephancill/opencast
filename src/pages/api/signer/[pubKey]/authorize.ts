@@ -5,7 +5,7 @@ import { AppAuthResponse } from '../../../../lib/types/app-auth';
 // https://warpcast.notion.site/Signer-Request-API-Migration-Guide-Public-9e74827f9070442fb6f2a7ffe7226b3c
 
 type SignerEndpointQuery = {
-  pubKey: string;
+  pubKey: `0x${string}`;
 };
 
 const SIGNED_KEY_REQUEST_VALIDATOR_EIP_712_DOMAIN = {
@@ -39,7 +39,7 @@ export default async function handle(
     primaryType: 'SignedKeyRequest',
     message: {
       requestFid: BigInt(appFid),
-      key: `0x${pubKey}`,
+      key: pubKey,
       deadline: BigInt(deadline)
     }
   });

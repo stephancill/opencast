@@ -32,18 +32,19 @@ export function TweetTopicSkeleton() {
 
 export function TweetTopic({ topic }: { topic: TopicType }) {
   return (
-    <Link href={`/topic?url=${encodeURIComponent(topic.url)}`} passHref>
-      <a className='flex w-full cursor-pointer items-center whitespace-nowrap text-light-secondary hover:underline dark:text-dark-secondary'>
-        <TopicView topic={topic}></TopicView>
-      </a>
+    <Link
+      href={`/topic?url=${encodeURIComponent(topic.url)}`}
+      className='flex w-full cursor-pointer items-center whitespace-nowrap text-light-secondary hover:underline dark:text-dark-secondary'
+    >
+      <TopicView topic={topic}></TopicView>
     </Link>
   );
 }
 
 export function TopicView({ topic }: { topic: TopicType }) {
   return (
-    <div className='override-nav inline flex items-center'>
-      #
+    <div className='override-nav inline flex items-center gap-[2px]'>
+      <span>#</span>
       {topic.image && (
         <span className='mx-1 inline flex-shrink-0 flex-grow-0 overflow-hidden rounded-md'>
           <NextImage

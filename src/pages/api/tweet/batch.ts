@@ -1,14 +1,12 @@
-import { populateEmbedsForTweets } from '@lib/embeds';
 import { Prisma, casts } from '@prisma/client';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { FeedOrderingType } from '../../../lib/types/feed';
-import { prisma } from '../../../lib/prisma';
 import {
   PaginatedTweetsResponse,
   PaginatedTweetsType,
   TweetsResponse,
   getTweetsPaginatedRawSql
 } from '../../../lib/paginated-tweets';
+import { prisma } from '../../../lib/prisma';
 import { tweetConverter } from '../../../lib/types/tweet';
 
 export default async function handle(
@@ -39,15 +37,13 @@ export default async function handle(
 
       const castHashes = req.body.castHashes as string[];
 
-      console.log('castHashes', castHashes);
-
       // Get all the target_fids (people that the user follows)
       let targetFids: bigint[] | null = null;
       if (userFid != null) {
         const links = await prisma.links.findMany({
           where: {
             fid: userFid,
-            target_fid: { not: null },
+            target_fid: { not: undefined },
             deleted_at: null
           },
           select: {

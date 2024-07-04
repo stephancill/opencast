@@ -14,15 +14,15 @@ export async function getSignerDetail(
       MAX(s.timestamp) AS signer_timestamp,
       MAX(s.name) as signer_name,
       s.signer as pubkey,
-      COUNT(DISTINCT CASE WHEN m.message_type = 0 THEN m.hash ELSE NULL END) AS none_count,
-      COUNT(DISTINCT CASE WHEN m.message_type = 1 THEN m.hash ELSE NULL END) AS cast_add_count,
-      COUNT(DISTINCT CASE WHEN m.message_type = 2 THEN m.hash ELSE NULL END) AS cast_remove_count,
-      COUNT(DISTINCT CASE WHEN m.message_type = 3 THEN m.hash ELSE NULL END) AS reaction_add_count,
-      COUNT(DISTINCT CASE WHEN m.message_type = 4 THEN m.hash ELSE NULL END) AS reaction_remove_count,
-      COUNT(DISTINCT CASE WHEN m.message_type = 5 THEN m.hash ELSE NULL END) AS link_add_count,
-      COUNT(DISTINCT CASE WHEN m.message_type = 6 THEN m.hash ELSE NULL END) AS link_remove_count,
-      COUNT(DISTINCT CASE WHEN m.message_type = 7 THEN m.hash ELSE NULL END) AS verification_add_eth_address_count,
-      COUNT(DISTINCT CASE WHEN m.message_type = 8 THEN m.hash ELSE NULL END) AS verification_remove_count
+      COUNT(DISTINCT CASE WHEN m.type = 0 THEN m.hash ELSE NULL END) AS none_count,
+      COUNT(DISTINCT CASE WHEN m.type = 1 THEN m.hash ELSE NULL END) AS cast_add_count,
+      COUNT(DISTINCT CASE WHEN m.type = 2 THEN m.hash ELSE NULL END) AS cast_remove_count,
+      COUNT(DISTINCT CASE WHEN m.type = 3 THEN m.hash ELSE NULL END) AS reaction_add_count,
+      COUNT(DISTINCT CASE WHEN m.type = 4 THEN m.hash ELSE NULL END) AS reaction_remove_count,
+      COUNT(DISTINCT CASE WHEN m.type = 5 THEN m.hash ELSE NULL END) AS link_add_count,
+      COUNT(DISTINCT CASE WHEN m.type = 6 THEN m.hash ELSE NULL END) AS link_remove_count,
+      COUNT(DISTINCT CASE WHEN m.type = 7 THEN m.hash ELSE NULL END) AS verification_add_eth_address_count,
+      COUNT(DISTINCT CASE WHEN m.type = 8 THEN m.hash ELSE NULL END) AS verification_remove_count
     FROM 
       messages m
     INNER JOIN 
@@ -34,7 +34,7 @@ export async function getSignerDetail(
   `;
 
   const [signer] = signersRaw.map((signer: any) => ({
-    pubKey: signer.pubkey,
+    pubKey: `0x${signer.pubkey}`,
     messageCount: signer.message_count,
     createdAtTimestamp: signer.signer_timestamp || signer.signer_created_at,
     lastMessageTimestamp: signer.last_message_timestamp,

@@ -3,11 +3,13 @@ import { useMemo } from 'react';
 import useSWR from 'swr';
 import { ExternalEmbed } from '../../lib/types/tweet';
 import { NextImage } from '../ui/next-image';
+import { ImagePreview } from '@components/input/image-preview';
+import { Frame } from '@components/frames/Frame';
 
 const hoverModifier =
   'hover:brightness-75 dark:hover:brightness-125 hover:duration-200 transition';
 
-export function TweetEmbeds({ embeds }: { embeds: ExternalEmbed[] }) {
+export function TweetEmbeds({ embeds, tweetId, tweetAuthorId }: { embeds: ExternalEmbed[], tweetId: string, tweetAuthorId: string }) {
   const fetchEmbeds = async (url: string | null) => {
     if (!url) return null;
 
@@ -32,12 +34,41 @@ export function TweetEmbeds({ embeds }: { embeds: ExternalEmbed[] }) {
     return embedsData?.filter((embed) => embed !== null).length || 0;
   }, [embedsData]);
 
+  const imageEmbeds = useMemo(() => {
+    return embedsData?.filter((embed) => embed?.contentType?.startsWith("image/"))
+  }, [embedsData])
+
+  const frames = useMemo(() => {
+    return embedsData?.filter((embed) => embed?.frame)
+  }, [embedsData])
+
   return embedsData !== undefined ? (
     embedsData && embedsCount > 0 && (
-      <div className={embedsCount > 1 ? `mt-2 grid gap-2` : 'mt-2'}>
-        {embedsData?.map((embed, index) =>
-          embed ? <TweetEmbed {...embed} key={index}></TweetEmbed> : <></>
-        )}
+      <div>
+        {imageEmbeds && imageEmbeds.length > 0 && <div>
+          <ImagePreview
+            tweet
+            imagesPreview={imageEmbeds.map(e => ({ alt: e?.title || "", id: e!.url, src: e!.url }))}
+            previewCount={imageEmbeds.length}
+          />
+        </div>}
+        <div className={embedsCount > 1 ? `mt-2 grid gap-2` : 'mt-2'}>
+          {embedsData?.map((embed, index) =>
+            embed && !embed.contentType?.startsWith("image/") && !embed.frame ? <TweetEmbed {...embed} key={index}></TweetEmbed> : <></>
+          )}
+        </div>
+        {
+          frames?.map(embed => (<div key={embed?.url}>
+            <div className='flex justify-center override-nav rounded-md'>
+              <Frame url={embed!.url} frame={embed?.frame!} frameContext={{
+                castId: {
+                  fid: parseInt(tweetAuthorId),
+                  hash: `0x${tweetId}`
+                },
+              }} />
+            </div>
+          </div>))
+        }
       </div>
     )
   ) : (
@@ -67,74 +98,67 @@ export function TweetEmbed({
   newTab?: boolean;
 }): JSX.Element {
   const link = (
-    <Link href={url} passHref>
-      <a
-        className='override-nav inline-block w-full rounded-2xl border p-2 text-left text-sm dark:border-dark-border'
-        target={newTab ? '_blank' : url.startsWith('/') ? undefined : '_blank'}
-      >
-        <div className='flex items-center'>
-          <div className='flex-grow'>
-            <div className='flex items-center'>
-              {icon && (
-                // Only fully rounded if it's a link to a cast
-                <span
-                  className={`mx-1 ${
-                    url.startsWith('/tweet')
-                      ? 'overflow-hidden rounded-full'
-                      : ''
-                  }`}
-                >
-                  <NextImage
-                    src={icon}
-                    alt={provider || ''}
-                    width={16}
-                    height={16}
-                  ></NextImage>
-                </span>
-              )}
-              {title && (
-                <span
-                  className={`mx-1 line-clamp-2 overflow-hidden text-ellipsis ${hoverModifier}`}
-                >
-                  {title}
-                </span>
-              )}
-            </div>
-            {text ? (
+    <Link
+      href={url}
+      className='override-nav inline-block w-full rounded-md border 
+border-black border-light-border p-2 text-left text-sm dark:border-dark-border'
+      target={newTab ? '_blank' : url.startsWith('/') ? undefined : '_blank'}
+    >
+      <div className='flex items-center'>
+        <div className='flex-grow'>
+          <div className='flex items-center'>
+            {icon && (
+              // Only fully rounded if it's a link to a cast
               <span
-                className={`mx-1 line-clamp-4 text-muted-foreground ${hoverModifier}`}
+                className={`mx-1 ${url.startsWith('/tweet') ? 'overflow-hidden rounded-full' : ''
+                  }`}
               >
-                {text
-                  .split(' ')
-                  .map((word) =>
-                    word.length > 40 ? word.slice(0, 20) + '...' : word
-                  )
-                  .join(' ')}
+                <img src={icon}
+                  alt={provider || ''} className='w-4 h-4' />
               </span>
-            ) : isLoading ? (
-              <div className='h-12 w-full animate-pulse rounded-md bg-light-secondary dark:bg-dark-secondary'></div>
-            ) : (
-              <></>
+            )}
+            {title && (
+              <span
+                className={`mx-1 line-clamp-2 overflow-hidden text-ellipsis ${hoverModifier}`}
+              >
+                {title}
+              </span>
             )}
           </div>
-          {image ? (
-            <div className='ml-2 mr-1 block hidden h-28 w-28 flex-shrink-0 flex-grow-0 overflow-hidden rounded-md sm:block'>
-              <NextImage
-                src={image}
-                alt={title || ''}
-                title={title || 'Unknown'}
-                className='h-full w-full object-cover'
-                width={112}
-                height={112}
-              />
-            </div>
+          {text ? (
+            <span
+              className={`mx-1 line-clamp-4 text-gray-400 ${hoverModifier}`}
+            >
+              {text
+                .split(' ')
+                .map((word) =>
+                  word.length > 40 ? word.slice(0, 20) + '...' : word
+                )
+                .join(' ')}
+            </span>
           ) : isLoading ? (
-            <div className='ml-2 mr-1 block hidden h-28 w-28 flex-shrink-0 flex-grow-0 animate-pulse overflow-hidden rounded-md rounded-md bg-light-secondary dark:bg-dark-secondary sm:block'></div>
+            <div className='h-12 w-full animate-pulse rounded-md bg-light-secondary dark:bg-dark-secondary'></div>
           ) : (
             <></>
           )}
         </div>
-      </a>
+        {image ? (
+          <div className='ml-2 mr-1 block hidden h-28 w-28 flex-shrink-0 flex-grow-0 overflow-hidden rounded-md sm:block'>
+            <img
+              src={image}
+              alt={title || ''}
+              title={title || 'Unknown'}
+              className='h-full w-full object-cover'
+              width={112}
+              height={112}
+            />
+          </div>
+        ) : isLoading ? (
+          <div className='ml-2 mr-1 block hidden h-28 w-28 flex-shrink-0 flex-grow-0 animate-pulse overflow-hidden rounded-md rounded-md bg-light-secondary dark:bg-dark-secondary sm:block'></div>
+        ) : (
+          <></>
+        )}
+      </div>
     </Link>
   );
 

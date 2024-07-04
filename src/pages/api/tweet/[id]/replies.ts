@@ -1,8 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { populateEmbedsForTweets } from '../../../../lib/embeds';
 import {
-  PaginatedTweetsResponse,
-  getTweetsPaginatedPrismaArgs
+  getTweetsPaginatedPrismaArgs,
+  PaginatedTweetsResponse
 } from '../../../../lib/paginated-tweets';
 
 export default async function handle(
@@ -35,10 +34,8 @@ export default async function handle(
         }
       });
 
-      const tweetsWithEmbeds = await populateEmbedsForTweets(result.tweets);
-
       res.json({
-        result: { ...result, tweets: tweetsWithEmbeds }
+        result
       });
       break;
     default:

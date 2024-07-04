@@ -3,7 +3,7 @@ import { BaseResponse } from './responses';
 
 export type SignerDetail = {
   name: string | null;
-  pubKey: string;
+  pubKey: `0x${string}`;
   messageCount: number;
   createdAtTimestamp: string;
   lastMessageTimestamp: string;

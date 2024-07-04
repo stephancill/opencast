@@ -17,6 +17,17 @@ const chainById = Object.values(chains).reduce(
 
 export type TopicsMapType = { [key: string]: TopicType };
 
+export type FarcasterChannel = {
+  id: string;
+  url: string;
+  name: string;
+  description: string;
+  imageUrl: string;
+  createdAt: string;
+  followerCount: number;
+  leadFid: number;
+};
+
 export async function resolveTopic(url: string): Promise<TopicType | null> {
   const key = `topic:${url}`;
   const cached = LRU.get(key);
@@ -44,8 +55,49 @@ function cleanUrl(url: string): string {
   }
 }
 
+async function getAllChannelsIndexed() {
+  const key = 'all-channels';
+  const cached = LRU.get(key);
+  if (cached !== undefined) {
+    return cached as { [key: string]: FarcasterChannel };
+  }
+
+  const {
+    result: { channels }
+  } = (await fetch('https://api.warpcast.com/v2/all-channels').then((r) =>
+    r.json()
+  )) as { result: { channels: FarcasterChannel[] } };
+
+  const channelsByUrl = channels.reduce((acc, cur) => {
+    acc[cur.url] = cur;
+    return acc;
+  }, {} as { [key: string]: FarcasterChannel });
+
+  LRU.set(key, channelsByUrl, {
+    ttl: 5 * 60 * 1000
+  });
+
+  return channelsByUrl;
+}
+
+async function getChannel(url: string) {
+  const channelsByUrl = await getAllChannelsIndexed();
+  return channelsByUrl[url];
+}
+
 // CAIP-19 URL
 async function _resolveTopic(url: string): Promise<TopicType | null> {
+  const farcasterChannel = await getChannel(url);
+
+  if (farcasterChannel) {
+    return {
+      name: farcasterChannel.name,
+      description: farcasterChannel.description,
+      image: farcasterChannel.imageUrl,
+      url
+    };
+  }
+
   if (url.startsWith('https://')) {
     let metadata: ExternalEmbed | null;
     try {

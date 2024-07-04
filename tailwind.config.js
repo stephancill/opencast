@@ -1,25 +1,17 @@
 /** @type {import('tailwindcss').Config} */
 
 const defaultTheme = require('tailwindcss/defaultTheme');
-const modConfig = require('@mod-protocol/react-ui-shadcn/tailwind.config');
 
 module.exports = {
   darkMode: 'class',
-  content: [
-    'src/pages/**/*.tsx',
-    'src/components/**/*.tsx',
-    // Mod Protocol
-    './node_modules/@mod-protocol/react-ui-shadcn/dist/**/*.{ts,tsx,css,js}'
-  ],
+  content: ['src/pages/**/*.tsx', 'src/components/**/*.tsx'],
   theme: {
     screens: {
       xs: '500px',
       ...defaultTheme.screens
     },
     extend: {
-      ...modConfig.theme.extend,
       fontFamily: {
-        ...modConfig.theme.extend.fontFamily,
         'twitter-chirp': ['TwitterChirp', 'sans-serif'],
         'twitter-chirp-extended': ['TwitterChirpExtendedHeavy', 'sans-serif']
       },
@@ -48,7 +40,6 @@ module.exports = {
         'light-line-reply': '#CFD9DE',
         'twitter-icon': '#D6D9DB',
         'image-preview-hover': '#272C30',
-        ...modConfig.theme.extend.colors,
       }
     }
   },

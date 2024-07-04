@@ -21,9 +21,9 @@ export function UserAvatar({
 
   return (
     <Link href={username ? `/user/${username}` : '#'}>
-      <span
+      <div
         className={cn(
-          'blur-picture override-nav flex self-start',
+          'blur-picture override-nav',
           !username && 'pointer-events-none',
           className
         )}
@@ -31,14 +31,15 @@ export function UserAvatar({
       >
         <NextImage
           useSkeleton
-          imgClassName='rounded-full'
+          className='overflow-hidden rounded-full'
+          imgClassName='rounded-full !h-full !w-full'
           width={pictureSize}
           height={pictureSize}
           src={src}
           alt={alt}
           key={src}
         />
-      </span>
+      </div>
     </Link>
   );
 }

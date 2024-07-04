@@ -69,8 +69,8 @@ export function ImagePreview({
           ? previewCount - 1
           : selectedIndex - 1
         : selectedIndex === previewCount - 1
-        ? 0
-        : selectedIndex + 1;
+          ? 0
+          : selectedIndex + 1;
 
     setSelectedIndex(nextIndex);
   };
@@ -120,20 +120,12 @@ export function ImagePreview({
           onClick={preventBubbling(handleSelectedImage(index))}
           key={id}
         >
-          <NextImage
-            className='relative h-full w-full cursor-pointer transition 
-                         hover:brightness-75 hover:duration-200'
-            imgClassName={cn(
-              isTweet
-                ? postImageBorderRadius[previewCount][index]
-                : 'rounded-2xl'
-            )}
-            previewCount={previewCount}
-            layout='fill'
-            src={src}
-            alt={alt}
-            useSkeleton={true}
-          />
+          <div
+            className='flex h-full w-full cursor-pointer 
+                         justify-center transition hover:brightness-75 hover:duration-200'
+          >
+            <img className={cn('rounded-2xl object-cover')} src={src} alt={alt} />
+          </div>
           {removeImage && (
             <Button
               className='group absolute left-0 top-0 translate-x-1 translate-y-1

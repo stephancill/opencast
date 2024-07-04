@@ -1,6 +1,5 @@
 import { Prisma } from '@prisma/client';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { populateEmbedsForTweets } from '../../../../../../lib/embeds';
 import {
   PaginatedTweetsType,
   getTweetsPaginatedRawSql
@@ -65,12 +64,9 @@ export default async function handle(
           : undefined
       );
 
-      const tweetsWithEmbeds = await populateEmbedsForTweets(result.tweets);
-
       res.json({
         result: {
-          ...result,
-          tweets: tweetsWithEmbeds
+          ...result
         }
       });
       break;

@@ -78,14 +78,13 @@ export function LoginMain(): JSX.Element {
             >
               <HeroIcon iconName='GlobeAltIcon' /> Sign in with Ethereum
             </Button>
-            <Link href='/home' passHref>
-              <a
-                className='custom-button main-tab flex justify-center gap-2 border border-white bg-black font-bold text-white
+            <Link
+              href='/home'
+              className='custom-button main-tab flex justify-center gap-2 border border-white bg-black font-bold text-white
              transition hover:bg-opacity-90 focus-visible:bg-opacity-90 active:bg-opacity-80
              dark:hover:brightness-125 dark:focus-visible:brightness-125 dark:active:brightness-150'
-              >
-                Continue without signing in
-              </a>
+            >
+              Continue without signing in
             </Link>
             <p
               className='inner:custom-underline inner:custom-underline text-center text-xs

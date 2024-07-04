@@ -139,21 +139,21 @@ export function UserTooltip({
                 ))}
               </div>
             )}
-            <div className='flex gap-4 text-secondary'>
+            <div className='text-secondary flex gap-4'>
               {allStats.map(([id, label, stat]) => (
-                <Link href={`${userLink}/${id}`} key={id}>
-                  <a
-                    className='hover-animation flex h-4 items-center gap-1 border-b border-b-transparent 
+                <Link
+                  href={`${userLink}/${id}`}
+                  key={id}
+                  className='hover-animation flex h-4 items-center gap-1 border-b border-b-transparent 
                              outline-none hover:border-b-light-primary focus-visible:border-b-light-primary
                              dark:hover:border-b-dark-primary dark:focus-visible:border-b-dark-primary'
-                  >
-                    <p className='font-bold text-light-primary dark:text-dark-primary'>
-                      {formatNumber(stat)}
-                    </p>
-                    <p className='text-light-secondary dark:text-dark-secondary'>
-                      {label}
-                    </p>
-                  </a>
+                >
+                  <p className='font-bold text-light-primary dark:text-dark-primary'>
+                    {formatNumber(stat)}
+                  </p>
+                  <p className='text-light-secondary dark:text-dark-secondary'>
+                    {label}
+                  </p>
                 </Link>
               ))}
             </div>

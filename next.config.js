@@ -6,28 +6,20 @@ const nextConfig = {
     config.resolve.fallback = { fs: false, net: false, tls: false };
     return config;
   },
-  experimental: {
-    images: {
-      remotePatterns: [
-        {
-          protocol: 'https',
-          hostname: '**'
-        },
-        {
-          protocol: 'http',
-          hostname: '**'
-        }
-      ]
-    },
-    scrollRestoration: true
-  },
   images: {
-    domains: [
-      'lh3.googleusercontent.com',
-      'firebasestorage.googleapis.com',
-      'i.imgur.com',
-      'i.seadn.io'
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '*'
+      },
+      {
+        protocol: 'http',
+        hostname: '*'
+      }
     ]
+  },
+  experimental: {
+    scrollRestoration: true
   },
   async headers() {
     return [

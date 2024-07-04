@@ -1,13 +1,11 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
+import { hexToBytes } from 'viem';
 import { prisma } from '../../../../lib/prisma';
 import { UserResponse } from '../../../../lib/types/user';
-import {
-  resolveUserFromFid,
-  resolveUserFullFromFid
-} from '../../../../lib/user/resolve-user';
+import { resolveUserFullFromFid } from '../../../../lib/user/resolve-user';
 
 type SignerEndpointQuery = {
-  pubKey: string;
+  pubKey: `0x${string}`;
 };
 
 export default async function signerUserEndpoint(
@@ -18,8 +16,8 @@ export default async function signerUserEndpoint(
 
   const signerRow = await prisma.signers.findFirst({
     where: {
-      signer: Buffer.from(pubKey, 'hex'),
-      deleted_at: null
+      key: Buffer.from(hexToBytes(pubKey)),
+      removed_at: null
     }
   });
 

@@ -6,11 +6,11 @@ The goal of this project is to provide a reference implementation of a Farcaster
 
 It only depends on the reference Farcaster postgres indexer and optionally a hub for submitting messages.
 
-## Development 💻
+## Development
 
-### Farcaster Replicator
+### Farcaster Indexer
 
-This project depends on the reference Farcaster PosgreSQL indexer. Follow the instructions at [replicate-data-postgres](https://github.com/farcasterxyz/hub-monorepo/tree/main/apps/replicator) to set up an instance.
+This project depends on the Lazy Farcaster Indexer. Follow the instructions at [https://github.com/stephancill/lazy-indexer](https://github.com/stephancill/lazy-indexer) to set up an instance.
 
 ### Local
 
@@ -66,13 +66,3 @@ This project depends on the reference Farcaster PosgreSQL indexer. Follow the in
   - [ ] Bandwidth
 
 ...
-
-## Tech 🛠
-
-- [Next.js](https://nextjs.org)
-- [TypeScript](https://www.typescriptlang.org)
-- [Tailwind CSS](https://tailwindcss.com)
-- [SWR](https://swr.vercel.app)
-- [Headless UI](https://headlessui.com)
-- [React Hot Toast](https://react-hot-toast.com)
-- [Framer Motion](https://framer.com)

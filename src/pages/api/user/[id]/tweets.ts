@@ -1,9 +1,8 @@
 import { UserDataType } from '@farcaster/hub-web';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { populateEmbedsForTweets } from '../../../../lib/embeds';
 import {
-  PaginatedTweetsResponse,
-  getTweetsPaginatedPrismaArgs
+  getTweetsPaginatedPrismaArgs,
+  PaginatedTweetsResponse
 } from '../../../../lib/paginated-tweets';
 import { prisma } from '../../../../lib/prisma';
 
@@ -48,10 +47,7 @@ export default async function handle(
           },
           fid: BigInt(id as string),
           parent_hash: replies ? undefined : null,
-          deleted_at: null,
-          messages: {
-            deleted_at: null
-          }
+          deleted_at: null
         },
         take: limit,
         orderBy: {
@@ -59,10 +55,8 @@ export default async function handle(
         }
       });
 
-      const tweetsWithEmbeds = await populateEmbedsForTweets(result.tweets);
-
       res.json({
-        result: { ...result, tweets: tweetsWithEmbeds }
+        result
       });
       break;
     default:

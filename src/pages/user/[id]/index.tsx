@@ -26,8 +26,7 @@ export default function UserTweets(): JSX.Element {
     LoadMore
   } = useInfiniteScroll(
     (pageParam) =>
-      `/api/user/${id}/tweets?limit=10${
-        pageParam ? `&cursor=${pageParam}` : ''
+      `/api/user/${id}/tweets?limit=10${pageParam ? `&cursor=${pageParam}` : ''
       }`,
     { marginBottom: 20, queryKey: ['user', id], enabled }
   );
@@ -67,6 +66,7 @@ export default function UserTweets(): JSX.Element {
                 <Tweet
                   {...populateTweetUsers(tweet, users)}
                   user={users[tweet.createdBy]}
+                  usersMap={users}
                   key={tweet.id}
                 />
               );

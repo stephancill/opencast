@@ -12,18 +12,18 @@ import { UserUsername } from '@components/user/user-username';
 import { useAuth } from '@lib/context/auth-context';
 import { useModal } from '@lib/hooks/useModal';
 import type { Tweet } from '@lib/types/tweet';
-import type { User } from '@lib/types/user';
+import type { User, UsersMapType } from '@lib/types/user';
 import cn from 'clsx';
 import Link from 'next/link';
 import { RefObject } from 'react';
+import { TweetEmbeds } from '../tweet/tweet-embed';
 import { TweetText } from '../tweet/tweet-text';
 import { TweetTopic } from '../tweet/tweet-topic';
-import { ModEmbeds } from '../tweet/tweet-embeds-mod';
-import { isFarcasterUrlEmbed } from '@mod-protocol/farcaster';
-import { TweetEmbed } from '../tweet/tweet-embed';
+import { Tweet as TweetView } from '@components/tweet/tweet';
 
 type ViewTweetProps = Tweet & {
   user: User;
+  usersMap?: UsersMapType<User>;
   viewTweetRef?: RefObject<HTMLElement>;
 };
 
@@ -125,51 +125,36 @@ export function ViewTweet(tweet: ViewTweetProps): JSX.Element {
       {reply && (
         <p className='text-light-secondary dark:text-dark-secondary'>
           Replying to{' '}
-          <Link href={`/user/${parentUsername}`}>
-            <a className='custom-underline text-main-accent'>
-              @{parentUsername}
-            </a>
+          <Link
+            href={`/user/${parentUsername}`}
+            className='custom-underline text-main-accent'
+          >
+            @{parentUsername}
           </Link>
         </p>
       )}
-      {/* TODO: Refactor these embeds and those in <Tweet> into common component */}
-      <div className='space-y-2'>
+      <div>
         <TweetText text={text || ''} images={images} mentions={mentions} />
-        {/* Images are shown using native image preview component */}
         {images && (
           <ImagePreview
-            tweet
+            viewTweet
             imagesPreview={images}
             previewCount={images.length}
           />
         )}
-        {/* All embeds that do not route locally are handled by Mod */}
-        {embeds && embeds.length > 0 && (
-          <ModEmbeds
-            embeds={embeds.filter(
-              (embed) =>
-                !embed.metadata?.mimeType?.startsWith('image/') &&
-                !(isFarcasterUrlEmbed(embed) && embed.url.startsWith('/'))
-            )}
-          />
-        )}
-        {/* Local routing embeds embeds i.e. /tweet/... */}
-        {embeds &&
-          embeds.length > 0 &&
-          embeds
-            .filter(
-              (embed) => isFarcasterUrlEmbed(embed) && embed.url.startsWith('/')
-            )
-            .map((embed, index) => (
-              <TweetEmbed
-                url={(embed as { url: string }).url}
-                image={embed.metadata?.image?.url}
-                icon={embed.metadata?.logo?.url}
-                title={embed.metadata?.title}
-                text={embed.metadata?.description}
-                key={index}
-              />
-            ))}
+        {embeds && embeds.length > 0 && <TweetEmbeds embeds={embeds} tweetAuthorId={createdBy} tweetId={tweetId} />}
+
+        {
+          tweet.usersMap && tweet.quoteTweets?.map((quoteTweet) => (
+            <TweetView
+              key={quoteTweet.id}
+              {...quoteTweet}
+              user={tweet.usersMap![quoteTweet.createdBy]}
+              parentTweet={false}
+              quoted
+            />
+          ))
+        }
         {topic && (
           <span className='mt-2 inline-block'>
             <TweetTopic topic={topic} />
@@ -209,8 +194,8 @@ export function ViewTweet(tweet: ViewTweetProps): JSX.Element {
         </div>
         {user?.keyPair && (
           <Input
-            isReply
-            parentPost={{ id: tweetId, username: username, userId: ownerId }}
+            reply
+            parent={{ id: tweetId, username: username, userId: ownerId }}
             parentUrl={topic?.url || undefined}
           />
         )}
