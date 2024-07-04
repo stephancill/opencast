@@ -6,9 +6,9 @@ The goal of this project is to provide a reference implementation of a Farcaster
 
 It only depends on the reference Farcaster postgres indexer and optionally a hub for submitting messages.
 
-## Development 💻
+## Development
 
-### Farcaster Replicator
+### Farcaster Indexer
 
 This project depends on the Lazy Farcaster Indexer. Follow the instructions at [https://github.com/stephancill/lazy-indexer](https://github.com/stephancill/lazy-indexer) to set up an instance.
 
@@ -66,9 +66,3 @@ This project depends on the Lazy Farcaster Indexer. Follow the instructions at [
   - [ ] Bandwidth
 
 ...
-
-## Tech 🛠
-
-- [Next.js](https://nextjs.org)
-- [TypeScript](https://www.typescriptlang.org)
-- [Tailwind CSS](https://tailwindcss.com)

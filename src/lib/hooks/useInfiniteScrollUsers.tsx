@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { useCallback, useEffect, useState } from 'react';
-import { useInfiniteQuery } from 'react-query';
+import { useInfiniteQuery } from '@tanstack/react-query';
 import { Loading } from '../../components/ui/loading';
 import { PaginatedUsersResponse } from '../paginated-reactions';
 
@@ -56,10 +56,13 @@ export function useInfiniteScrollUsers(
     hasNextPage,
     isLoading: loading,
     isFetchingNextPage
-  } = useInfiniteQuery(queryKey, fetchData, {
+  } = useInfiniteQuery<PaginatedUsersResponse['result']>({
+    queryKey,
+    queryFn: fetchData as any, // TODO: Fix this
     getNextPageParam: (lastPage) => {
       return lastPage?.nextPageCursor ?? false;
     },
+    initialPageParam: null,
     enabled: enabled
   });
 

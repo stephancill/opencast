@@ -34,7 +34,7 @@ export async function getSignerDetail(
   `;
 
   const [signer] = signersRaw.map((signer: any) => ({
-    pubKey: signer.pubkey,
+    pubKey: `0x${signer.pubkey}`,
     messageCount: signer.message_count,
     createdAtTimestamp: signer.signer_timestamp || signer.signer_created_at,
     lastMessageTimestamp: signer.last_message_timestamp,

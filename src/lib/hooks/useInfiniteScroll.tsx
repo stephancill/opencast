@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { useCallback, useEffect, useState } from 'react';
-import { useInfiniteQuery } from 'react-query';
+import { useInfiniteQuery } from '@tanstack/react-query';
 import { Loading } from '../../components/ui/loading';
 import { PaginatedTweetsResponse } from '../paginated-tweets';
 
@@ -61,12 +61,18 @@ export function useInfiniteScroll(
     hasNextPage,
     isLoading: loading,
     isFetchingNextPage
-  } = useInfiniteQuery(queryKey, fetchData, {
+  } = useInfiniteQuery<PaginatedTweetsResponse['result']>({
+    queryKey,
+    queryFn: fetchData as any, // TODO: Fix this
     getNextPageParam: (lastPage) => {
-      return lastPage?.nextPageCursor ?? false;
+      return lastPage?.nextPageCursor || false;
     },
+    // getNextPageParam: (lastPage) => {
+    //   return lastPage?.nextPageCursor ?? false;
+    // },
     enabled: enabled !== undefined ? enabled : true,
-    refetchOnWindowFocus: refetchOnFocus !== undefined ? refetchOnFocus : true
+    refetchOnWindowFocus: refetchOnFocus !== undefined ? refetchOnFocus : true,
+    initialPageParam: null
   });
 
   useEffect(() => {

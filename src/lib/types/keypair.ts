@@ -1,4 +1,4 @@
 export type KeyPair = {
-  publicKey: string;
-  privateKey: string;
+  publicKey: `0x${string}`;
+  privateKey: `0x${string}`;
 };

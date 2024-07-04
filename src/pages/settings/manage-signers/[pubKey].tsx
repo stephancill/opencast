@@ -81,7 +81,7 @@ export default function SignerDetailPage(): JSX.Element {
       ...KEY_REGISTRY,
       chainId: 10,
       functionName: signer ? 'remove' : undefined,
-      args: signer?.pubKey ? [`0x${signer.pubKey}`] : undefined,
+      args: signer?.pubKey ? [signer.pubKey] : undefined,
       enabled: !!signer
     });
 
@@ -161,7 +161,7 @@ export default function SignerDetailPage(): JSX.Element {
         useMobileSidebar
         title={
           signer
-            ? signer.name || truncateAddress(`0x${signer.pubKey}`)
+            ? signer.name || truncateAddress(signer.pubKey)
             : 'Manage Signer'
         }
         description={signer ? getSignerDescription(signer) : ''}
@@ -239,7 +239,7 @@ export default function SignerDetailPage(): JSX.Element {
                           importedData.messages.length
                         } messages by ${
                           importedData.signer.name ||
-                          truncateAddress(`0x${importedData.signer.pubKey}`)
+                          truncateAddress(importedData.signer.pubKey)
                         }`}
                         onClick={handleSignAndRebroadcast}
                         iconName='SignalIcon'

@@ -11,18 +11,22 @@ import {
   Message,
   MessageData,
   NobleEd25519Signer,
-  ReactionType,
-  Signer
+  ReactionType
 } from '@farcaster/hub-web';
 import { blake3 } from '@noble/hashes/blake3';
+import { getActiveKeyPair } from '../keys';
 
 function getSigner(privateKey: string): NobleEd25519Signer {
   const ed25519Signer = new NobleEd25519Signer(Buffer.from(privateKey, 'hex'));
   return ed25519Signer;
 }
 
-function getSignerFromStorage(key: string = 'keyPair'): NobleEd25519Signer {
-  const privateKey = JSON.parse(localStorage.getItem(key) || '{}').privateKey;
+async function getSignerFromStorage(): Promise<NobleEd25519Signer> {
+  const keyPair = await getActiveKeyPair();
+  const privateKey = keyPair?.privateKey.slice(2);
+
+  if (!privateKey) throw new Error('No signer found');
+
   return getSigner(privateKey);
 }
 
@@ -39,7 +43,7 @@ export async function createReactionMessage({
   remove?: boolean;
   fid: number;
 }) {
-  const signer = getSignerFromStorage();
+  const signer = await getSignerFromStorage();
 
   const messageDataOptions = {
     fid,
@@ -82,7 +86,7 @@ export async function createCastMessage({
   mentionsPositions?: number[];
   fid: number;
 }) {
-  const signer = getSignerFromStorage();
+  const signer = await getSignerFromStorage();
 
   const messageDataOptions = {
     fid,
@@ -125,7 +129,7 @@ export async function createRemoveCastMessage({
   castHash: string;
   castAuthorFid: number;
 }) {
-  const signer = getSignerFromStorage();
+  const signer = await getSignerFromStorage();
   const messageDataOptions = {
     fid: castAuthorFid,
     network: FarcasterNetwork.MAINNET
@@ -150,7 +154,7 @@ export async function createFollowMessage({
   fid: number;
   remove?: boolean;
 }) {
-  const signer = getSignerFromStorage();
+  const signer = await getSignerFromStorage();
   const messageDataOptions = {
     fid: fid,
     network: FarcasterNetwork.MAINNET
@@ -171,7 +175,7 @@ export async function createFollowMessage({
 }
 
 export async function makeMessage(messageData: MessageData) {
-  const signer = getSignerFromStorage();
+  const signer = await getSignerFromStorage();
 
   const dataBytes = MessageData.encode(messageData).finish();
 

@@ -8,12 +8,13 @@ import { WarpcastSignInModal } from '../../components/modal/sign-in-modal-warpca
 import { fetchJSON } from '../fetch';
 import { useModal } from '../hooks/useModal';
 import {
+  ACTIVE_KEYPAIR_KEY,
   addKeyPair,
-  getKeyPair,
+  getActiveKeyPair,
   getKeyPairs,
   removeKeyPair,
   setKeyPair
-} from '../storage';
+} from '../keys';
 import { KeyPair } from '../types/keypair';
 import { NotificationsResponseSummary } from '../types/notifications';
 import { useRouter } from 'next/router';
@@ -102,7 +103,7 @@ export function AuthContextProvider({
    * Updates users and current user
    * @param forceKeyPair Force a key pair to be set as the current user
    */
-  const handleUserAuth = (forceKeyPair?: KeyPair): void => {
+  const handleUserAuth = async (forceKeyPair?: KeyPair): Promise<void> => {
     setLoading(true);
 
     // Get signer from local storage
@@ -110,8 +111,8 @@ export function AuthContextProvider({
       setKeyPair(forceKeyPair);
     }
 
-    let keyPair = forceKeyPair || getKeyPair();
-    const keyPairs = getKeyPairs();
+    let keyPair = forceKeyPair || (await getActiveKeyPair());
+    const keyPairs = await getKeyPairs();
 
     if (!keyPair && keyPairs.length > 0) {
       keyPair = keyPairs[0];
@@ -151,10 +152,15 @@ export function AuthContextProvider({
     // `user` is changed by the user selection menu
     // When it changes we need to update the current user in local storage
     if (user?.keyPair) {
-      const keyPair: KeyPair = getKeyPair();
-      if (!keyPair || keyPair.publicKey !== user.keyPair.publicKey) {
-        setKeyPair(user.keyPair);
-      }
+      getActiveKeyPair().then((activeKeyPair) => {
+        if (
+          (!activeKeyPair ||
+            activeKeyPair.publicKey !== user.keyPair?.publicKey) &&
+          user.keyPair
+        ) {
+          setKeyPair(user.keyPair);
+        }
+      });
     }
   }, [user]);
 
@@ -168,8 +174,10 @@ export function AuthContextProvider({
 
   const signOut = async (): Promise<void> => {
     try {
-      const keyPair = getKeyPair();
-      localStorage.removeItem('keyPair');
+      const keyPair = await getActiveKeyPair();
+      if (!keyPair) throw new Error('No key pair found');
+
+      localStorage.removeItem(ACTIVE_KEYPAIR_KEY);
       removeKeyPair(keyPair);
       handleUserAuth();
     } catch (error) {

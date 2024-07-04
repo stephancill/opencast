@@ -4,15 +4,17 @@ import { resolveUserAmbiguous } from '../../../../lib/user/resolve-user';
 
 type UserEndpointQuery = {
   id: string;
+  full?: string;
 };
 
 export default async function userIdEndpoint(
   req: NextApiRequest,
   res: NextApiResponse<UserResponse>
 ): Promise<void> {
-  const { id } = req.query as UserEndpointQuery;
+  console.log(req.query);
+  const { id, full = 'true' } = req.query as UserEndpointQuery;
 
-  const user = (await resolveUserAmbiguous(id, true)) as UserFull;
+  const user = (await resolveUserAmbiguous(id, full === 'true')) as UserFull;
 
   if (!user) {
     res.status(404).json({
