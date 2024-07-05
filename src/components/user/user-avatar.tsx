@@ -23,7 +23,7 @@ export function UserAvatar({
     <Link href={username ? `/user/${username}` : '#'}>
       <div
         className={cn(
-          'blur-picture override-nav',
+          'blur-picture override-nav border border-gray-200 dark:border-gray-800',
           !username && 'pointer-events-none',
           className
         )}

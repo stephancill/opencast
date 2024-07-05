@@ -77,7 +77,7 @@ export function UserTooltip({
   return (
     <div
       className={cn(
-        'group relative cursor-pointer self-start text-light-primary dark:text-dark-primary ',
+        'z-100 group relative cursor-pointer self-start text-light-primary dark:text-dark-primary',
         avatar ? '[&>div]:translate-y-2' : 'grid [&>div]:translate-y-7'
       )}
     >
