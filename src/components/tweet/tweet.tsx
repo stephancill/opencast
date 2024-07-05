@@ -90,8 +90,8 @@ export function Tweet(tweet: TweetProps): JSX.Element {
           parentTweet
             ? 'mt-0.5 pb-0 pt-2.5'
             : 'border-b border-light-border dark:border-dark-border',
-          quoted
-          && 'border border-light-border dark:border-dark-border rounded-md p-4 mt-4'
+          quoted &&
+            'mt-4 rounded-md border border-light-border p-4 dark:border-dark-border'
         )}
         onClick={(event) => {
           const clickedElement = event.target as any;
@@ -107,9 +107,10 @@ export function Tweet(tweet: TweetProps): JSX.Element {
           // Prevent click when selecting text
           const text = window.getSelection()?.toString();
           if (text) {
-            // event.stopPropagation();
             return;
           }
+
+          event.stopPropagation();
 
           if (!isSpecialElement) {
             push(tweetLink);
@@ -198,9 +199,15 @@ export function Tweet(tweet: TweetProps): JSX.Element {
                   previewCount={images.length}
                 />
               )}
-              {embeds && embeds.length > 0 && <TweetEmbeds embeds={embeds} tweetAuthorId={tweet.createdBy} tweetId={tweet.id} />}
-              {
-                tweet.usersMap && tweet.quoteTweets?.map((quoteTweet) => (
+              {embeds && embeds.length > 0 && (
+                <TweetEmbeds
+                  embeds={embeds}
+                  tweetAuthorId={tweet.createdBy}
+                  tweetId={tweet.id}
+                />
+              )}
+              {tweet.usersMap &&
+                tweet.quoteTweets?.map((quoteTweet) => (
                   <Tweet
                     key={quoteTweet.id}
                     {...quoteTweet}
@@ -210,8 +217,7 @@ export function Tweet(tweet: TweetProps): JSX.Element {
                     parentTweet={false}
                     quoted
                   />
-                ))
-              }
+                ))}
               {topicUrl && <TweetTopicLazy topicUrl={topicUrl} />}
               {!modal && !quoted && (
                 <TweetStats
@@ -226,7 +232,6 @@ export function Tweet(tweet: TweetProps): JSX.Element {
                   openModal={openModal}
                 />
               )}
-
             </div>
           </div>
         </div>
