@@ -45,7 +45,8 @@ export default function TweetId(): JSX.Element {
     LoadMore
   } = useInfiniteScroll(
     (pageParam) =>
-      `/api/tweet/${id}/replies?limit=10${pageParam ? `&cursor=${pageParam}` : ''
+      `/api/tweet/${id}/replies?limit=10${
+        pageParam ? `&cursor=${pageParam}` : ''
       }`,
     { queryKey: ['replies', id], enabled, refetchOnFocus: false }
   );
@@ -58,9 +59,11 @@ export default function TweetId(): JSX.Element {
   const parentId = tweetData?.parent?.id;
 
   const pageTitle = tweetData
-    ? `${tweetData.users[tweetData.createdBy]?.name} on Opencast: "${text ?? ''
-    }${images ? ` (${imagesLength} image${isPlural(imagesLength)})` : ''
-    }" / Opencast`
+    ? `${tweetData.users[tweetData.createdBy]?.name} on Opencast: "${
+        text ?? ''
+      }${
+        images ? ` (${imagesLength} image${isPlural(imagesLength)})` : ''
+      }" / Opencast`
     : null;
 
   const tweetWithPopulatedUsers = useMemo(() => {
