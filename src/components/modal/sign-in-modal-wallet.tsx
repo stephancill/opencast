@@ -116,8 +116,6 @@ const WalletSignInModal = ({
     if (pendingRequest) {
       localStorage.setItem(PENDING_KEY_REQUEST, JSON.stringify(pendingRequest));
 
-      console.log('pendingRequest', pendingRequest);
-
       if (pendingRequest?.state === 'preparing') {
         setAppAuthLoading(true);
         fetchJSON<AppAuthResponse>(

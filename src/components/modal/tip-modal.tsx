@@ -33,14 +33,11 @@ export function TipModal({
 
   const [tipAmount, setTipAmount] = useState<number>(0.001);
   const {
-    data: tipTxResult,
-    isLoading: tipTxResultLoading,
+    data: tipTxHash,
+    isPending: tipTxResultLoading,
     isSuccess: tipTxSuccess,
     sendTransaction: sendTipTx
-  } = useSendTransaction({
-    to: user?.address || undefined,
-    value: parseEther(tipAmount.toString())
-  });
+  } = useSendTransaction();
 
   useEffect(() => {
     if (!tipTxSuccess) return;
@@ -56,7 +53,7 @@ export function TipModal({
 
     const chain = chainById[chainId];
     const explorerUrl = chain?.blockExplorers?.default;
-    const url = `${explorerUrl?.url}/tx/${tipTxResult?.hash}`;
+    const url = `${explorerUrl?.url}/tx/${tipTxHash}`;
 
     if (!url) return;
 
@@ -65,7 +62,7 @@ export function TipModal({
         <span className='flex gap-2'>
           Your tip was sent
           <Link
-            href={`${explorerUrl?.url}/tx/${tipTxResult?.hash}`}
+            href={`${explorerUrl?.url}/tx/${tipTxHash}`}
             className='custom-underline font-bold'
             target='_blank'
           >
@@ -124,11 +121,14 @@ export function TipModal({
                         </button>
                       ))}
                     </div>
-                    {!tipTxResultLoading ? (
+                    {!tipTxResultLoading && user.address ? (
                       <Button
                         className='accent-tab mt-2 flex items-center justify-center bg-main-accent font-bold text-white enabled:hover:bg-main-accent/90 enabled:active:bg-main-accent/75'
                         onClick={() => {
-                          sendTipTx();
+                          sendTipTx({
+                            to: user?.address as `0x${string}`,
+                            value: parseEther(tipAmount.toString())
+                          });
                         }}
                         disabled={tipTxResultLoading || tipAmount === 0}
                       >

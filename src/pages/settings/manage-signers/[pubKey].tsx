@@ -8,11 +8,7 @@ import cn from 'clsx';
 import { useRouter } from 'next/router';
 import { useRef, useState, type ReactElement, type ReactNode } from 'react';
 import useSWR from 'swr';
-import {
-  useContractWrite,
-  usePrepareContractWrite,
-  useWaitForTransaction
-} from 'wagmi';
+import { useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
 import { TweetFeed } from '../../../components/feed/tweet-feed';
 import { Error } from '../../../components/ui/error';
 import { HeroIcon } from '../../../components/ui/hero-icon';
@@ -76,27 +72,18 @@ export default function SignerDetailPage(): JSX.Element {
     null
   );
 
-  const { config: removeKeyConfig, error: removeKeyError } =
-    usePrepareContractWrite({
-      ...KEY_REGISTRY,
-      chainId: 10,
-      functionName: signer ? 'remove' : undefined,
-      args: signer?.pubKey ? [signer.pubKey] : undefined,
-      enabled: !!signer
-    });
-
   const {
-    write: removeKey,
-    data: removeKeySignResult,
-    isLoading: removeKeySignPending,
+    writeContract: removeKey,
+    data: removeKeyHash,
+    isPending: removeKeySignPending,
     isSuccess: removeKeySignSuccess
-  } = useContractWrite(removeKeyConfig);
+  } = useWriteContract();
 
   const {
     data: removeKeyTxReceipt,
     isSuccess: isRemoveKeyTxSuccess,
     isLoading: isRemoveKeyTxLoading
-  } = useWaitForTransaction({ hash: removeKeySignResult?.hash });
+  } = useWaitForTransactionReceipt({ hash: removeKeyHash });
 
   const handleBackup = async () => {
     setIsBackupLoading(true);
@@ -148,7 +135,14 @@ export default function SignerDetailPage(): JSX.Element {
   };
 
   const handleDelete = async () => {
-    removeKey?.();
+    if (!signer) return;
+
+    removeKey?.({
+      ...KEY_REGISTRY,
+      chainId: 10,
+      functionName: 'remove',
+      args: [signer.pubKey]
+    });
   };
 
   const matchesCurrentSigner = (pubKey: string) =>
@@ -261,7 +255,7 @@ export default function SignerDetailPage(): JSX.Element {
                 isLoading={
                   isDeleteLoading ||
                   removeKeySignPending ||
-                  (removeKeySignResult?.hash != null && isRemoveKeyTxLoading)
+                  (removeKeyHash != null && isRemoveKeyTxLoading)
                 }
               />
             ) : (

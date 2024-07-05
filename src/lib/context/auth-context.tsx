@@ -114,24 +114,16 @@ export function AuthContextProvider({
     let keyPair = forceKeyPair || (await getActiveKeyPair());
     const keyPairs = await getKeyPairs();
 
-    if (!keyPair && keyPairs.length > 0) {
-      keyPair = keyPairs[0];
-    }
-
     if (keyPair) {
       void manageUser({ keyPair });
     } else {
       // Default to fid 3 view-only account
       void manageUser({ id: '3' });
+      return;
     }
 
-    // Add key pair to storage if it's not already there
-    if (
-      keyPair &&
-      !keyPairs.find((keyPair_) => keyPair_.publicKey === keyPair.publicKey)
-    ) {
-      addKeyPair(keyPair);
-    }
+    // Add key pair to storage in case it's not already there
+    addKeyPair(keyPair);
 
     // Fetch users for all key pairs
     Promise.all(keyPairs.map(fetchUserForKey)).then((users) => {
