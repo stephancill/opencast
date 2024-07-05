@@ -22,7 +22,8 @@ export function SidebarProfile(): JSX.Element {
     setUser,
     showAddAccountModal
   } = useAuth();
-  const { open, openModal, closeModal } = useModal();
+  const { open: isLogoutModalOpen, openModal: openLogoutModal, closeModal: closeLogoutModal } = useModal();
+  const { open: isSavePasskeyModalOpen, openModal: openSavePasskeyModal, closeModal: closeSavePasskeyModal } = useModal();
 
   const { name, username, verified, photoURL } = user as User;
 
@@ -30,8 +31,8 @@ export function SidebarProfile(): JSX.Element {
     <>
       <Modal
         modalClassName='max-w-xs bg-main-background w-full p-8 rounded-2xl'
-        open={open}
-        closeModal={closeModal}
+        open={isLogoutModalOpen}
+        closeModal={closeLogoutModal}
       >
         <ActionModal
           useIcon
@@ -41,9 +42,103 @@ export function SidebarProfile(): JSX.Element {
           mainBtnLabel='Log out'
           action={() => {
             signOut();
-            closeModal();
+            closeLogoutModal();
           }}
-          closeModal={closeModal}
+          closeModal={closeLogoutModal}
+        />
+      </Modal>
+      <Modal
+        modalClassName='max-w-xs bg-main-background w-full p-8 rounded-2xl'
+        open={isSavePasskeyModalOpen}
+        closeModal={closeSavePasskeyModal}
+      >
+        <ActionModal
+          useIcon
+          focusOnMainBtn
+          title='Save your Signer Key?'
+          description='This will save your Farcaster signer to a passkey which can be used to import your signer on other devices.'
+          mainBtnLabel='Save Passkey'
+          action={async () => {
+            if (!user?.keyPair) return;
+
+            // const rp = { name: process.env.NEXT_PUBLIC_FC_CLIENT_NAME || "opencast", id: window.location.hostname }
+            const rp = { name: process.env.NEXT_PUBLIC_FC_CLIENT_NAME || "opencast", id: "localhost" }
+
+            console.log({ rp })
+
+            try {
+              const publicKey = await navigator.credentials.create({
+                publicKey: {
+                  challenge: new Uint8Array(32),
+                  rp,
+                  user: {
+                    displayName: name,
+                    name: username,
+                    id: Buffer.from(user.id)
+                  },
+                  authenticatorSelection: {
+                    residentKey: 'required',
+                  },
+                  pubKeyCredParams: [{ alg: -7, type: "public-key" }, { alg: -257, type: "public-key" }],
+                  extensions: {
+                    // @ts-ignore -- LargeBlob extension is not yet in the WebAuthn types
+                    largeBlob: { support: 'required' },
+                  }
+                },
+              });
+
+              if (publicKey && 'response' in publicKey) {
+
+                const credential = publicKey as PublicKeyCredential;
+                const response = credential.response as AuthenticatorAttestationResponse;
+
+                console.log({ credential })
+
+                // @ts-ignore -- LargeBlob extension is not yet in the WebAuthn types
+                if (credential.getClientExtensionResults().largeBlob.supported) {
+                  // Large blob is supported for this credential.
+                  const blob = Buffer.from(JSON.stringify(user.keyPair));
+                  const assertion = await navigator.credentials.get({
+                    publicKey: {
+                      challenge: new Uint8Array(32),
+                      allowCredentials: [{
+                        type: "public-key",
+                        id: Buffer.from(credential.id),
+                      }],
+                      extensions: {
+                        // @ts-ignore -- LargeBlob extension is not yet in the WebAuthn types
+                        largeBlob: {
+                          write: blob,
+                        },
+                      },
+                    }
+                  });
+
+                  // @ts-ignore -- LargeBlob extension is not yet in the WebAuthn types
+                  if (assertion.getClientExtensionResults().largeBlob.written) {
+                    // Success, the large blob was written.
+                    alert('Signer data saved successfully.');
+                    closeSavePasskeyModal();
+                  } else {
+                    // The large blob could not be written (e.g. because of a lack of space).
+                    // The assertion is still valid.
+                    alert('Could not save largeBlob.');
+                  }
+                } else {
+                  // Large blob is not supported (this happens if support="preferred" -- the credential was still created).
+                  alert('LargeBlob extension not supported.');
+                }
+
+
+              }
+            } catch (error) {
+              console.error('Error creating passkey:', error);
+              alert('Failed to create passkey and store signer data.');
+            }
+
+            // closeSavePasskeyModal();
+          }}
+          closeModal={closeSavePasskeyModal}
         />
       </Modal>
       <Menu className='relative' as='section'>
@@ -133,9 +228,23 @@ export function SidebarProfile(): JSX.Element {
                       <Button
                         className={cn(
                           'flex w-full gap-3 rounded-md rounded-t-none p-4',
+                          active && 'bg-main-sidebar-background'
+                        )}
+                        onClick={openSavePasskeyModal}
+                      >
+                        <HeroIcon iconName='KeyIcon' />
+                        Save Signer Key
+                      </Button>
+                    )}
+                  </Menu.Item>
+                  <Menu.Item>
+                    {({ active }): JSX.Element => (
+                      <Button
+                        className={cn(
+                          'flex w-full gap-3 rounded-md rounded-t-none p-4',
                           active && ' bg-main-sidebar-background'
                         )}
-                        onClick={openModal}
+                        onClick={openLogoutModal}
                       >
                         <HeroIcon iconName='ArrowRightOnRectangleIcon' />
                         <div className='truncate'>Log out @{username}</div>
