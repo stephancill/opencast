@@ -11,7 +11,6 @@ export default async function userIdEndpoint(
   req: NextApiRequest,
   res: NextApiResponse<UserResponse>
 ): Promise<void> {
-  console.log(req.query);
   const { id, full = 'true' } = req.query as UserEndpointQuery;
 
   const user = (await resolveUserAmbiguous(id, full === 'true')) as UserFull;

@@ -19,7 +19,7 @@ import { KeyPair } from '../types/keypair';
 import { NotificationsResponseSummary } from '../types/notifications';
 import { useRouter } from 'next/router';
 
-type UserWithKey = UserFull & { keyPair?: KeyPair };
+export type UserWithKey = UserFull & { keyPair?: KeyPair };
 
 type AuthContext = {
   user: UserWithKey | null;

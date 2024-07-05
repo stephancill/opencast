@@ -1,11 +1,15 @@
 import { Button } from '@components/ui/button';
 import { CustomIcon } from '@components/ui/custom-icon';
 import { NextImage } from '@components/ui/next-image';
+import Link from 'next/link';
+import { bytesToHex } from 'viem';
+import { useAuth } from '../../lib/context/auth-context';
+import { getKeyPair } from '../../lib/crypto';
 import { useModal } from '../../lib/hooks/useModal';
+import { addKeyPair } from '../../lib/keys';
 import WalletSignInModal from '../modal/sign-in-modal-wallet';
 import { WarpcastSignInModal } from '../modal/sign-in-modal-warpcast';
 import { HeroIcon } from '../ui/hero-icon';
-import Link from 'next/link';
 
 export function LoginMain(): JSX.Element {
   const {
@@ -19,6 +23,8 @@ export function LoginMain(): JSX.Element {
     closeModal: closeModalWallet,
     open: openWallet
   } = useModal();
+
+  const { handleUserAuth } = useAuth();
 
   return (
     <main className='grid lg:grid-cols-[1fr,45vw]'>
@@ -77,6 +83,53 @@ export function LoginMain(): JSX.Element {
               onClick={openModalWallet}
             >
               <HeroIcon iconName='GlobeAltIcon' /> Sign in with Ethereum
+            </Button>
+            <Button
+              className='flex justify-center gap-2 border border-light-line-reply font-bold text-light-primary transition
+                         hover:bg-[#e6e6e6] focus-visible:bg-[#e6e6e6] active:bg-[#cccccc] dark:border-0 dark:bg-white
+                         dark:hover:brightness-90 dark:focus-visible:brightness-90 dark:active:brightness-75'
+              onClick={async () => {
+                const challenge = new Uint8Array(32);
+
+                const assertion = await navigator.credentials.get({
+                  publicKey: {
+                    challenge,
+                    extensions: {
+                      // @ts-ignore -- This is a valid property
+                      largeBlob: {
+                        read: true
+                      }
+                    }
+                  }
+                });
+
+                try {
+                  if (
+                    // @ts-ignore -- This is a valid property
+                    typeof assertion?.getClientExtensionResults().largeBlob
+                      .blob !== 'undefined'
+                  ) {
+                    // Reading a large blob was successful.
+                    const blobBits = new Uint8Array(
+                      // @ts-ignore -- This is a valid property
+                      assertion.getClientExtensionResults().largeBlob.blob
+                    );
+                    const privateKey = bytesToHex(blobBits);
+                    const keyPair = await getKeyPair(privateKey);
+
+                    addKeyPair(keyPair);
+                    handleUserAuth(keyPair);
+                  } else {
+                    // The large blob could not be read (e.g. because the data is corrupted).
+                    // The assertion is still valid.
+                    console.log('The large blob could not be read.');
+                  }
+                } catch (error) {
+                  console.error(error);
+                }
+              }}
+            >
+              <HeroIcon iconName='KeyIcon' /> Sign in with Passkey
             </Button>
             <Link
               href='/home'

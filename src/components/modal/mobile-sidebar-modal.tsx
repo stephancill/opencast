@@ -14,6 +14,7 @@ import Link from 'next/link';
 import { ActionModal } from './action-modal';
 import { DisplayModal } from './display-modal';
 import { Modal } from './modal';
+import { SavePasskeyModal } from './save-passkey-modal';
 
 export type MobileNavLink = Omit<NavLink, 'canBeHidden'>;
 
@@ -58,6 +59,12 @@ export function MobileSidebarModal({
     closeModal: logOutCloseModal
   } = useModal();
 
+  const {
+    open: isSavePasskeyModalOpen,
+    openModal: openSavePasskeyModal,
+    closeModal: closeSavePasskeyModal
+  } = useModal();
+
   const allStats: Readonly<Stats[]> = [
     ['following', 'Following', following.length],
     ['followers', 'Followers', followers.length]
@@ -77,6 +84,16 @@ export function MobileSidebarModal({
       </Modal>
       <Modal
         modalClassName='max-w-xs bg-main-background w-full p-8 rounded-2xl'
+        open={isSavePasskeyModalOpen}
+        closeModal={closeSavePasskeyModal}
+      >
+        <SavePasskeyModal
+          closeSavePasskeyModal={closeSavePasskeyModal}
+          user={user}
+        ></SavePasskeyModal>
+      </Modal>
+      <Modal
+        modalClassName='max-w-xs bg-main-background w-full p-8 rounded-2xl'
         open={logOutOpen}
         closeModal={logOutCloseModal}
       >
@@ -86,7 +103,10 @@ export function MobileSidebarModal({
           title='Log out of Opencast?'
           description='You can always log back in at any time. If you just want to switch accounts, you can do that by adding an existing account.'
           mainBtnLabel='Log out'
-          action={signOut}
+          action={() => {
+            signOut();
+            logOutCloseModal();
+          }}
           closeModal={logOutCloseModal}
         />
       </Modal>
@@ -212,18 +232,29 @@ export function MobileSidebarModal({
             </Button>
 
             {user?.keyPair && (
-              <Button
-                className='accent-tab accent-bg-tab flex items-center gap-2 rounded-md p-1.5 font-bold transition
+              <>
+                <Button
+                  className='accent-tab accent-bg-tab flex items-center gap-2 rounded-md p-1.5 font-bold transition
                          hover:bg-light-primary/10 focus-visible:ring-2 first:focus-visible:ring-[#878a8c] 
                          dark:hover:bg-dark-primary/10 dark:focus-visible:ring-white'
-                onClick={logOutOpenModal}
-              >
-                <HeroIcon
-                  className='h-5 w-5'
-                  iconName='ArrowRightOnRectangleIcon'
-                />
-                Log out
-              </Button>
+                  onClick={openSavePasskeyModal}
+                >
+                  <HeroIcon className='h-5 w-5' iconName='KeyIcon' />
+                  Save Signer Key
+                </Button>
+                <Button
+                  className='accent-tab accent-bg-tab flex items-center gap-2 rounded-md p-1.5 font-bold transition
+                         hover:bg-light-primary/10 focus-visible:ring-2 first:focus-visible:ring-[#878a8c] 
+                         dark:hover:bg-dark-primary/10 dark:focus-visible:ring-white'
+                  onClick={logOutOpenModal}
+                >
+                  <HeroIcon
+                    className='h-5 w-5'
+                    iconName='ArrowRightOnRectangleIcon'
+                  />
+                  Log out
+                </Button>
+              </>
             )}
           </nav>
         </div>

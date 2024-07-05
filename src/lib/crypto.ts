@@ -11,3 +11,12 @@ export async function generateKeyPair(): Promise<KeyPair> {
     privateKey: bytesToHex(privateKey)
   };
 }
+
+export async function getKeyPair(privateKey: `0x${string}`): Promise<KeyPair> {
+  const publicKey = await ed.getPublicKeyAsync(privateKey.slice(2));
+
+  return {
+    publicKey: bytesToHex(publicKey),
+    privateKey
+  };
+}
