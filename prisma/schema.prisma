@@ -8,58 +8,35 @@ datasource db {
 }
 
 model casts {
-  id                 String      @id @default(dbgenerated("generate_ulid()")) @db.Uuid
-  created_at         DateTime    @default(now()) @db.Timestamptz(6)
-  updated_at         DateTime    @default(now()) @db.Timestamptz(6)
-  timestamp          DateTime    @db.Timestamptz(6)
-  deleted_at         DateTime?   @db.Timestamptz(6)
+  id                 String    @id @default(dbgenerated("generate_ulid()")) @db.Uuid
+  created_at         DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at         DateTime  @default(now()) @db.Timestamptz(6)
+  timestamp          DateTime  @db.Timestamptz(6)
+  deleted_at         DateTime? @db.Timestamptz(6)
+  pruned_at          DateTime? @db.Timestamptz(6)
   fid                BigInt
   parent_fid         BigInt?
-  hash               Bytes       @unique(map: "casts_hash_unique")
+  hash               Bytes     @unique
   root_parent_hash   Bytes?
   parent_hash        Bytes?
   root_parent_url    String?
   parent_url         String?
   text               String
-  embeds             Json        @default("[]") @db.Json
-  mentions           Json        @default("[]") @db.Json
-  mentions_positions Json        @default("[]") @db.Json
-  fids               fids        @relation(fields: [fid], references: [fid], onDelete: Cascade, onUpdate: NoAction, map: "casts_fid_foreign")
-  reactions          reactions[]
+  signer             Bytes
+  embeds             Json      @default("[]") @db.Json
+  mentions           Json      @default("[]") @db.Json
+  mentions_positions Json      @default("[]") @db.Json
 
   @@index([timestamp], map: "casts_timestamp_index")
 }
 
 model fids {
-  fid                                 BigInt            @id
-  created_at                          DateTime          @default(now()) @db.Timestamptz(6)
-  updated_at                          DateTime          @default(now()) @db.Timestamptz(6)
-  registered_at                       DateTime          @db.Timestamptz(6)
-  chain_event_id                      String            @db.Uuid
-  custody_address                     Bytes
-  recovery_address                    Bytes
-  casts                               casts[]
-  fnames                              fnames?
-  links_links_fidTofids               links[]           @relation("links_fidTofids")
-  links_links_target_fidTofids        links[]           @relation("links_target_fidTofids")
-  reactions                           reactions[]
-  signers_signers_fidTofids           signers[]         @relation("signers_fidTofids")
-  signers_signers_requester_fidTofids signers[]         @relation("signers_requester_fidTofids")
-  user_data                           user_data[]
-  username_proofs                     username_proofs[]
-  verifications                       verifications[]
-}
-
-model fnames {
-  id            String    @id @default(dbgenerated("generate_ulid()")) @db.Uuid
-  created_at    DateTime  @default(now()) @db.Timestamptz(6)
-  updated_at    DateTime  @default(now()) @db.Timestamptz(6)
-  registered_at DateTime  @db.Timestamptz(6)
-  deleted_at    DateTime? @db.Timestamptz(6)
-  fid           BigInt    @unique(map: "fnames_fid_unique")
-  type          Int       @db.SmallInt
-  username      String    @unique(map: "fnames_username_unique")
-  fids          fids      @relation(fields: [fid], references: [fid], onDelete: Cascade, onUpdate: NoAction, map: "fnames_fid_foreign")
+  fid              BigInt   @id
+  created_at       DateTime @default(now()) @db.Timestamptz(6)
+  updated_at       DateTime @default(now()) @db.Timestamptz(6)
+  registered_at    DateTime @db.Timestamptz(6)
+  custody_address  Bytes
+  recovery_address Bytes
 }
 
 model kysely_migration {
@@ -73,20 +50,18 @@ model kysely_migration_lock {
 }
 
 model links {
-  id                          String    @id @default(dbgenerated("generate_ulid()")) @db.Uuid
-  created_at                  DateTime  @default(now()) @db.Timestamptz(6)
-  updated_at                  DateTime  @default(now()) @db.Timestamptz(6)
-  timestamp                   DateTime  @db.Timestamptz(6)
-  deleted_at                  DateTime? @db.Timestamptz(6)
-  fid                         BigInt
-  target_fid                  BigInt
-  display_timestamp           DateTime? @db.Timestamptz(6)
-  type                        String
-  hash                        Bytes     @unique(map: "links_hash_unique")
-  fids_links_fidTofids        fids      @relation("links_fidTofids", fields: [fid], references: [fid], onDelete: Cascade, onUpdate: NoAction, map: "links_fid_foreign")
-  fids_links_target_fidTofids fids      @relation("links_target_fidTofids", fields: [target_fid], references: [fid], onDelete: Cascade, onUpdate: NoAction, map: "links_target_fid_foreign")
-
-  @@unique([fid, target_fid, type], map: "links_fid_target_fid_type_unique")
+  id                String    @id @default(dbgenerated("generate_ulid()")) @db.Uuid
+  created_at        DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at        DateTime  @default(now()) @db.Timestamptz(6)
+  timestamp         DateTime  @db.Timestamptz(6)
+  deleted_at        DateTime? @db.Timestamptz(6)
+  pruned_at         DateTime? @db.Timestamptz(6)
+  fid               BigInt
+  target_fid        BigInt
+  display_timestamp DateTime? @db.Timestamptz(6)
+  type              String
+  hash              Bytes     @unique
+  signer            Bytes
 }
 
 model reactions {
@@ -95,32 +70,28 @@ model reactions {
   updated_at       DateTime  @default(now()) @db.Timestamptz(6)
   timestamp        DateTime  @db.Timestamptz(6)
   deleted_at       DateTime? @db.Timestamptz(6)
+  pruned_at        DateTime? @db.Timestamptz(6)
   fid              BigInt
   target_cast_fid  BigInt?
   type             Int       @db.SmallInt
-  hash             Bytes     @unique(map: "reactions_hash_unique")
+  hash             Bytes     @unique
   target_cast_hash Bytes?
   target_url       String?
-  fids             fids      @relation(fields: [fid], references: [fid], onDelete: Cascade, onUpdate: NoAction, map: "reactions_fid_foreign")
-  casts            casts?    @relation(fields: [target_cast_hash], references: [hash], onDelete: Cascade, onUpdate: NoAction, map: "reactions_target_hash_foreign")
-
-  @@unique([fid, type, target_cast_hash, target_url], map: "reactions_fid_type_target_cast_hash_target_url_unique")
+  signer           Bytes
 }
 
 model signers {
-  id                                                       String        @id @default(dbgenerated("generate_ulid()")) @db.Uuid
-  created_at                                               DateTime      @default(now()) @db.Timestamptz(6)
-  updated_at                                               DateTime      @default(now()) @db.Timestamptz(6)
-  added_at                                                 DateTime      @db.Timestamptz(6)
-  removed_at                                               DateTime?     @db.Timestamptz(6)
-  fid                                                      BigInt
-  requester_fid                                            BigInt
-  key_type                                                 Int           @db.SmallInt
-  metadata_type                                            Int           @db.SmallInt
-  key                                                      Bytes
-  metadata                                                 Json          @db.Json
-  fids_signers_fidTofids                                   fids          @relation("signers_fidTofids", fields: [fid], references: [fid], onDelete: Cascade, onUpdate: NoAction, map: "signers_fid_foreign")
-  fids_signers_requester_fidTofids                         fids          @relation("signers_requester_fidTofids", fields: [requester_fid], references: [fid], onDelete: Cascade, onUpdate: NoAction, map: "signers_requester_fid_foreign")
+  id            String?   @default(dbgenerated("generate_ulid()")) @db.Uuid
+  created_at    DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at    DateTime  @default(now()) @db.Timestamptz(6)
+  added_at      DateTime  @db.Timestamptz(6)
+  removed_at    DateTime? @db.Timestamptz(6)
+  fid           BigInt
+  requester_fid BigInt
+  key_type      Int       @db.SmallInt
+  metadata_type Int       @db.SmallInt
+  key           Bytes
+  metadata      Json      @db.Json
 
   @@unique([fid, key], map: "signers_fid_key_unique")
   @@index([fid], map: "signers_fid_index")
@@ -135,9 +106,9 @@ model user_data {
   deleted_at DateTime? @db.Timestamptz(6)
   fid        BigInt
   type       Int       @db.SmallInt
-  hash       Bytes     @unique(map: "user_data_hash_unique")
+  hash       Bytes     @unique
   value      String
-  fids       fids      @relation(fields: [fid], references: [fid], onDelete: Cascade, onUpdate: NoAction, map: "user_data_fid_foreign")
+  signer     Bytes
 
   @@unique([fid, type], map: "user_data_fid_type_unique")
 }
@@ -156,25 +127,42 @@ model verifications {
   signer_address Bytes
   block_hash     Bytes
   signature      Bytes
-  fids           fids      @relation(fields: [fid], references: [fid], onDelete: Cascade, onUpdate: NoAction, map: "verifications_fid_foreign")
 
   @@unique([signer_address, fid], map: "verifications_signer_address_fid_unique")
   @@index([fid, timestamp], map: "verifications_fid_timestamp_index")
 }
 
+model hubs {
+  id              String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  gossip_address  String
+  rpc_address     String
+  excluded_hashes String[]
+  count           Int      @default(0)
+  hub_version     String
+  network         String
+  app_version     String
+  timestamp       BigInt
+  created_at      DateTime @default(now()) @db.Timestamptz(6)
+  updated_at      DateTime @default(now()) @db.Timestamptz(6)
+}
 
-model username_proofs {
-  id         String    @id @default(dbgenerated("generate_ulid()")) @db.Uuid
-  created_at DateTime  @default(now()) @db.Timestamptz(6)
-  updated_at DateTime  @default(now()) @db.Timestamptz(6)
-  timestamp  DateTime  @db.Timestamptz(6)
-  deleted_at DateTime? @db.Timestamptz(6)
+model storage {
+  id         String?  @default(dbgenerated("generate_ulid()")) @db.Uuid
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  updated_at DateTime @default(now()) @db.Timestamptz(6)
+  rented_at  DateTime @db.Timestamptz(6)
+  expires_at DateTime @db.Timestamptz(6)
   fid        BigInt
-  type       Int       @db.SmallInt
-  username   String
-  signature  Bytes
-  owner      Bytes
-  fids       fids      @relation(fields: [fid], references: [fid], onDelete: Cascade, onUpdate: NoAction, map: "username_proofs_fid_foreign")
+  units      Int      @db.SmallInt
+  payer      Bytes
 
-  @@unique([username, timestamp], map: "username_proofs_username_timestamp_unique")
+  @@unique([fid, expires_at], map: "storage_fid_expires_at_unique")
+  @@index([fid, expires_at], map: "storage_fid_expires_at_index")
+}
+
+model targets {
+  id         String   @id @default(dbgenerated("generate_ulid()")) @db.Uuid
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  updated_at DateTime @default(now()) @db.Timestamptz(6)
+  fid        BigInt   @unique(map: "target_fid_unique")
 }

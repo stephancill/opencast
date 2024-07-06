@@ -59,6 +59,43 @@ export default async function handle(
         afterTime = new Date(beforeTime.getTime() - 24 * 60 * 60 * 1000);
       }
 
+      // Get last reaction and last cast from other clients
+      const lastActivity = (await prisma.$queryRaw`
+        SELECT timestamp FROM (
+          SELECT 'cast' as type, id, fid, timestamp
+          FROM casts
+          WHERE 
+            fid = ${fid} AND
+            deleted_at IS NULL AND
+            timestamp > ${afterTime}
+          UNION ALL
+          SELECT 'reaction' as type, id, fid, timestamp
+          FROM reactions
+          WHERE 
+            fid = ${fid} AND
+            deleted_at IS NULL AND
+            timestamp > ${afterTime}
+        ) AS combined
+        LEFT JOIN signers ON combined.fid = signers.fid
+        WHERE 
+          (signers.requester_fid IS NULL OR signers.requester_fid != ${BigInt(
+            process.env.APP_FID!
+          )})
+        ORDER BY timestamp DESC
+        LIMIT 1
+      `) as { timestamp: Date }[];
+
+      // Consider that user would likely have cleared notifications badge on the other client
+      // afterTime is the max of last activity or afterTime
+      if (lastActivity.length > 0 && req.query.last_time) {
+        afterTime = new Date(
+          Math.max(
+            afterTime?.getTime() || 0,
+            lastActivity[0].timestamp.getTime()
+          )
+        );
+      }
+
       const userPostsReactions = (await prisma.$queryRaw`
         SELECT 
           casts.*, 
