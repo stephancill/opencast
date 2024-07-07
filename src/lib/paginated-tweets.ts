@@ -6,6 +6,7 @@ import { BaseResponse } from './types/responses';
 import { Tweet, tweetConverter } from './types/tweet';
 import { User, UserFull, UsersMapType } from './types/user';
 import { resolveUsersMap } from './user/resolve-user';
+import { hexToBytes } from 'viem';
 
 export type PaginatedTweetsType = {
   tweets: Tweet[];
@@ -122,8 +123,8 @@ export async function castsToTweets(
       acc[cast.hash.toString('hex')] = (cast.embeds as any[])
         .filter((embed) => 'castId' in embed)
         .map((embed) => {
-          const hash = Buffer.from(embed.castId.hash.data);
-          castEmbedsHashes.add(Buffer.from(embed.castId.hash.data));
+          const hash = Buffer.from(hexToBytes(embed.castId.hash));
+          castEmbedsHashes.add(hash);
           return hash.toString('hex');
         });
 
