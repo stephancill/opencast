@@ -45,19 +45,19 @@ export default async function tweetIdEndpoint(
   const { tweets, users } = await convertAndCalculateCursor([cast]);
   const tweet = tweets[0];
 
-  // const signer = await prisma.signers.findFirst({
-  //   where: {
-  //     key: cast.signer
-  //   }
-  // });
-  // const clientFid =
-  //   signer?.metadata_type === 1
-  //     ? ((signer?.metadata as JsonObject | undefined)?.requestFid as string) ||
-  //       null
-  //     : null;
-  // const clientUser = clientFid
-  //   ? await resolveUserFromFid(BigInt(clientFid))
-  //   : null;
+  const signer = await prisma.signers.findFirst({
+    where: {
+      key: cast.signer
+    }
+  });
+  const clientFid =
+    signer?.metadata_type === 1
+      ? ((signer?.metadata as JsonObject | undefined)?.requestFid as string) ||
+        null
+      : null;
+  const clientUser = clientFid
+    ? await resolveUserFromFid(BigInt(clientFid))
+    : null;
 
   let topic: TopicType | null = null;
   if (cast.parent_url) {
@@ -68,7 +68,7 @@ export default async function tweetIdEndpoint(
     ...tweet,
     users,
     topic: topic,
-    client: null
+    client: clientUser?.name || null
   };
 
   res.json({
