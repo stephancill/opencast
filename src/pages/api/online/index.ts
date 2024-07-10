@@ -1,6 +1,7 @@
+import { Prisma } from '@prisma/client';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { prisma } from '../../../lib/prisma';
-import { OnlineUsersResponse } from '../../../lib/types/online';
+import { AppProfile, OnlineUsersResponse } from '../../../lib/types/online';
 import { UserFull } from '../../../lib/types/user';
 import { resolveUserFromFid } from '../../../lib/user/resolve-user';
 
@@ -63,17 +64,63 @@ export default async function handle(
         distinct: ['fid']
       });
 
-      const timestampsByUser = [...casts, ...reactions]
+      const combined = [...casts, ...reactions];
+
+      const signersSet = new Set(combined.map((c) => c.signer));
+
+      const timestampsByUser = combined
         .sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime()) // ascending order - oldest first
         .reduce((acc, cur) => {
           if (!acc[cur.fid.toString()]) {
             acc[cur.fid.toString()] = {
               lastOnline: cur.timestamp,
-              fid: cur.fid
+              fid: cur.fid,
+              signer: cur.signer
             };
           }
           return acc;
-        }, {} as Record<string, { lastOnline: Date; fid: bigint }>);
+        }, {} as Record<string, { lastOnline: Date; fid: bigint; signer: Buffer }>);
+
+      type SignerRow = {
+        user_fid: bigint;
+        requester_fid: bigint;
+        pfp?: string;
+        display?: string;
+        bio?: string;
+        url?: string;
+        username?: string;
+      };
+
+      // TODO: Update this with convenience view
+      const signers = (await prisma.$queryRaw`
+        SELECT DISTINCT 
+          s.fid as user_fid,
+          s.key,
+          s.requester_fid,
+          MAX(CASE WHEN ud.type = 1 THEN ud.value END) AS pfp,
+          MAX(CASE WHEN ud.type = 2 THEN ud.value END) AS display,
+          MAX(CASE WHEN ud.type = 3 THEN ud.value END) AS bio,
+          MAX(CASE WHEN ud.type = 5 THEN ud.value END) AS url,
+          MAX(CASE WHEN ud.type = 6 THEN ud.value END) AS username
+        FROM signers s
+        LEFT JOIN user_data ud ON s.requester_fid = ud.fid
+        WHERE s.key IN (${Prisma.join(Array.from(signersSet))})
+        GROUP BY s.requester_fid, s.key, s.fid
+      `) as SignerRow[];
+
+      const appProfilesMap = signers.reduce((acc, cur) => {
+        acc[cur.requester_fid.toString()] = {
+          display: cur.display,
+          pfp: cur.pfp,
+          username: cur.username
+        };
+        return acc;
+      }, {} as Record<string, AppProfile>);
+
+      const appFidsByUserFid = signers.reduce((acc, cur) => {
+        acc[cur.user_fid.toString()] = cur.requester_fid.toString();
+        return acc;
+      }, {} as Record<string, string>);
 
       const users = (
         (
@@ -93,11 +140,12 @@ export default async function handle(
         .map((u) => {
           return {
             user: u,
-            lastOnline: timestampsByUser[u!.id.toString()].lastOnline
+            lastOnline: timestampsByUser[u!.id.toString()].lastOnline,
+            appFid: appFidsByUserFid[u!.id.toString()]
           };
         });
 
-      res.json({ result: users });
+      res.json({ result: { users, appProfilesMap } });
       break;
     default:
       res.setHeader('Allow', ['GET']);

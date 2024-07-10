@@ -20,7 +20,7 @@ export default function Home(): JSX.Element {
   const { isMobile } = useWindow();
   const { user, userNotifications } = useAuth();
 
-  const { data: onlineUsers, isValidating: onlineUsersLoading } = useSWR(
+  const { data: onlineResponse, isValidating: onlineUsersLoading } = useSWR(
     `/api/online?fid=${user?.id}`,
     async (url) => (await fetchJSON<OnlineUsersResponse>(url)).result,
     { revalidateOnFocus: false, refreshInterval: 10_000 }
@@ -42,7 +42,7 @@ export default function Home(): JSX.Element {
       ></MainHeader>
       <div className='overflow-scroll'>
         <div>
-          {onlineUsersLoading && !onlineUsers && (
+          {onlineUsersLoading && !onlineResponse && (
             <div className='p-1'>
               <NextImage
                 useSkeleton
@@ -58,11 +58,11 @@ export default function Home(): JSX.Element {
           )}
 
           <div className='flex gap-2 px-2'>
-            {onlineUsers && onlineUsers.length === 0 && (
+            {onlineResponse && onlineResponse.users?.length === 0 && (
               <div>No users online</div>
             )}
-            {onlineUsers &&
-              onlineUsers.map(({ user }) => (
+            {onlineResponse &&
+              onlineResponse.users?.map(({ user, appFid }) => (
                 <div key={user.id} className='p-1'>
                   <div className='relative rounded-full bg-gradient-to-r from-blue-500 to-purple-500 p-[2px]'>
                     <div className='relative rounded-full bg-white'>
@@ -73,6 +73,13 @@ export default function Home(): JSX.Element {
                         size={64}
                       />
                       <div className='absolute bottom-0.5 right-0.5 h-2 w-2 rounded-full bg-green-500'></div>
+                      {onlineResponse.appProfilesMap[appFid] && (
+                        <img
+                          className='border-1 absolute bottom-0.5 h-5 w-5 rounded-md border border-gray-500'
+                          src={onlineResponse.appProfilesMap[appFid].pfp}
+                          alt={onlineResponse.appProfilesMap[appFid].display}
+                        />
+                      )}
                     </div>
                   </div>
                 </div>
