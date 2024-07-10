@@ -68,7 +68,7 @@ export function Tweet(tweet: TweetProps): JSX.Element {
   const tweetLink = `/tweet/${tweetId}`;
   const userId = user?.id as string;
   const isOwner = userId === createdBy;
-  const { id: parentId, username: parentUsername = username } = parent ?? {};
+  const { id: parentId, username: parentUsername } = parent ?? {};
   const { push } = useRouter();
   const reply = !!parent;
   const tweetIsRetweeted = retweet !== null;
@@ -161,7 +161,7 @@ export function Tweet(tweet: TweetProps): JSX.Element {
                 )}
               </div>
             </div>
-            {(reply || modal) && (
+            {(reply || modal) && parentUsername && (
               <p
                 className={cn(
                   'text-light-secondary dark:text-dark-secondary',
