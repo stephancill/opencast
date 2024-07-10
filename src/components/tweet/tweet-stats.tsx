@@ -43,12 +43,13 @@ export function TweetStats({
   const totalLikes = userLikes.length;
   const totalRetweets = userRetweets.length;
 
-  const [{ currentReplies, currentRetweets, currentLikes }, setCurrentStats] =
-    useState({
-      currentReplies: totalReplies,
-      currentLikes: totalLikes,
-      currentRetweets: totalRetweets
-    });
+  const [currentStats, setCurrentStats] = useState({
+    currentReplies: totalReplies,
+    currentLikes: totalLikes,
+    currentRetweets: totalRetweets
+  });
+
+  const { currentReplies, currentRetweets, currentLikes } = currentStats;
 
   useEffect(() => {
     setCurrentStats({
@@ -141,16 +142,24 @@ export function TweetStats({
               console.error('Error creating recast message');
               return;
             }
+
+            const beforeStats = { ...currentStats };
+            const beforeTweetIsRetweeted = tweetIsRetweeted;
+
+            setCurrentStats({
+              currentReplies,
+              currentLikes,
+              currentRetweets: tweetIsRetweeted
+                ? totalRetweets - 1
+                : totalRetweets + 1
+            });
+            setTweetIsRetweeted(!tweetIsRetweeted);
+
             const result = await submitHubMessage(message);
-            if (result?.hash) {
-              setCurrentStats({
-                currentReplies,
-                currentLikes,
-                currentRetweets: tweetIsRetweeted
-                  ? totalRetweets - 1
-                  : totalRetweets + 1
-              });
-              setTweetIsRetweeted(!tweetIsRetweeted);
+
+            if (!result?.hash) {
+              setCurrentStats(beforeStats);
+              setTweetIsRetweeted(beforeTweetIsRetweeted);
             }
           }}
         />
@@ -179,14 +188,21 @@ export function TweetStats({
               console.error('Error creating like message');
               return;
             }
+            const beforeStats = { ...currentStats };
+            const beforeTweetIsLiked = tweetIsLiked;
+
+            setCurrentStats({
+              currentReplies,
+              currentRetweets: currentRetweets,
+              currentLikes: tweetIsLiked ? totalLikes - 1 : totalLikes + 1
+            });
+            setTweetIsLiked(!tweetIsLiked);
+
             const result = await submitHubMessage(message);
-            if (result?.hash) {
-              setCurrentStats({
-                currentReplies,
-                currentRetweets: currentRetweets,
-                currentLikes: tweetIsLiked ? totalLikes - 1 : totalLikes + 1
-              });
-              setTweetIsLiked(!tweetIsLiked);
+
+            if (!result?.hash) {
+              setCurrentStats(beforeStats);
+              setTweetIsLiked(beforeTweetIsLiked);
             }
           }}
         />
