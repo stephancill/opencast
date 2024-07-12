@@ -17,7 +17,7 @@
     "@farcaster/core": "^0.13.3",
     "@farcaster/hub-nodejs": "^0.10.3",
     "@farcaster/hub-web": "^0.6.0",
-    "@frames.js/render": "^0.2.15",
+    "@frames.js/render": "^0.2.20",
     "@headlessui/react": "^1.7.2",
     "@heroicons/react": "^2.0.11",
     "@noble/ed25519": "^2.0.0",

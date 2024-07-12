@@ -1,6 +1,5 @@
 'use client';
 
-import { FrameUI } from '@frames.js/render';
 import {
   FarcasterFrameContext,
   FarcasterSigner,
@@ -17,6 +16,7 @@ import {
   useSendTransaction,
   useSwitchChain
 } from 'wagmi';
+import { FrameUI } from './frame-ui';
 
 type FrameProps = {
   url: string;
@@ -53,6 +53,7 @@ export function Frame({ frame, frameContext, url }: FrameProps) {
 
   const frameState = useFrame({
     homeframeUrl: url,
+    frame,
     frameActionProxy: '/frames',
     connectedAddress,
     frameGetProxy: '/frames',
@@ -90,12 +91,8 @@ export function Frame({ frame, frameContext, url }: FrameProps) {
   });
 
   return (
-    <div className='w-[400px] overflow-hidden rounded-2xl'>
-      <FrameUI
-        frameState={frameState}
-        theme={{}}
-        FrameImage={(props) => <img {...props}></img>}
-      />
+    <div className='w-full overflow-hidden'>
+      <FrameUI frameState={frameState} />
     </div>
   );
 }

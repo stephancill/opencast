@@ -1,15 +1,24 @@
 import Link from 'next/link';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import useSWR from 'swr';
 import { ExternalEmbed } from '../../lib/types/tweet';
 import { NextImage } from '../ui/next-image';
 import { ImagePreview } from '@components/input/image-preview';
 import { Frame } from '@components/frames/Frame';
+import { Frame as FrameType } from 'frames.js';
 
 const hoverModifier =
   'hover:brightness-75 dark:hover:brightness-125 hover:duration-200 transition';
 
-export function TweetEmbeds({ embeds, tweetId, tweetAuthorId }: { embeds: ExternalEmbed[], tweetId: string, tweetAuthorId: string }) {
+export function TweetEmbeds({
+  embeds,
+  tweetId,
+  tweetAuthorId
+}: {
+  embeds: ExternalEmbed[];
+  tweetId: string;
+  tweetAuthorId: string;
+}) {
   const fetchEmbeds = async (url: string | null) => {
     if (!url) return null;
 
@@ -35,40 +44,52 @@ export function TweetEmbeds({ embeds, tweetId, tweetAuthorId }: { embeds: Extern
   }, [embedsData]);
 
   const imageEmbeds = useMemo(() => {
-    return embedsData?.filter((embed) => embed?.contentType?.startsWith("image/"))
-  }, [embedsData])
+    return embedsData?.filter((embed) =>
+      embed?.contentType?.startsWith('image/')
+    );
+  }, [embedsData]);
 
   const frames = useMemo(() => {
-    return embedsData?.filter((embed) => embed?.frame)
-  }, [embedsData])
+    return embedsData?.filter((embed) => embed?.frame);
+  }, [embedsData]);
 
   return embedsData !== undefined ? (
     embedsData && embedsCount > 0 && (
       <div>
-        {imageEmbeds && imageEmbeds.length > 0 && <div>
-          <ImagePreview
-            tweet
-            imagesPreview={imageEmbeds.map(e => ({ alt: e?.title || "", id: e!.url, src: e!.url }))}
-            previewCount={imageEmbeds.length}
-          />
-        </div>}
+        {imageEmbeds && imageEmbeds.length > 0 && (
+          <div>
+            <ImagePreview
+              tweet
+              imagesPreview={imageEmbeds.map((e) => ({
+                alt: e?.title || '',
+                id: e!.url,
+                src: e!.url
+              }))}
+              previewCount={imageEmbeds.length}
+            />
+          </div>
+        )}
         <div className={embedsCount > 1 ? `mt-2 grid gap-2` : 'mt-2'}>
           {embedsData?.map((embed, index) =>
-            embed && !embed.contentType?.startsWith("image/") && !embed.frame ? <TweetEmbed {...embed} key={index}></TweetEmbed> : <></>
+            embed &&
+            !embed.contentType?.startsWith('image/') &&
+            !embed.frame ? (
+              <TweetEmbed {...embed} key={index}></TweetEmbed>
+            ) : (
+              <></>
+            )
           )}
         </div>
-        {
-          frames?.map(embed => (<div key={embed?.url}>
-            <div className='flex justify-center override-nav rounded-md'>
-              <Frame url={embed!.url} frame={embed?.frame!} frameContext={{
-                castId: {
-                  fid: parseInt(tweetAuthorId),
-                  hash: `0x${tweetId}`
-                },
-              }} />
-            </div>
-          </div>))
-        }
+        {frames?.map((embed) => (
+          <div key={embed?.url}>
+            <FramePreview
+              embed={embed!}
+              url={embed!.url}
+              tweetAuthorId={tweetAuthorId}
+              tweetId={tweetId}
+            />
+          </div>
+        ))}
       </div>
     )
   ) : (
@@ -92,75 +113,149 @@ export function TweetEmbed({
   url,
   icon,
   isLoading,
-  newTab
+  newTab,
+  buttonTitle,
+  onButtonClick
 }: ExternalEmbed & {
   isLoading?: boolean;
   newTab?: boolean;
+  buttonTitle?: string;
+  onButtonClick?: () => void;
 }): JSX.Element {
-  const link = (
-    <Link
-      href={url}
-      className='override-nav inline-block w-full rounded-md border 
-border-black border-light-border p-2 text-left text-sm dark:border-dark-border'
-      target={newTab ? '_blank' : url.startsWith('/') ? undefined : '_blank'}
-    >
-      <div className='flex items-center'>
-        <div className='flex-grow'>
-          <div className='flex items-center'>
-            {icon && (
-              // Only fully rounded if it's a link to a cast
-              <span
-                className={`mx-1 ${url.startsWith('/tweet') ? 'overflow-hidden rounded-full' : ''
-                  }`}
-              >
-                <img src={icon}
-                  alt={provider || ''} className='w-4 h-4' />
-              </span>
-            )}
-            {title && (
-              <span
-                className={`mx-1 line-clamp-2 overflow-hidden text-ellipsis ${hoverModifier}`}
-              >
-                {title}
-              </span>
-            )}
-          </div>
-          {text ? (
-            <span
-              className={`mx-1 line-clamp-4 text-gray-400 ${hoverModifier}`}
-            >
-              {text
-                .split(' ')
-                .map((word) =>
-                  word.length > 40 ? word.slice(0, 20) + '...' : word
-                )
-                .join(' ')}
-            </span>
-          ) : isLoading ? (
-            <div className='h-12 w-full animate-pulse rounded-md bg-light-secondary dark:bg-dark-secondary'></div>
-          ) : (
-            <></>
-          )}
-        </div>
+  const imageEl = (
+    <div>
+      <div className='ml-auto h-[100px] w-[100px] overflow-hidden rounded-md'>
         {image ? (
-          <div className='ml-2 mr-1 block hidden h-28 w-28 flex-shrink-0 flex-grow-0 overflow-hidden rounded-md sm:block'>
-            <img
-              src={image}
-              alt={title || ''}
-              title={title || 'Unknown'}
-              className='h-full w-full object-cover'
-              width={112}
-              height={112}
-            />
-          </div>
+          <img
+            src={image}
+            alt={title || ''}
+            title={title || 'Unknown'}
+            className='h-full w-full object-cover'
+          />
         ) : isLoading ? (
-          <div className='ml-2 mr-1 block hidden h-28 w-28 flex-shrink-0 flex-grow-0 animate-pulse overflow-hidden rounded-md rounded-md bg-light-secondary dark:bg-dark-secondary sm:block'></div>
+          <div className='animate-pulse rounded-md bg-light-secondary dark:bg-dark-secondary sm:block'></div>
         ) : (
-          <></>
+          <div className='rounded-md bg-light-secondary dark:bg-dark-secondary sm:block'></div>
         )}
       </div>
-    </Link>
+    </div>
+  );
+
+  const link = (
+    <div>
+      <Link
+        href={url}
+        className='override-nav'
+        target={newTab ? '_blank' : url.startsWith('/') ? undefined : '_blank'}
+      >
+        <div
+          className='flex w-full gap-2 rounded-md border 
+border-black border-light-border p-2 text-left text-sm dark:border-dark-border'
+        >
+          {buttonTitle ? imageEl : <></>}
+          <div className='flex min-w-0 flex-grow flex-col justify-center'>
+            <div className='break-word flex items-center [overflow-wrap:anywhere]'>
+              {icon && (
+                // Only fully rounded if it's a link to a cast
+                <span
+                  className={`mx-1 flex-shrink-0 overflow-hidden ${
+                    url.startsWith('/tweet') ? 'rounded-full' : 'rounded-sm'
+                  }`}
+                >
+                  <img
+                    src={icon}
+                    alt={provider || ''}
+                    className='h-4 w-4 object-cover'
+                  />
+                </span>
+              )}
+              {title && (
+                <span
+                  className={`mx-1 line-clamp-2 text-ellipsis ${hoverModifier}`}
+                >
+                  {title}
+                </span>
+              )}
+            </div>
+            {text ? (
+              <span
+                className={`mx-1 line-clamp-3 text-gray-400 ${hoverModifier}`}
+              >
+                {text}
+              </span>
+            ) : isLoading ? (
+              <div className='h-12 w-full animate-pulse rounded-md bg-light-secondary dark:bg-dark-secondary'></div>
+            ) : (
+              <></>
+            )}
+          </div>
+          {!buttonTitle ? (
+            imageEl
+          ) : (
+            <div className='my-auto flex'>
+              <button
+                onClick={onButtonClick}
+                className='rounded-md bg-main-accent p-2 font-bold'
+              >
+                {buttonTitle}
+              </button>
+            </div>
+          )}
+        </div>
+      </Link>
+      <div className='text-right text-sm text-light-secondary dark:text-dark-secondary'>
+        {URL.canParse(url) ? new URL(url).hostname : ''}
+      </div>
+    </div>
   );
 
   return link;
+}
+
+export function FramePreview({
+  url,
+  tweetAuthorId,
+  tweetId,
+  embed: { frame, ...embed }
+}: {
+  url: string;
+  tweetAuthorId: string;
+  tweetId: string;
+  embed: ExternalEmbed;
+}) {
+  const [showFrame, setShowFrame] = useState(false);
+
+  const handleToggleFrame = () => {
+    setShowFrame(!showFrame);
+  };
+
+  return showFrame && frame ? (
+    <div className='override-nav flex justify-center rounded-md'>
+      <Frame
+        url={url}
+        frame={frame}
+        frameContext={{
+          castId: {
+            fid: parseInt(tweetAuthorId),
+            hash: `0x${tweetId}`
+          }
+        }}
+      />
+    </div>
+  ) : (
+    <div
+      onClick={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        handleToggleFrame();
+      }}
+    >
+      <TweetEmbed
+        {...embed}
+        buttonTitle={'View'}
+        onButtonClick={handleToggleFrame}
+        url={url}
+      ></TweetEmbed>
+    </div>
+  );
 }
