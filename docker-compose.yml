@@ -1,15 +1,52 @@
 version: '3.8'
+
 services:
-  dev-db:
-    image: postgres:13
-    ports:
-      - 5432:5432
+  lazy-indexer:
+    image: gabrieltemtsen/lazy-indexer:latest  # Use the published image from Docker Hub
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: admin
-      POSTGRES_DB: postgres
+      - HUB_REST_URL=https://hub.pinata.cloud
+      - HUB_RPC=hub-grpc.pinata.cloud
+      - HUB_SSL=true
+      - DATABASE_URL="postgresql://indexer:password@localhost:5432/indexer"
+      - REDIS_URL=redis://redis:6379
+      - WORKER_CONCURRENCY=5
+      - LOG_LEVEL=debug
+    depends_on:
+      - db
+      - redis
     networks:
-      - main
+      - app-network
+
+  opencast:
+    build:
+      context: . 
+    environment:
+      - DATABASE_URL="postgres://replicator:password@localhost:6541/replicator?schema=public"
+    ports:
+      - "3000:3000"  # Maps port 3000 on the host to port 3000 in the container
+    depends_on:
+      - db
+    networks:
+      - app-network
+
+  db:
+    image: postgres:15
+    environment:
+      - POSTGRES_USER=indexer
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=indexer
+    ports:
+      - "5432:5432"
+    networks:
+      - app-network
+
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+    networks:
+      - app-network
 
 networks:
-  main:
+  app-network:
+    driver: bridge
