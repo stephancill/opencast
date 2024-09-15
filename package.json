@@ -17,7 +17,7 @@
     "@farcaster/core": "^0.13.3",
     "@farcaster/hub-nodejs": "^0.10.3",
     "@farcaster/hub-web": "^0.6.0",
-    "@frames.js/render": "^0.2.20",
+    "@frames.js/render": "^0.3.8",
     "@headlessui/react": "^1.7.2",
     "@heroicons/react": "^2.0.11",
     "@noble/ed25519": "^2.0.0",
@@ -27,7 +27,7 @@
     "clsx": "^1.2.1",
     "firebase": "^9.9.4",
     "framer-motion": "^7.2.1",
-    "frames.js": "^0.17.1",
+    "frames.js": "^0.19.1",
     "lodash": "^4.17.21",
     "lru-cache": "^10.0.1",
     "metadata-scraper": "^0.2.61",
@@ -42,7 +42,8 @@
     "swr": "^1.3.0",
     "validator": "^13.11.0",
     "viem": "2.x",
-    "wagmi": "^2.10.9"
+    "wagmi": "^2.10.9",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^5.16.4",

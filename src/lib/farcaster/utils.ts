@@ -13,7 +13,10 @@ import {
   NobleEd25519Signer,
   ReactionType
 } from '@farcaster/hub-web';
+import { ed25519 } from '@noble/curves/ed25519';
 import { blake3 } from '@noble/hashes/blake3';
+import { Buffer } from 'buffer';
+import { toHex } from 'viem';
 import { getActiveKeyPair } from '../keys';
 
 function getSigner(privateKey: string): NobleEd25519Signer {
@@ -220,4 +223,55 @@ export async function batchSubmitHubMessages(messages: Message[]) {
     body: JSON.stringify({ messages: messages.map(Message.toJSON) })
   });
   return res.ok;
+}
+
+function base64ToBase64Url(base64: string): string {
+  return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+}
+
+export async function generateAuthToken(
+  payload: Record<string, any>,
+  fid: number,
+  expirationSeconds: number = 300
+): Promise<string> {
+  const signer = await getSignerFromStorage();
+  const keyPair = await getActiveKeyPair();
+
+  if (!keyPair) throw new Error('No active key pair found');
+
+  const header = {
+    fid,
+    type: 'app_key',
+    key: keyPair.publicKey
+  };
+
+  const encodedHeader = base64ToBase64Url(
+    Buffer.from(JSON.stringify(header)).toString('base64')
+  );
+
+  const fullPayload = {
+    ...payload,
+    exp: Math.floor(Date.now() / 1000) + expirationSeconds
+  };
+  const encodedPayload = base64ToBase64Url(
+    Buffer.from(JSON.stringify(fullPayload)).toString('base64')
+  );
+
+  const message = Buffer.from(`${encodedHeader}.${encodedPayload}`, 'utf-8');
+
+  const signatureResult = await signer.signMessageHash(message);
+
+  if (signatureResult.isErr()) throw new Error('Failed to sign message');
+
+  const encodedSignature = base64ToBase64Url(
+    Buffer.from(signatureResult.value).toString('base64')
+  );
+
+  const validate = ed25519.verify(
+    signatureResult.value,
+    message,
+    Buffer.from(keyPair.publicKey.slice(2), 'hex')
+  );
+
+  return `${encodedHeader}.${encodedPayload}.${encodedSignature}`;
 }

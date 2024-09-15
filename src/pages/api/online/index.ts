@@ -117,6 +117,25 @@ export default async function handle(
         return acc;
       }, {} as Record<string, AppProfile>);
 
+      // Fill in missing app profiles
+      const appProfilesNotFound = new Set(
+        Object.keys(appProfilesMap)
+          .filter((key) => !appProfilesMap[key].username)
+          .map((fid) => BigInt(fid))
+      );
+      const appProfiles = await Promise.all(
+        Array.from(appProfilesNotFound).map((fid) => resolveUserFromFid(fid))
+      );
+      appProfiles.forEach((profile) => {
+        if (profile) {
+          appProfilesMap[profile.id.toString()] = {
+            display: profile.name,
+            username: profile.username,
+            pfp: profile.photoURL
+          };
+        }
+      });
+
       const appFidsByUserFid = signers.reduce((acc, cur) => {
         acc[cur.user_fid.toString()] = cur.requester_fid.toString();
         return acc;

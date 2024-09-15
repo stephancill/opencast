@@ -3,6 +3,7 @@ import { Placeholder } from '@components/common/placeholder';
 import { useRequireAuth } from '@lib/hooks/useRequireAuth';
 import type { ReactNode } from 'react';
 import { AsideTrends } from '../aside/trends';
+import { AsideOnline } from '../aside/aside-online';
 
 export type LayoutProps = {
   children: ReactNode;
@@ -23,6 +24,7 @@ export function HomeLayout({ children }: LayoutProps): JSX.Element {
       <Aside>
         {/* <Suggestions /> */}
         <AsideTrends />
+        <AsideOnline />
       </Aside>
     </>
   );
