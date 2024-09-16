@@ -17,7 +17,6 @@ services:
     networks:
       - app-network
 
-  # Redis service for caching (if used by the indexer or opencast)
   redis:
     image: redis:alpine
     container_name: lazy-indexer-redis
@@ -53,7 +52,7 @@ services:
 
   # Opencast service
   opencast:
-    build: ./ # Update to point to the Opencast Dockerfile path
+    build: ./ # Update to point to the Opencast path
     container_name: opencast
     environment:
       DATABASE_URL: postgresql://indexer:password@postgres:5432/indexer
