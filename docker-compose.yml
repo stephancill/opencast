@@ -1,51 +1,80 @@
 version: '3.8'
-
 services:
-  lazy-indexer:
-    image: gabrieltemtsen/lazy-indexer:latest  # Use the published image from Docker Hub
+  # Postgres service for the indexer
+  postgres:
+    image: postgres:13
+    container_name: lazy-indexer-postgres
     environment:
-      - HUB_REST_URL=https://hub.pinata.cloud
-      - HUB_RPC=hub-grpc.pinata.cloud
-      - HUB_SSL=true
-      - DATABASE_URL="postgresql://indexer:password@localhost:5432/indexer"
-      - REDIS_URL=redis://redis:6379
-      - WORKER_CONCURRENCY=5
-      - LOG_LEVEL=debug
-    depends_on:
-      - db
-      - redis
+      POSTGRES_USER: indexer
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: indexer
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "indexer"]
+      interval: 10s
+      retries: 5
     networks:
       - app-network
 
-  opencast:
-    build:
-      context: . 
-    environment:
-      - DATABASE_URL="postgres://replicator:password@localhost:6541/replicator?schema=public"
-    ports:
-      - "3000:3000"  # Maps port 3000 on the host to port 3000 in the container
-    depends_on:
-      - db
-    networks:
-      - app-network
-
-  db:
-    image: postgres:15
-    environment:
-      - POSTGRES_USER=indexer
-      - POSTGRES_PASSWORD=password
-      - POSTGRES_DB=indexer
-    ports:
-      - "5432:5432"
-    networks:
-      - app-network
-
+  # Redis service for caching (if used by the indexer or opencast)
   redis:
     image: redis:alpine
-    ports:
-      - "6379:6379"
+    container_name: lazy-indexer-redis
+    command: --loglevel warning --maxmemory-policy noeviction
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      retries: 5
     networks:
       - app-network
+
+  # Lazy Indexer service
+  lazy-indexer:
+    image: gabrieltemtsen/lazy-indexer # Update to point to the Lazy Indexer  image
+    container_name: lazy-indexer
+    environment:
+      DATABASE_URL: postgresql://indexer:password@postgres:5432/indexer
+      REDIS_URL: redis://redis:6379
+      HUB_REST_URL: https://hub.pinata.cloud
+      HUB_RPC: hub-grpc.pinata.cloud
+      HUB_SSL: "true"
+      WORKER_CONCURRENCY: 5
+      LOG_LEVEL: debug
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - app-network
+
+  # Opencast service
+  opencast:
+    build: ./ # Update to point to the Opencast Dockerfile path
+    container_name: opencast
+    environment:
+      DATABASE_URL: postgresql://indexer:password@postgres:5432/indexer
+      FC_HUB_URL: localhost:2283
+      FC_HUB_USE_TLS: "false"
+      APP_FID: 1
+      APP_MNENOMIC: ""
+      NEXT_PUBLIC_FC_CLIENT_NAME: "Opencast"
+      NEXT_PUBLIC_WALLETCONNECT_ID: "0fcda49e9f4acad4b84401373fbc5a4f"
+      NEXT_PUBLIC_URL: "http://localhost:3000"
+      INDEXER_API_URL: "http://localhost:3005"
+    ports:
+      - "3000:3000"
+    depends_on:
+      - lazy-indexer
+    networks:
+      - app-network
+
+volumes:
+  postgres-data:
+  redis-data:
 
 networks:
   app-network:

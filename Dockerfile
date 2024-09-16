@@ -10,6 +10,9 @@ COPY package*.json ./
 # Install dependencies.
 RUN yarn install
 
+RUN apk add --no-cache python3 make g++ gcc
+
+
 # Copy the rest of the application code.
 COPY . .
 
