@@ -2,31 +2,39 @@ version: '3.8'
 services:
   # Postgres service for the indexer
   postgres:
-    image: postgres:13
-    container_name: lazy-indexer-postgres
+    image: 'postgres:16-alpine'
+    restart: unless-stopped
+    ports:
+      - '5432:5432'
     environment:
-      POSTGRES_USER: indexer
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: indexer
+      - POSTGRES_DB=indexer
+      - POSTGRES_USER=indexer
+      - POSTGRES_PASSWORD=password
     volumes:
       - postgres-data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "indexer"]
-      interval: 10s
-      retries: 5
+      test: ['CMD-SHELL', 'pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB']
+      interval: 5s       # Check every 5 seconds for readiness
+      timeout: 5s        # Allow up to 5 seconds for a response
+      retries: 3         # Fail after 3 unsuccessful attempts
+      start_period: 10s  # Start checks after 10 seconds
     networks:
       - app-network
 
   redis:
-    image: redis:alpine
-    container_name: lazy-indexer-redis
+    image: 'redis:7.2-alpine'
+    restart: unless-stopped
     command: --loglevel warning --maxmemory-policy noeviction
     volumes:
       - redis-data:/data
+    ports:
+      - '6379:6379'
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      retries: 5
+      test: ['CMD-SHELL', 'redis-cli ping']
+      interval: 5s       # Check every 5 seconds
+      timeout: 5s        # Allow up to 5 seconds for a response
+      retries: 3         # Fail after 3 unsuccessful attempts
+      start_period: 5s   # Start health checks after 5 seconds
     networks:
       - app-network
 
@@ -54,6 +62,7 @@ services:
   opencast:
     build: ./ # Update to point to the Opencast path
     container_name: opencast
+    restart: unless-stopped
     env_file:
       # Set in .env
       # APP_FID

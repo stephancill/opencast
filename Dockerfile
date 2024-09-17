@@ -1,9 +1,6 @@
 # Use the official Node.js image.
 FROM node:20
 
-# Install necessary build tools
-RUN apk add python3 make g++ gcc
-
 # Set the working directory inside the container.
 WORKDIR /app
 
