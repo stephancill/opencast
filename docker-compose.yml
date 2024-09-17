@@ -32,7 +32,7 @@ services:
 
   # Lazy Indexer service
   lazy-indexer:
-    image: gabrieltemtsen/lazy-indexer # Update to point to the Lazy Indexer  image
+    image: stephancill/lazy-indexer
     container_name: lazy-indexer
     environment:
       DATABASE_URL: postgresql://indexer:password@postgres:5432/indexer
@@ -54,12 +54,15 @@ services:
   opencast:
     build: ./ # Update to point to the Opencast path
     container_name: opencast
+    env_file:
+      # Set in .env
+      # APP_FID
+      # APP_MNENOMIC
+      - .env
     environment:
       DATABASE_URL: postgresql://indexer:password@postgres:5432/indexer
-      FC_HUB_URL: localhost:2283
-      FC_HUB_USE_TLS: "false"
-      APP_FID: 1
-      APP_MNENOMIC: ""
+      FC_HUB_URL: "hub-grpc.pinata.cloud"
+      FC_HUB_USE_TLS: "true"
       NEXT_PUBLIC_FC_CLIENT_NAME: "Opencast"
       NEXT_PUBLIC_WALLETCONNECT_ID: "0fcda49e9f4acad4b84401373fbc5a4f"
       NEXT_PUBLIC_URL: "http://localhost:3000"
