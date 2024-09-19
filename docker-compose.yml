@@ -1,8 +1,7 @@
 version: '3.8'
 services:
-  # Opencast service
   opencast:
-    build: ./ # Update to point to the Opencast path
+    build: ./
     container_name: opencast
     restart: unless-stopped
     env_file:
@@ -17,7 +16,7 @@ services:
       NEXT_PUBLIC_FC_CLIENT_NAME: 'Opencast'
       NEXT_PUBLIC_WALLETCONNECT_ID: '0fcda49e9f4acad4b84401373fbc5a4f'
       NEXT_PUBLIC_URL: 'http://localhost:3000'
-      INDEXER_API_URL: 'http://localhost:3005'
+      INDEXER_API_URL: 'http://lazy-indexer:3005'
     ports:
       - '3000:3000'
     depends_on:
@@ -25,13 +24,12 @@ services:
     networks:
       - app-network
 
-  # Lazy Indexer service
   lazy-indexer:
     image: stephancill/lazy-indexer
     container_name: lazy-indexer
     env_file:
       # Set in .env
-      # TARGET_SIGNER_FID=18821 (usually same as APP_FID)
+      # TARGET_SIGNER_FID (usually same as APP_FID)
       - .env
     environment:
       DATABASE_URL: postgresql://indexer:password@postgres:5432/indexer
@@ -51,7 +49,6 @@ services:
     networks:
       - app-network
 
-    # Postgres service for the indexer
   postgres:
     image: 'postgres:16-alpine'
     restart: unless-stopped
