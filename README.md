@@ -1,12 +1,34 @@
 # Opencast
 
-[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/template/s9rLIi?referralCode=y46sre)
-
 A fully open source Twitter flavoured Farcaster client. Originally a fork of [ccrsxx/twitter-clone](https://github.com/ccrsxx/twitter-clone).
 
-The goal of this project is to provide a reference implementation of a Farcaster client in order to make it easier for developers to explore their ideas without having to start from scratch.
+The goal of this project is to be a fully standalone Farcaster client that you can run on your own machine. It only depends on [stephancill/lazy-indexer](https://github.com/stephancill/lazy-indexer) and a connection to a Farcaster Hub.
 
-It only depends on the reference Farcaster postgres indexer and optionally a hub for submitting messages.
+## Running it yourself
+
+### Prerequisites
+
+- [Docker](https://docs.docker.com/engine/install/)
+
+1. Clone the repo
+
+```
+git clone git@github.com:stephancill/opencast.git
+```
+
+2. Copy .env.sample, rename it to .env and fill in the values
+
+```
+cp .env.sample .env
+```
+
+3. Run the Docker Compose file
+
+```
+docker-compose up -d
+```
+
+4. Go to Opencast at http://localhost:3000 and log in. It will take a few moments to index your profile and might require you to refresh the page.
 
 ## Development
 
@@ -16,11 +38,23 @@ This project depends on the Lazy Farcaster Indexer. Follow the instructions at [
 
 ### Local
 
-1. `yarn`
+Install dependencies
 
-1. Copy the `.env.sample` file to `.env` and fill in the database connection details.
+```
+yarn install
+```
 
-1. `yarn dev`
+Fill in the environment variables
+
+```
+cp .env.dev.sample .env
+```
+
+Run the development server
+
+```
+yarn dev
+```
 
 ## Todo
 

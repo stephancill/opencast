@@ -1,15 +1,95 @@
 version: '3.8'
 services:
-  dev-db:
-    image: postgres:13
-    ports:
-      - 5432:5432
+  opencast:
+    build: ./
+    container_name: opencast
+    restart: unless-stopped
+    env_file:
+      # Set in .env
+      # APP_FID
+      # APP_MNENOMIC
+      - .env
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: admin
-      POSTGRES_DB: postgres
+      DATABASE_URL: postgresql://indexer:password@postgres:5432/indexer
+      FC_HUB_URL: 'hub-grpc.pinata.cloud'
+      FC_HUB_USE_TLS: 'true'
+      NEXT_PUBLIC_FC_CLIENT_NAME: 'Opencast'
+      NEXT_PUBLIC_WALLETCONNECT_ID: '0fcda49e9f4acad4b84401373fbc5a4f'
+      NEXT_PUBLIC_URL: 'http://localhost:3000'
+      INDEXER_API_URL: 'http://lazy-indexer:3005'
+    ports:
+      - '3000:3000'
+    depends_on:
+      - lazy-indexer
     networks:
-      - main
+      - app-network
+
+  lazy-indexer:
+    image: stephancill/lazy-indexer
+    container_name: lazy-indexer
+    env_file:
+      # Set in .env
+      # TARGET_SIGNER_FID (usually same as APP_FID)
+      - .env
+    environment:
+      DATABASE_URL: postgresql://indexer:password@postgres:5432/indexer
+      REDIS_URL: redis://redis:6379
+      HUB_REST_URL: https://hub.pinata.cloud
+      HUB_RPC: hub-grpc.pinata.cloud
+      HUB_SSL: true
+      WORKER_CONCURRENCY: 5
+      LOG_LEVEL: debug
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - '3005:3005'
+    networks:
+      - app-network
+
+  postgres:
+    image: 'postgres:16-alpine'
+    restart: unless-stopped
+    ports:
+      - '5432:5432'
+    environment:
+      - POSTGRES_DB=indexer
+      - POSTGRES_USER=indexer
+      - POSTGRES_PASSWORD=password
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB']
+      interval: 5s # Check every 5 seconds for readiness
+      timeout: 5s # Allow up to 5 seconds for a response
+      retries: 3 # Fail after 3 unsuccessful attempts
+      start_period: 10s # Start checks after 10 seconds
+    networks:
+      - app-network
+
+  redis:
+    image: 'redis:7.2-alpine'
+    restart: unless-stopped
+    command: --loglevel warning --maxmemory-policy noeviction
+    volumes:
+      - redis-data:/data
+    ports:
+      - '6379:6379'
+    healthcheck:
+      test: ['CMD-SHELL', 'redis-cli ping']
+      interval: 5s # Check every 5 seconds
+      timeout: 5s # Allow up to 5 seconds for a response
+      retries: 3 # Fail after 3 unsuccessful attempts
+      start_period: 5s # Start health checks after 5 seconds
+    networks:
+      - app-network
+
+volumes:
+  postgres-data:
+  redis-data:
 
 networks:
-  main:
+  app-network:
+    driver: bridge
