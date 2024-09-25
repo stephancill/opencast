@@ -8,6 +8,7 @@ type UserAvatarProps = {
   size?: number;
   username?: string;
   className?: string;
+  onClick?: () => void;
 };
 
 export function UserAvatar({
@@ -15,12 +16,21 @@ export function UserAvatar({
   alt,
   size,
   username,
-  className
+  className,
+  onClick
 }: UserAvatarProps): JSX.Element {
   const pictureSize = size ?? 48;
 
   return (
-    <Link href={username ? `/user/${username}` : '#'}>
+    <Link
+      href={username ? `/user/${username}` : '#'}
+      onClick={(e) => {
+        if (onClick) {
+          e.preventDefault();
+          onClick();
+        }
+      }}
+    >
       <div
         className={cn(
           'blur-picture override-nav border border-gray-200 dark:border-gray-800',

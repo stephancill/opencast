@@ -11,6 +11,7 @@ import type { ReactElement, ReactNode } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { WagmiProvider } from 'wagmi';
 import { arbitrum, base, mainnet, optimism, polygon, zora } from 'wagmi/chains';
+import { FrameConfigProvider } from '../lib/context/frame-config-context';
 
 const queryClient = new QueryClient();
 
@@ -47,9 +48,11 @@ export default function App({
         <QueryClientProvider client={queryClient}>
           <RainbowKitProvider>
             <AuthContextProvider>
-              <ThemeContextProvider>
-                {getLayout(<Component {...pageProps} />)}
-              </ThemeContextProvider>
+              <FrameConfigProvider>
+                <ThemeContextProvider>
+                  {getLayout(<Component {...pageProps} />)}
+                </ThemeContextProvider>
+              </FrameConfigProvider>
             </AuthContextProvider>
           </RainbowKitProvider>
         </QueryClientProvider>

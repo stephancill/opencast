@@ -939,13 +939,14 @@
   resolved "https://registry.yarnpkg.com/@firebase/webchannel-wrapper/-/webchannel-wrapper-0.10.1.tgz#60bb2aaf129f9e00621f8d698722ddba6ee1f8ac"
   integrity sha512-Dq5rYfEpdeel0bLVN+nfD1VWmzCkK+pJbSjIawGE+RY4+NIJqhbUDDQjvV0NUK84fMfwxvtFoCtEe70HfZjFcw==
 
-"@frames.js/render@^0.2.20":
-  version "0.2.20"
-  resolved "https://registry.yarnpkg.com/@frames.js/render/-/render-0.2.20.tgz#8e4c92c8f0ffcfb5781dd342802ab55106bb64e7"
-  integrity sha512-NiZRAlM/KuIegFeazEp/CMjMtyziLVMmjILzgco6stCmv8tTCqDkL1qlZ4/xmAipqUSm5N8ZeKDilnV6bpCsIA==
+"@frames.js/render@^0.3.8":
+  version "0.3.8"
+  resolved "https://registry.yarnpkg.com/@frames.js/render/-/render-0.3.8.tgz#3e3410591d6933c78fe2ec567019573d1870fc2d"
+  integrity sha512-6y/fkillOm1wXWDTmMLwmGSf/pDTv9GYFuwWIb3618I4YcXznWb81mRC/UtnlyUn/X4yrbyoRz4/n+JtOXav5A==
   dependencies:
     "@farcaster/core" "^0.14.7"
-    frames.js "^0.17.4"
+    "@noble/ed25519" "^2.0.0"
+    frames.js "^0.19.1"
 
 "@grpc/grpc-js@~1.7.0":
   version "1.7.3"
@@ -5185,20 +5186,10 @@ framer-motion@^7.2.1:
   optionalDependencies:
     "@emotion/is-prop-valid" "^0.8.2"
 
-frames.js@^0.17.1:
-  version "0.17.1"
-  resolved "https://registry.yarnpkg.com/frames.js/-/frames.js-0.17.1.tgz#e5029eb0eb914e928cd0965d264c9550a5d56136"
-  integrity sha512-aCkxFSCx4jnaLyiIoAaPir3XUbxZRYcHonGt+VGzArOz6pnOjue3TM0v45YNIjrmJ+4Gw3Wplgx7em2xo8JuTw==
-  dependencies:
-    "@vercel/og" "^0.6.2"
-    cheerio "^1.0.0-rc.12"
-    protobufjs "^7.2.6"
-    viem "^2.7.8"
-
-frames.js@^0.17.4:
-  version "0.17.4"
-  resolved "https://registry.yarnpkg.com/frames.js/-/frames.js-0.17.4.tgz#b7ebc3d47cd4aa05e77fe0de029d0996ede5f48d"
-  integrity sha512-nkeFPaTBAQK2q6eMvCT9ow69MLX8PDZKCdFaNldU3U7zhGGTC3ccFCGqlG5SyujYukb6zchlWfeOw1YdMcRCgQ==
+frames.js@^0.19.1:
+  version "0.19.1"
+  resolved "https://registry.yarnpkg.com/frames.js/-/frames.js-0.19.1.tgz#fe0257e5e7bc6db119052909f1bbc3a471e4783c"
+  integrity sha512-4u4RWS7pyHtR+86IvAZyr+eXOUB2ySns5wTH0gowNb8+SExbaobwEO1yKOAPoGNB+Ed9bomHQjskiPKsfXE+xg==
   dependencies:
     "@vercel/og" "^0.6.2"
     cheerio "^1.0.0-rc.12"
@@ -9938,6 +9929,11 @@ yoga-wasm-web@0.3.3, yoga-wasm-web@^0.3.3:
   version "0.3.3"
   resolved "https://registry.yarnpkg.com/yoga-wasm-web/-/yoga-wasm-web-0.3.3.tgz#eb8e9fcb18e5e651994732f19a220cb885d932ba"
   integrity sha512-N+d4UJSJbt/R3wqY7Coqs5pcV0aUj2j9IaQ3rNj9bVCLld8tTGKRa2USARjnvZJWVx1NDmQev8EknoczaOQDOA==
+
+zod@^3.23.8:
+  version "3.23.8"
+  resolved "https://registry.yarnpkg.com/zod/-/zod-3.23.8.tgz#e37b957b5d52079769fb8097099b592f0ef4067d"
+  integrity sha512-XBx9AXhXktjUqnepgTiE5flcKIYWi/rme0Eaj+5Y0lftuGBq+jyRu/md4WnuxqgP1ubdpNCsYEYPxrzVHD8d6g==
 
 zustand@4.4.1:
   version "4.4.1"

@@ -29,7 +29,7 @@ export function Aside({ children }: AsideProps): JSX.Element | null {
           );
         }}
       />
-      {children}
+      <div className='sticky top-[4.5rem] flex flex-col gap-4'>{children}</div>
       <AsideFooter />
     </aside>
   );
